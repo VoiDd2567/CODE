@@ -1,0 +1,89 @@
+.file-manager-wrap {
+    height: 30%;
+    width: 97%;
+    background-color: #797a7c;
+    margin-left: 2vw;
+    border-radius: 2vh;
+    border: 0.3vh solid #222831;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.5vh;
+}
+
+.file-manager__header {
+    width: 100%;
+    height: 10%;
+    background-color: #222831;
+    color: #c2c2c2;
+    display: flex;
+    align-items: center;
+}
+
+.file-manager__header-username {
+    margin-left: 1vw;
+}
+
+.file-manager__files {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.file_manager__file {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding-bottom: 1vh;
+    padding-top: 1vh;
+}
+
+.file_manager__file:hover {
+    background-color: #565758;
+}
+
+.file_manager__file.active {
+    background-color: #646565;
+}
+
+
+.file_manager__file img {
+    height: 3vh;
+}
+
+.file-manager__buttons {
+    height: auto;
+    display: flex;
+    align-items: center;
+    border-top: 2px solid #222831;
+}
+
+.file-manager__btn {
+    display: flex;
+    align-items: center;
+    height: 3vh;
+    margin-left: 0.5vh;
+}
+
+.file-manager__btn img {
+    height: 2.5vh;
+}
+
+.file-manager__files::-webkit-scrollbar {
+    background-color: transparent;
+    width: 1vh;
+}
+
+.file-manager__files::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+}
+
+.file-manager__files::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+.file-manager__files::-webkit-scrollbar-thumb {
+    background-color: #494a4d;
+    border-radius: 1vw;
+    width: 0.5vh;
+}

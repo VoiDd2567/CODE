@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #393E46;
+    transition: transform 0.2s ease;
+}
+
+header {
+    height: 13vh;
+    width: 100vw;
+    background-color: #222831;
+    display: flex;
+    align-items: center;
+}
+
+.header__logo {
+    margin-left: 3vw;
+    width: 15vw;
+    height: 13vh;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    user-select: none;
+    cursor: pointer;
+}
+
+.header__logo img {
+    height: auto;
+    width: 100%;
+}
+
+.header__item-list {
+    width: 80vw;
+    height: 13vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    align-items: center;
+    margin-right: 2vw;
+    gap: 1vw;
+    font-family: "Electrolize", sans-serif;
+    font-weight: 400;
+    font-size: 2.5vw;
+    color: #FFD369;
+    margin-top: 3vh;
+}
+
+.header__item-list div {
+    user-select: none;
+
+}
+
+.header__item:hover,
+.header__lng-menu div:hover {
+    color: #a48640;
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.header__lng {
+    margin-right: 1vw;
+    margin-top: 1vh;
+    font-size: 2vw;
+}
+
+.header__lng-change-wrap {
+    position: relative;
+}
+
+.header__lng-menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+    font-size: 1.7vw;
+    background-color: #32373f;
+    padding: 1vw;
+    border: 0.1vh black solid;
+    border-radius: 1vw;
+    margin-top: 1vh;
+}
+
+.header__account-wrap {
+    margin-bottom: 3vh;
+    display: flex;
+    justify-content: right;
+    height: 9vh;
+}
+
+.header__account {
+    height: 9vh;
+    display: flex;
+    align-items: center;
+    border-radius: 2vw;
+    margin-top: 1vh;
+}
+
+.header__account-wrap[hidden] {
+    display: none;
+}
+
+.header__account:hover {
+    background-color: #a48640;
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.header__account-name {
+    font-size: 3.5vw;
+}
+
+.header__account-icon {
+    display: flex;
+    width: 10vh;
+    height: 10vh;
+    overflow: hidden;
+    margin-bottom: 2vh;
+}
+
+.header__account-image {
+    position: relative;
+    height: 10vh;
+    width: auto;
+}
+
+.header__account-menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+    font-size: 1.7vw;
+    background-color: #32373f;
+    padding: 1vw;
+    border: 0.1vh black solid;
+    border-radius: 1vw;
+    margin-top: 10.5vh;
+    cursor: default;
+}
+
+.header__account-menu div {
+    cursor: pointer;
+}
+
+.header__account-menu div:hover {
+    transform: scale(1.05);
+    color: #a48640;
+}

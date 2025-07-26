@@ -1,0 +1,148 @@
+* {
+    margin: 0;
+}
+
+
+.registration-page__logo {
+    margin-top: 10vh;
+    width: 25vw;
+    padding-bottom: 5vh;
+}
+
+.registration-page__logo img {
+    width: 100%;
+    height: auto;
+}
+
+.registration-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.registration-page__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30vw;
+    overflow: hidden;
+    background-color: #a4a1a1;
+    border: 0;
+    border-radius: 3vh;
+    font-family: "Electrolize", sans-serif;
+}
+
+.registration-page__input {
+    margin-top: 2vh;
+    width: 90%;
+    height: 5vh;
+    background-color: #d3d0d0;
+    border-color: #ffffff;
+    border: 0;
+    border-radius: 1vh;
+    padding-left: 1vw;
+}
+
+.registration-page__input:first-of-type {
+    margin-top: 3vh;
+}
+
+.registration-page__input::placeholder {
+    font-family: "Electrolize", sans-serif;
+    font-size: 2vh;
+}
+
+.registration-page__registry {
+    margin-top: 3vh;
+    font-family: "Electrolize", sans-serif;
+    font-size: 1vw;
+    margin-bottom: 2vh;
+}
+
+.registration-page__link {
+    color: #FFD369;
+    margin-left: 1vw;
+    cursor: pointer;
+}
+
+.registration-page__back-button {
+    margin-top: 2vh;
+    font-family: "Electrolize", sans-serif;
+    font-size: 1vw;
+    color: #FFD369;
+    cursor: pointer;
+}
+
+.registration-page__agree-terms-of-use {
+    display: flex;
+    width: 100%;
+    margin-top: 2vh;
+    font-size: 2vh;
+    gap: 0.5vw;
+    align-items: center;
+    justify-content: center;
+}
+
+.terms-of-use-ask-label {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5vw;
+}
+
+.terms-of-use-ask-label a {
+    color: rgb(97, 97, 214);
+    cursor: pointer;
+}
+
+.registration-page__checkbox {
+    width: 1.2vw;
+    height: 1.2vw;
+}
+
+.registration-page__send-form-btn {
+    margin-top: 3vh;
+    width: 80%;
+    height: 5vh;
+    border: 0;
+    border-radius: 2vh;
+    background-color: #FFD369;
+    font-family: "Electrolize", sans-serif;
+    font-size: 2vh;
+}
+
+.registration-page__send-form-btn:hover {
+    translate: transform 0.2s ease;
+    transform: scale(1.06);
+    background-color: #a48640;
+}
+
+
+.registration-page__error {
+    margin-top: 2vh;
+    color: rgb(163, 22, 22);
+    font-size: 2vh;
+}
+
+.registartion-page__radio-wrap {
+    margin-top: 2vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2.5vh;
+}
+
+.registration-page__radio-group {
+    display: flex;
+    margin-top: 2vh;
+    font-size: 2vh;
+    gap: 5vw;
+}
+
+.registration-page__choise-question {
+    font-weight: bold;
+}
+
+.registration-page__radio-btn[type="radio"] {
+    padding-right: 1vw;
+}

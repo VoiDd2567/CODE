@@ -1,0 +1,20 @@
+.code-editor-page__workspace-wrap {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100vw;
+}
+
+.code-editor-page__right-part {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    width: 35vw;
+    justify-content: start;
+}
+
+.code-editor-page__left-part {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+}

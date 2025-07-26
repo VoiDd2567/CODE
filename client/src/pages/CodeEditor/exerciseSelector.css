@@ -1,0 +1,99 @@
+.exercise-selector-wrap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.2);
+    font-family: "Fira Code", monospace;
+}
+
+.exercise-selector {
+    position: relative;
+    margin-top: 20vh;
+    margin-left: 35vw;
+    width: 30vw;
+    height: 60vh;
+    background-color: #797a7c;
+    border-radius: 2vh;
+    overflow: hidden;
+}
+
+.exercise-selector__choose-label {
+    width: 100%;
+    height: 13%;
+    background-color: #222831;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3vh;
+}
+
+.exercise-selector__exercises-list {
+    flex: 1;
+    height: 79%;
+    min-width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.exercise-selector__buttons {
+    height: 8%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+.exercise-selector__buttons__btn {
+    width: 10%;
+    height: 80%;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    background-color: #222831;
+    margin-right: 1vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 1vh;
+}
+
+.exercise-selector__exercise {
+    width: 100%;
+    min-width: 100%;
+    height: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding-right: 1vh;
+    cursor: pointer;
+}
+
+.exercise-selector__exercise:hover {
+    background-color: #5e6063;
+}
+
+
+.exercise-selector__exercise.active {
+    background-color: #5e6063;
+}
+
+.exercise-selector__exercises-list::-webkit-scrollbar {
+    background-color: transparent;
+    width: 1vh;
+}
+
+.exercise-selector__exercises-list::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+}
+
+.exercise-selector__exercises-list::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+.exercise-selector__exercises-list::-webkit-scrollbar-thumb {
+    background-color: #494a4d;
+    border-radius: 1vw;
+    width: 0.5vh;
+}

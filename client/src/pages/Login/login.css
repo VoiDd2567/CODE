@@ -1,0 +1,100 @@
+* {
+    margin: 0;
+}
+
+
+.login-page__logo {
+    margin-top: 10vh;
+    width: 25vw;
+    padding-bottom: 5vh;
+}
+
+.login-page__logo img {
+    width: 100%;
+    height: auto;
+}
+
+.login-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-page__form {
+    font-family: "Electrolize", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30vw;
+    overflow: hidden;
+    background-color: #a4a1a1;
+    border: 0;
+    border-radius: 3vh;
+    font-family: "Electrolize", sans-serif;
+}
+
+.login-page__input {
+    margin-top: 2vh;
+    width: 90%;
+    height: 5vh;
+    background-color: #d3d0d0;
+    border-color: #ffffff;
+    border: 0;
+    border-radius: 1vh;
+    padding-left: 1vw;
+}
+
+
+.login-page__input:first-of-type {
+    margin-top: 3vh;
+}
+
+.login-page__input::placeholder {
+    font-family: "Electrolize", sans-serif;
+    font-size: 2vh;
+}
+
+.login-page__registry {
+    margin-top: 3vh;
+    font-size: 1vw;
+    margin-bottom: 2vh;
+}
+
+.login-page__link {
+    color: #FFD369;
+    margin-left: 1vw;
+    cursor: pointer;
+}
+
+.login-page__back-button {
+    margin-top: 2vh;
+    width: 2vh;
+    height: 2vh;
+    font-size: 1vw;
+    color: #FFD369;
+    cursor: pointer;
+}
+
+.login-page__send-form-btn {
+    margin-top: 3vh;
+    width: 80%;
+    height: 5vh;
+    border: 0;
+    border-radius: 2vh;
+    background-color: #FFD369;
+    font-family: "Electrolize", sans-serif;
+    font-size: 2vh;
+}
+
+.login-page__send-form-btn:hover {
+    translate: transform 0.2s ease;
+    transform: scale(1.06);
+    background-color: #a48640;
+}
+
+.login-page__error {
+    margin-top: 2vh;
+    color: rgb(163, 22, 22);
+    font-size: 2vh;
+}

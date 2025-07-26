@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.editor-wrap {
+    display: flex;
+    flex-direction: row;
+    height: 81vh;
+    width: 60vw;
+    margin-top: 2vh;
+    margin-left: 2vw;
+    background-color: #a9aaad;
+    border-radius: 2.5vh;
+    overflow: hidden;
+}
+
+.opened {
+    height: 50vh;
+}
+
+.editor__string-numbers {
+    width: 2.5vw;
+    height: 100%;
+    margin-top: 2vh;
+    margin-right: 1vw;
+    text-align: left;
+    resize: none;
+    font-family: "Fira Code", monospace;
+    font-style: normal;
+    font-size: 1vw;
+    background-color: #a9aaad;
+    border: none;
+    line-height: 1.2vw;
+    pointer-events: none;
+    overflow: hidden;
+    text-align: right;
+}
+
+.editor__string-number {
+    font-family: "Fira Code", monospace;
+    font-size: 1vw;
+}
+
+.editor {
+    width: 58vw;
+    height: 100%;
+    margin-top: 2vh;
+    text-align: left;
+    overflow: scroll;
+    resize: none;
+    font-family: "Fira Code", monospace;
+    font-style: normal;
+    font-size: 1vw;
+    background-color: #a9aaad;
+    border: none;
+    line-height: 1.2vw;
+    white-space: nowrap;
+}
+
+.editor:focus {
+    outline: none;
+    border: none;
+}
+
+.editor::-webkit-scrollbar {
+    background-color: transparent;
+    width: 1vh;
+}
+
+.editor::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+}
+
+.editor::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+.editor::-webkit-scrollbar-thumb {
+    background-color: #494a4d;
+    border-radius: 1vw;
+    width: 0.5vh;
+}

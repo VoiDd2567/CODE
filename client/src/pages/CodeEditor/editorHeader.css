@@ -1,0 +1,12 @@
+.code-editor-page__header {
+    height: 9vh;
+    background-color: #222831;
+    display: flex;
+    align-items: center;
+}
+
+.code-editor-page__header img {
+    width: 10vw;
+    margin-left: 2vw;
+    cursor: pointer;
+}
