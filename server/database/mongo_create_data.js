@@ -5,7 +5,7 @@ const ExerciseSolution = require("./schemas/ExerciseSolution");
 const Session = require("./schemas/Session")
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
-const coloredText = require("../console_colors");
+const logger = require("../scripts/Logging")
 const MongoGetData = require("./mongo_get_data");
 const MongoDeleteData = require("./mongo_delete_data")
 
@@ -16,7 +16,7 @@ class MongoCreateData {
       const savedUser = await user.save();
       return savedUser._id;
     } catch (err) {
-      console.error(coloredText("Error creating user: " + err.message, "red"));
+      logger.error("Error creating user: " + err.message)
       throw err;
     }
   }
@@ -27,7 +27,7 @@ class MongoCreateData {
       const savedClass = await schoolClass.save();
       return savedClass._id;
     } catch (err) {
-      console.error(coloredText("Error creating class: " + err.message, "red"));
+      logger.error("Error creating class: " + err.message)
       throw err;
     }
   }
@@ -38,17 +38,16 @@ class MongoCreateData {
       const savedExercise = await exercise.save();
       return savedExercise._id;
     } catch (err) {
-      console.error(coloredText("Error creating exercise: " + err.message, "red"));
+      logger.error("Error creating exercise: " + err.message)
       throw err;
     }
   }
 
   static async createExerciseSolution(exerciseId, answer, studentId, answerCorrect = null) {
     try {
-      const getter = new MongoGetData();
-      const exercise = await getter.getExercise(exerciseId);
+      const exercise = await MongoGetData.getExercise({ _id: exerciseId })
       if (!exercise) {
-        console.error(coloredText("No exercise with this id was found: " + exerciseId, "red"));
+        logger.error("No exercise with this id was found: " + exerciseId)
         throw new Error("No exercise found");
       }
 
@@ -56,7 +55,7 @@ class MongoCreateData {
       const savedExerciseSolution = await exerciseSolution.save();
       return savedExerciseSolution._id;
     } catch (err) {
-      console.error(coloredText("Error creating exerciseSolution: " + err.message, "red"));
+      logger.error("Error creating exerciseSolution: " + err.message)
       throw err;
     }
   }
@@ -78,7 +77,7 @@ class MongoCreateData {
       return savedSession._id;
 
     } catch (err) {
-      console.error(coloredText("Error creating session: " + err.message, "red"));
+      logger.error("Error creating session: " + err.message)
       throw err;
     }
   }
@@ -105,7 +104,7 @@ class MongoCreateData {
       return savedRegistrationCode._id;
 
     } catch (err) {
-      console.error(coloredText("Error creating registrationCode: " + err.message, "red"));
+      logger.error("Error creating registartionCode: " + err.message)
       throw err;
     }
   }
@@ -116,7 +115,7 @@ class MongoCreateData {
       const savedCourse = await course.save();
       return savedCourse._id;
     } catch (err) {
-      console.error(coloredText("Error creating course: " + err.message, "red"));
+      logger.error("Error creating course: " + err.message)
       throw err;
     }
   }

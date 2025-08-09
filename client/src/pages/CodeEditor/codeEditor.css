@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 .code-editor-page__workspace-wrap {
     display: flex;
     flex-direction: row;
@@ -17,4 +19,26 @@
     display: flex;
     flex-direction: column;
     height: 90vh;
+}
+
+.code-editor-page__file-saved-label {
+    width: 100%;
+    height: 3vh;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    color: white;
+    font-family: "Open Sans", sans-serif;
+    font-size: 1.7vh;
+}
+
+.code-editor-page__file-saved-label div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.code-editor-page__file-saved-label div img {
+    margin-right: 0.2vw;
+    width: 1vw;
 }

@@ -14,17 +14,28 @@ const MongoUpdateData = require("./database/mongo_update_data");
 const MongoDeleteData = require("./database/mongo_delete_data");
 
 const { getUsersAllowedExercises, requireAuth } = require("./scripts/SecurityChecks")
-const { safeUser, safeRegistartionCode } = require("./scripts/SafeTemplates")
+const { safeUser, safeRegistrationCode } = require("./scripts/SafeTemplates")
 const RegistartionDataChecks = require("./scripts/RegistrationDataChecks")
 const EmailSend = require("./scripts/EmailSend");
+const Hash = require("./scripts/Hash")
+const logger = require("./scripts/Logging")
+
+const ContainerManagerImport = require("./codeProcessing/ContainerManager");
+const PythonRender = require("./codeProcessing/python/PythonRender")
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,
-    max: 30,
+    max: 60,
     standardHeaders: true,
     legacyHeaders: false,
     message: 'Too many requests, wait some time.'
 })
+
+const RegLimiter = rateLimit({
+    windowMs: 2 * 60 * 1000,
+    max: 5,
+    message: 'Too many registration attempts, please try again later.'
+});
 
 const app = express();
 app.use(cors({
@@ -34,6 +45,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(limiter)
+//app.set('trust proxy', true); Set on for cloudflare
 
 app.use(async (req, res, next) => {
     try {
@@ -58,7 +70,7 @@ app.use(async (req, res, next) => {
         req.sessionId = sessionId;
         next()
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 });
@@ -72,10 +84,14 @@ const options = {
     key: fs.readFileSync('../server.key'),
     cert: fs.readFileSync('../server.cert')
 };
+const ContainerManager = new ContainerManagerImport();
 
 app.get("/api/user", async (req, res) => {
     try {
         const sessionId = req.cookies.sessionId;
+        if (!sessionId) {
+            return res.status(401).json({ user: null, lng: null });
+        }
         if (sessionId) {
             const session = await MongoGetData.getSession({ sessionId: sessionId })
 
@@ -93,7 +109,7 @@ app.get("/api/user", async (req, res) => {
             }
         }
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 
@@ -108,7 +124,7 @@ app.post("/api/lng", async (req, res) => {
         const session = await MongoGetData.getSession({ sessionId: sessionId })
         await MongoUpdateData.update("user", { _id: session.userId }, { defaultLng: lng })
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 })
@@ -123,7 +139,8 @@ app.post('/api/login', async (req, res) => {
             res.status(401).json({ error: "Wrong username or password" });
             return
         }
-        if (user.password !== password) {
+        const passwordsSame = await Hash.compare(password, user.password)
+        if (!passwordsSame) {
             res.status(401).json({ error: "Wrong username or password" });
             return
         }
@@ -132,13 +149,13 @@ app.post('/api/login', async (req, res) => {
         const safeUserTemplate = safeUser(user)
         res.status(200).json({ user: safeUserTemplate });
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 });
 
 
-app.post("/api/registration", async (req, res) => {
+app.post("/api/registration", RegLimiter, async (req, res) => {
     try {
         const { username, password, password_repeat, email, role, policy } = req.body;
         const sessionId = req.cookies.sessionId;
@@ -161,17 +178,27 @@ app.post("/api/registration", async (req, res) => {
         const passwordValidResult = RegistartionDataChecks.passwordChecks(password)
         if (!passwordValidResult.valid) return res.status(403).json({ error: passwordValidResult.message })
 
-        const codeId = await MongoCreateData.createRegistrationCode(sessionId, username, email, password, role);
-        const code = await MongoGetData.getRegistrationCode({ _id: codeId })
+        const hashedPassword = await Hash.hash(password);
 
         const session = await MongoGetData.getSession({ sessionId: sessionId });
         const lng = session.lng;
 
-        await EmailSend.sendRegistartionCode(email, username, code.code, lng);
+        const checkCode = await MongoGetData.getRegistrationCode({ email: email })
+        let codeId;
+        if (!checkCode) {
+            codeId = await MongoCreateData.createRegistrationCode(sessionId, username, email, hashedPassword, role);
+        } else {
+            codeId = checkCode._id;
+        }
+        const code = await MongoGetData.getRegistrationCode({ _id: codeId })
+
+        if (!checkCode) {
+            await EmailSend.sendRegistartionCode(email, username, code.code, lng);
+        }
 
         res.status(200).json({ message: "Success" });
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 
@@ -182,10 +209,11 @@ app.get("/api/reg-code-time", async (req, res) => {
         const sessionId = req.cookies.sessionId;
 
         const registrationInfo = await MongoGetData.getRegistrationCode({ sessionId: sessionId });
-        const safeInfo = safeRegistartionCode(registrationInfo);
+        const safeInfo = safeRegistrationCode(registrationInfo);
 
         res.status(200).json({ data: safeInfo });
     } catch (err) {
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 });
@@ -204,7 +232,10 @@ app.get("/api/get-new-reg-code", async (req, res) => {
             const session = await MongoGetData.getSession({ sessionId: sessionId })
             const lng = session.lng;
 
-            await EmailSend.sendRegistartionCode(codeInfo.email, codeInfo.username, newCode, lng);
+            const sent = await EmailSend.sendRegistartionCode(codeInfo.email, codeInfo.username, newCode, lng);
+            if (!sent) {
+                return res.status(400).json({ error: "Couldn't send email" })
+            }
 
             return res.status(200).json({ newCodeExpires: newCodeExpires })
         } else {
@@ -212,6 +243,7 @@ app.get("/api/get-new-reg-code", async (req, res) => {
         }
 
     } catch (err) {
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 })
@@ -224,7 +256,7 @@ app.post("/api/check-reg-code", async (req, res) => {
         const regCode = await MongoGetData.getRegistrationCode({ sessionId: sessionId })
         if (regCode.code === String(code)) {
             const userId = await MongoCreateData.createUser(regCode.username, regCode.weight, regCode.password, regCode.email)
-            await MongoCreateData.createSession(sessionId, userId)
+            await MongoUpdateData.update("session", { sessionId: sessionId }, { userId: userId })
             await MongoDeleteData.deleteRegistrationCode(regCode._id);
             return res.status(200).json({ message: "Success" })
         } else {
@@ -239,6 +271,7 @@ app.post("/api/check-reg-code", async (req, res) => {
         }
 
     } catch (err) {
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 })
@@ -250,7 +283,7 @@ app.get("/api/logout", async (req, res) => {
         await MongoDeleteData.deleteSession(session._id)
         res.status(200).json({ success: true })
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 })
@@ -263,7 +296,7 @@ app.get("/api/get-exercises", requireAuth, async (req, res) => {
 
         res.status(200).json({ exerciseList: allowedExercises })
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 })
@@ -287,26 +320,124 @@ app.post("/api/get-exercise", requireAuth, async (req, res) => {
         }
 
     } catch (err) {
-        console.log(err)
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 });
 
+
 app.post("/api/save-code", requireAuth, async (req, res) => {
     try {
         const sessionId = req.cookies.sessionId;
-        const { type, name, value } = req.body;
+        const { type, name, value, exerciseId } = req.body;
         const user = await MongoGetData.getUserBySession(sessionId)
 
         if (type === "user") {
             if (name in user.userFiles) {
-                // You stopped here If name in userfiles then send the file. Mb do some checks idk, check that later
+                const userFiles = user.userFiles;
+                userFiles[name] = value;
+                await MongoUpdateData.update("user", { _id: user._id }, { userFiles: userFiles })
+                res.status(200).json({ success: true })
             } else {
                 res.status(404).json({ error: "File not found" })
             }
         }
+        if (type === "exercise") {
+            if (exerciseId) {
+                const exercise = await MongoGetData.getExercise({ _id: exerciseId })
+                if (exercise) {
+                    if (name.endsWith(".py") || name.endsWith(".js")) {
+                        const user = await MongoGetData.getUserBySession(sessionId)
+                        const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, studentId: user._id })
+                        if (!solution) {
+                            await MongoCreateData.createExerciseSolution(exerciseId, value, user._id);
+                            res.status(200).json({ success: true });
+                        } else {
+                            await MongoUpdateData.update("solution", { _id: solution._id }, { answer: value })
+                            res.status(200).json({ success: true });
+                        }
+                    }
+                }
+            } else {
+                res.status(404).json({ error: "Exercise not found" })
+            }
+        }
 
     } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+app.post("/api/render-code", requireAuth, async (req, res) => {
+    try {
+        const { files, mainFile, fileType } = req.body;
+
+        const formatedFiles = Object.entries(files).map(([filename, content]) => ({
+            filename,
+            content
+        }));
+
+        if (fileType === "py") {
+            const mainCode = formatedFiles.find(f => f.filename === mainFile)?.content;
+            const container = new PythonRender(mainCode, formatedFiles);
+            ContainerManager.add(container.id, container);
+            try {
+                const output = await container.runCode();
+                if (output.status == "complete") {
+                    return res.status(200).json({ output: output, waiting_for_input: false, complete: true })
+                }
+                if (output.status == "waiting_for_input") {
+                    return res.status(201).json({ output: output, waiting_for_input: true, complete: false, code_id: container.id })
+                }
+                throw new Error("Code didn't run")
+            } catch (err) {
+                logger.error("Failed to run container : " + err)
+                return res.status(400).json({ error: "Failed to run code" })
+            }
+        } else {
+            res.status(400).json({ error: "Can't run this file" })
+        }
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+app.post("/api/send-input", requireAuth, async (req, res) => {
+    try {
+        const { id, input } = req.body;
+        if (typeof input !== "string" || input.length > 1000) {
+            return res.status(400).json({ error: "Invalid input" });
+        }
+        if (typeof id !== "string" || !/^[a-zA-Z0-9_-]+$/.test(id)) {
+            return res.status(400).json({ error: "Invalid ID" });
+        }
+        const sanitizedInput = input.replace(/[\x00-\x1F\x7F]/g, "");
+
+        const container = ContainerManager.getContainer(id);
+        const output = await container.addInput(sanitizedInput);
+
+        if (output.status == "complete") {
+            return res.status(200).json({ output: output, waiting_for_input: false, complete: true })
+        }
+        if (output.status == "waiting_for_input") {
+            return res.status(201).json({ output: output, waiting_for_input: true, complete: false, code_id: container.id })
+        }
+        throw new Error("Code failed to complete")
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+app.post("/api/check-exercise", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const { exerciseId } = req.body;
+
+    } catch (err) {
+        logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }
 })

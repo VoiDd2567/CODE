@@ -5,7 +5,7 @@ const ExerciseSolution = require("./schemas/ExerciseSolution");
 const Session = require("./schemas/Session");
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
-const coloredText = require("../console_colors");
+const logger = require("../scripts/Logging")
 
 class MongoGetData {
   static async getUser(findBy) {
@@ -59,7 +59,7 @@ class MongoGetData {
       }
       return data;
     } catch (err) {
-      console.error(coloredText("FAILED : Error finding data: " + err.message, "red"));
+      logger.error("FAILED : Error finding data: " + err.message);
       throw err;
     }
   }

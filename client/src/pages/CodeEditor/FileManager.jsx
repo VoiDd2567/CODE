@@ -7,15 +7,16 @@ import new_file_image from "../../pictures/plus.png"
 import rename_file_image from "../../pictures/rename-icon.png"
 import delete_file_image from "../../pictures/delete.png"
 
-const FileManager = ({ fileList, setFile, username }) => {
+const FileManager = ({ editorValue, fileList, setFile, username, saveData }) => {
 
     const filesDiv = useRef(null);
 
     const handleFileClick = (e, fileName) => {
-        setFile(fileName)
-        const files = filesDiv.current.querySelectorAll(".file_manager__file")
+        saveData(editorValue);
+        setFile(fileName);
+        const files = filesDiv.current.querySelectorAll(".file_manager__file");
         files.forEach(file => file.classList.remove("active"));
-        e.currentTarget.classList.toggle("active")
+        e.currentTarget.classList.toggle("active");
     }
 
     return (
@@ -24,12 +25,16 @@ const FileManager = ({ fileList, setFile, username }) => {
                 <div className="file-manager__header-username">{username} </div>
             </div>
             <div className="file-manager__files" ref={filesDiv}>
-                {Object.keys(fileList).map(fileName => {
+                {Object.keys(fileList).map((fileName, index) => {
                     const ext = fileName.substring(fileName.lastIndexOf('.'));
                     const imgSrc = ext === ".py" ? py_file_image : ext === ".js" ? js_file_image : txt_file_image;
 
                     return (
-                        <div key={fileName} onClick={(e) => handleFileClick(e, fileName)} className="file_manager__file">
+                        <div
+                            key={fileName}
+                            onClick={(e) => handleFileClick(e, fileName)}
+                            className={`file_manager__file ${index === 0 ? "active" : ""}`}
+                        >
                             <img src={imgSrc} alt={ext} />
                             <p>{fileName}</p>
                         </div>

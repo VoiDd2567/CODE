@@ -8,6 +8,7 @@ const exerciseSchema = new mongoose.Schema({
   files: { type: Object, required: true },
   programmingLng: { type: String, default: "python" },
   answer: { type: String, default: "no-answer" },
+  answerType: { type: String, default: "no-answer-type" },
   creator: { type: String, default: config["DEFAULT_CREATOR"] },
   choises: { type: [String], defalt: [] }
 });

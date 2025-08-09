@@ -4,6 +4,7 @@ package-lock.json
 package.json
 /node_modules
 /temp
+/logs
 .eslintrc.json
 a.py
 requirements.txt

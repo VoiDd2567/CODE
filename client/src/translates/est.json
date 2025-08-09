@@ -31,5 +31,6 @@
     "too_many_characters_editor": "Sa ei saa kirjutada rohkem kui 10 000 tähemärki ühte faili.",
     "too_many_strings_editor": "Sa ei saa kirjutada rohkem kui 999 rida.",
     "exercise_choose": "Vali harjutus",
-    "select": "Valida"
+    "select": "Valida",
+    "teapot" : "Ma olen teekann"
 }

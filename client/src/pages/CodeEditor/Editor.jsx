@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import "./editor.css"
 
-const Editor = ({ setEditorValue, chosenFileValue, editor, mini, saveData }) => {
+const Editor = ({ setEditorValue, chosenFileValue, editor, mini, saveData, setFileSaved }) => {
     const { t } = useTranslation();
     const [numbersTextareaValue, setNumbersTextareaValue] = useState("");
     const numbersTa = useRef(null);
@@ -79,6 +79,7 @@ const Editor = ({ setEditorValue, chosenFileValue, editor, mini, saveData }) => 
             alert(t("too_many_strings_editor"))
         }
 
+        setFileSaved(false);
         setPreviousText(editor.current.value)
         setEditorValue(editor.current.value)
         setNumbers();

@@ -1,4 +1,4 @@
-const coloredText = require("../console_colors");
+const logger = require("../scripts/Logging")
 const User = require("./schemas/User");
 const SchoolClass = require("./schemas/SchoolClass");
 const Exercise = require("./schemas/Exercise");
@@ -25,7 +25,7 @@ class MongoUpdateData {
       this.#checkKeys(updateData, model, model.blockedFields || []);
       await model.updateOne(updateParameter, { $set: updateData });
     } catch (err) {
-      console.log(coloredText(`FAILED : ${err.message}`, "red", true));
+      logger.error(`FAILED : ${err.message}`);
       throw err;
     }
   }
@@ -38,7 +38,7 @@ class MongoUpdateData {
     const invalidFields = updateFields.filter(field => !allowedFields.includes(field));
 
     if (invalidFields.length > 0) {
-      console.log(coloredText(`FAILED : Invalid keys - ${invalidFields}`, "red", true));
+      logger.error(`FAILED : Invalid keys - ${invalidFields}`);
       throw new Error("Invalid keys");
     }
   }

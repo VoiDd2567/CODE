@@ -7,6 +7,7 @@ import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
 import RegistrationCode from "./pages/RegistrationCode/RegistrationCode";
 import CodeEditor from "./pages/CodeEditor/CodeEditor";
+import Teapot from "./pages/Teapot/Teapot"
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 
 const PrivateRoute = ({ children }) => {
@@ -45,6 +46,7 @@ const App = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/registration" element={<Registration />} />
                     <Route path="/registration-code" element={<RegistrationCode />} />
+                    <Route path="/teapot" element={<Teapot />} />
                     <Route path="/code-editor" element={
                         <PrivateRoute>
                             <CodeEditor />

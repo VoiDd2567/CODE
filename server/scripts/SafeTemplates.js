@@ -20,7 +20,7 @@ function safeUser(user) {
 
 }
 
-function safeRegistartionCode(regCode) {
+function safeRegistrationCode(regCode) {
     try {
         return {
             email: regCode.email,
@@ -33,4 +33,4 @@ function safeRegistartionCode(regCode) {
 }
 
 
-module.exports = { safeUser, safeRegistartionCode };
+module.exports = { safeUser, safeRegistrationCode };

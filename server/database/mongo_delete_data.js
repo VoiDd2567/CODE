@@ -6,36 +6,64 @@ const ExerciseSolution = require("./schemas/ExerciseSolution");
 const Session = require("./schemas/Session")
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
-const coloredText = require("../console_colors");
+const logger = require("../scripts/Logging")
 const MongoUpgradeData = require("./mongo_update_data");
 
 class MongoDeleteData {
     static async deleteUser(userId) {
-        const id = new mongoose.Types.ObjectId(userId);
-        const result = await User.deleteOne({ _id: id });
+        try {
+            const id = new mongoose.Types.ObjectId(userId);
+            await User.deleteOne({ _id: id });
+        } catch (err) {
+            logger.error("Error deleting data : " + err)
+        }
     }
     static async deleteSchoolClass(schoolClassId) {
-        const id = new mongoose.Types.ObjectId(schoolClassId);
-        const result = await SchoolClass.deleteOne({ _id: id });
+        try {
+            const id = new mongoose.Types.ObjectId(schoolClassId);
+            await SchoolClass.deleteOne({ _id: id });
+        } catch (err) {
+            logger.error("Error deleting data : " + err)
+        }
     }
     static async deleteExercise(exerciseId) {
-        const id = new mongoose.Types.ObjectId(exerciseId);
-        const result = await Exercise.deleteOne({ _id: id });
+        try {
+            const id = new mongoose.Types.ObjectId(exerciseId);
+            await Exercise.deleteOne({ _id: id });
+        } catch (err) {
+            logger.error("Error deleting data : " + err)
+        }
     }
     static async deleteExerciseSolution(exerciseSolutionId) {
-        const id = new mongoose.Types.ObjectId(exerciseSolutionId);
-        const result = await ExerciseSolution.deleteOne({ _id: id });
+        try {
+            const id = new mongoose.Types.ObjectId(exerciseSolutionId);
+            await ExerciseSolution.deleteOne({ _id: id });
+        } catch (err) {
+            logger.error("Error deleting data : " + err)
+        }
     }
     static async deleteSession(sessionId) {
-        const id = new mongoose.Types.ObjectId(sessionId);
-        const result = await Session.deleteOne({ _id: id });
+        try {
+            const id = new mongoose.Types.ObjectId(sessionId);
+            await Session.deleteOne({ _id: id });
+        } catch (err) {
+            logger.error("Error deleting data : " + err)
+        }
     }
     static async deleteRegistrationCode(registrationCodeId) {
-        const result = await RegistrationCode.deleteOne({ _id: registrationCodeId });
+        try {
+            await RegistrationCode.deleteOne({ _id: registrationCodeId });
+        } catch (err) {
+            logger.error("Error deleting data : " + err)
+        }
     }
     static async deleteCourse(courseId) {
-        const id = new mongoose.Types.ObjectId(courseId);
-        const result = await Course.deleteOne({ _id: id });
+        try {
+            const id = new mongoose.Types.ObjectId(courseId);
+            await Course.deleteOne({ _id: id });
+        } catch (err) {
+            logger.error("Error deleting data : " + err)
+        }
     }
 
 }

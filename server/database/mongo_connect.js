@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const config = require("../config");
-const coloredText = require("../console_colors");
+const logger = require("../scripts/Logging")
 
 const URI = config["MONGO_URI"];
 const DATABASE_NAME = config["DATABASE_NAME"];
@@ -8,9 +8,9 @@ const DATABASE_NAME = config["DATABASE_NAME"];
 async function connect() {
   try {
     await mongoose.connect(URI, { dbName: DATABASE_NAME, autoIndex: true });
-    console.log(coloredText("SUCCESS : Mongo connection succeeded", "green", true));
+    logger.info("SUCCESS : Mongo connection succeeded")
   } catch (err) {
-    console.log(coloredText("FAILED : Mongo connection failed", "red", true));
+    logger.error("FAILED : Mongo connection failed : " + err)
     throw err;
   }
 }

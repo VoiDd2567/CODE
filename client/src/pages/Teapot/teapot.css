@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
+
+.teapot{
+    height: 80vh;
+    font-family: "Fira Code", monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5vw;
+}

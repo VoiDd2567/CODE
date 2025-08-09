@@ -16,28 +16,41 @@ const transporter = nodemailer.createTransport({
 
 class EmailSend {
     static async sendRegistartionCode(email, name, code, lng) {
-        const html = await this.#generateRegistartionCodeEmail(name, code, lng);
-        const subject = lng == "eng" ? "Registartion code" : "Registreerimiskood";
-        transporter.sendMail({
-            from: `"Code Team" <${GMAIL}>`,
-            to: email,
-            subject: subject,
-            html: html,
-            attachments: [{
-                filename: 'logo.jpg',
-                path: "./public/pictures/logo.png",
-                cid: 'unique@cid'
-            }]
+        try {
+            const html = await this.#generateRegistartionCodeEmail(name, code, lng);
+            const subject = lng == "eng" ? "Registartion code" : "Registreerimiskood";
 
-        })
+            await transporter.sendMail({
+                from: `"Code Team" <${GMAIL}>`,
+                to: email,
+                subject: subject,
+                html: html,
+                attachments: [{
+                    filename: 'logo.jpg',
+                    path: "./public/pictures/logo.png",
+                    cid: 'unique@cid'
+                }]
+            });
+
+            return true;
+        } catch (err) {
+            console.error("Error while sending Email:", err);
+            return false;
+        }
     }
 
     static async #generateRegistartionCodeEmail(name, code, lng) {
-        const filePath = path.join(__dirname, "..", "public", "html", lng === "eng" ? "email_eng.html" : "email_est.html");
-        let file = await fs.promises.readFile(filePath, "utf-8")
-        let html = file.replace("{{username}}", name).replace("{{code}}", code)
-        return html
+        try {
+            const filePath = path.join(__dirname, "..", "public", "html", lng === "eng" ? "email_eng.html" : "email_est.html");
+            let file = await fs.promises.readFile(filePath, "utf-8");
+            let html = file.replace("{{username}}", name).replace("{{code}}", code);
+            return html;
+        } catch (err) {
+            console.error("Error generating email HTML:", err);
+            return "";
+        }
     }
 }
+
 
 module.exports = EmailSend;
