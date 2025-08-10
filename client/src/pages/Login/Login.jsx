@@ -17,7 +17,7 @@ const Login = () => {
     const fetchData = (event) => {
         event.preventDefault();
 
-        fetch('https://localhost:3001/api/login', {
+        fetch('https://localhost:3001/api/auth/login', {
             method: 'POST',
             credentials: 'include',
             headers: {

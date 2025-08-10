@@ -45,13 +45,13 @@ const CodeEditor = () => {
             exerciseId = exercise["_id"]
         }
 
-        fetch("https://localhost:3001/api/save-code", {
+        fetch("https://localhost:3001/api/code/save-code", {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ type: fileType, value: data, name: chosenFile, exerciseId: exerciseId })
+            body: JSON.stringify({ type: fileType, value: data, fileName: chosenFile, exerciseId: exerciseId })
         }).then(async res => {
             if (!res.ok) {
                 const errorData = await res.text();
@@ -65,7 +65,7 @@ const CodeEditor = () => {
     }
 
     const getExercises = () => {
-        fetch("https://localhost:3001/api/get-exercises", {
+        fetch("https://localhost:3001/api/exercise/get-exercises", {
             method: "GET",
             credentials: "include",
         }).then(async res => {
@@ -83,7 +83,7 @@ const CodeEditor = () => {
     }
 
     const getExercise = (exerciseId) => {
-        fetch("https://localhost:3001/api/get-exercise", {
+        fetch("https://localhost:3001/api/exercise/get-exercise", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -108,7 +108,7 @@ const CodeEditor = () => {
     }
 
     useEffect(() => {
-        fetch("https://localhost:3001/api/user", {
+        fetch("https://localhost:3001/api/user/user", {
             method: "GET",
             credentials: 'include',
         }).then(async res => {
@@ -162,7 +162,7 @@ const CodeEditor = () => {
                     </div>
                 </div>
                 <div className="code-editor-page__right-part">
-                    <Console chosenFile={chosenFile} files={files} getExerciseList={getExercises} saveData={saveData} editorValue={editorValue}  setExerciseChoose={setExerciseChoose} exerciseOpened={isExerciseOpen} />
+                    <Console chosenFile={chosenFile} files={files} getExerciseList={getExercises} saveData={saveData} editorValue={editorValue} setExerciseChoose={setExerciseChoose} exerciseOpened={isExerciseOpen} />
                     <FileManager fileList={files} setFile={handleNewFileSet} username={user["name"]} saveData={saveData} editorValue={editorValue} />
                 </div>
             </div>

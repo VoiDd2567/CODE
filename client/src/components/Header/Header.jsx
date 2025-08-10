@@ -60,7 +60,7 @@ function Header() {
     i18n.changeLanguage(newLng);
     setIsLngOpen(false);
 
-    fetch('https://localhost:3001/api/lng', {
+    fetch('https://localhost:3001/api/user/lng', {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -72,7 +72,7 @@ function Header() {
   };
 
   const logout = () => {
-    fetch('https://localhost:3001/api/logout', {
+    fetch('https://localhost:3001/api/auth/logout', {
       method: 'GET',
       credentials: 'include',
     }).then(async res => {

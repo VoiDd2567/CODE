@@ -10,7 +10,7 @@ const NewCodeSend = ({ endDate, onTimeout, setNewCodeSend, successMessage, error
 
     const handleNewCodeSend = () => {
         if (codeBtn.current.classList.contains("active")) {
-            fetch("https://localhost:3001/api/get-new-reg-code", {
+            fetch("https://localhost:3001/api/auth/get-new-reg-code", {
                 method: "GET",
                 credentials: "include"
             }).then(async res => {

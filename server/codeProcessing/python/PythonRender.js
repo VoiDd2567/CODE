@@ -59,7 +59,7 @@ ${code}
             exec(`docker ps -a --format '{{.Names}}'`, (err, stdout) => {
                 if (err) return reject(err);
 
-                const createCmd = `docker run -dit --rm --name ${this.containerName} \
+                const createCmd = `docker run --user 1000:1000 -dit --rm --name ${this.containerName} \
                     -v ${volumeHostPath}:/tmp:ro \
                     --read-only \
                     --network none \

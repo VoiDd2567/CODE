@@ -23,7 +23,7 @@ const Registration = () => {
     const fetchData = (event) => {
         event.preventDefault();
 
-        fetch('https://localhost:3001/api/registration', {
+        fetch('https://localhost:3001/api/auth/registration', {
             method: 'POST',
             credentials: 'include',
             headers: {

@@ -25,7 +25,7 @@ const RegistrationCode = () => {
     const newCodeSendDiv = useRef(null);
 
     const codeExpireTime = () => {
-        fetch("https://localhost:3001/api/reg-code-time", {
+        fetch("https://localhost:3001/api/auth/reg-code-time", {
             method: "GET",
             credentials: "include"
         }).then(async res => {
@@ -49,7 +49,7 @@ const RegistrationCode = () => {
 
     const checkCode = (event) => {
         event.preventDefault();
-        fetch("https://localhost:3001/api/check-reg-code", {
+        fetch("https://localhost:3001/api/auth/check-reg-code", {
             method: "POST",
             credentials: "include",
             headers: {

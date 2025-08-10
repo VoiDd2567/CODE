@@ -22,7 +22,7 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
     const handleRunBtnClick = () => {
         const fileType = chosenFile.split(".")[1]
         textToConsole("Running code...", false);
-        fetch("https://localhost:3001/api/render-code", {
+        fetch("https://localhost:3001/api/code/render-code", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -65,7 +65,7 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
         setWaitingForInput(false);
         setInputHistory([""])
 
-        fetch("https://localhost:3001/api/send-input", {
+        fetch("https://localhost:3001/api/code/send-input", {
             method: "POST",
             credentials: "include",
             headers: {

@@ -22,7 +22,7 @@ const App = () => {
     const { setLng } = useContext(LanguageContext);
 
     useEffect(() => {
-        fetch('https://localhost:3001/api/user', {
+        fetch('https://localhost:3001/api/user/user', {
             method: 'GET',
             credentials: 'include'
         }).then(async res => {
