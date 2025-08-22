@@ -29,13 +29,12 @@ const Login = () => {
             }),
         }).then(async res => {
             if (!res.ok) {
-                console.log(res)
                 const errorData = await res.json();
                 errorMessage.current.textContent = errorData.error || 'Error';
                 errorMessage.current.hidden = false;
                 throw new Error(`Error ${res.status}`);
             } else {
-                console.log(res)
+
                 const data = await res.json();
                 i18n.changeLanguage(data["user"].defaultLng);
                 setRedirectBack(true);

@@ -5,7 +5,7 @@ import complete_image from "../../pictures/complete-btn.png"
 import open_exercise_image from "../../pictures/open-exercise-btn.png"
 import { useRef, useState, useEffect } from "react";
 
-const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, chosenFile, saveData, editorValue }) => {
+const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, chosenFile, saveData, editorValue, exercise }) => {
     const { t } = useTranslation();
     const webConsole = useRef(null);
     const [lockedText, setLockedText] = useState("");
@@ -79,6 +79,7 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
                 throw new Error(`Error ${res.status}`);
             } else {
                 const data = await res.json();
+                textToConsole("\n")
                 if (data["output"]["status"] === "complete") {
                     textToConsole(data["output"]["output"]);
                     textToConsole("\n\n---------------------Code running completed-----------------------");
@@ -164,19 +165,37 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
 
     const handleSendBtnClick = () => {
         saveData(editorValue);
+        textToConsole("Running code...", false);
+        fetch("https://localhost:3001/api/exercise/check-exercise", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ exerciseId: exercise._id })
+        }).then(async res => {
+            if (!res.ok) {
+                const errorData = await res.text();
+                textToConsole(errorData, false);
+                throw new Error(`Error ${res.status}`);
+            } else {
+                const data = await res.json();
+                textToConsole(data["output"], false);
+                textToConsole(data["correct"] ? "\n------------------------Correct solution-------------------------" : "\n--------------------------Wrong solution--------------------------");
+                textToConsole("\n\n---------------------Answer check completed-----------------------");
+            }
+        })
     }
 
     return (
         <div className="console-wrap">
             <div className="console__buttons-wrap">
-                <button className="console__btn run-btn" onClick={handleRunBtnClick}><p>{t("run")}</p><img src={run_image} alt="" /></button>
+                <button className="console__btn run-btn" onClick={handleRunBtnClick} title="Run code"><p>{t("run")}</p><img src={run_image} alt="" /></button>
                 {exerciseOpened &&
-                    <button className="console__btn send-btn" onClick={handleSendBtnClick}><p>{t("send")}</p><img src={complete_image} alt="" /></button>
+                    <button className="console__btn send-btn" onClick={handleSendBtnClick} title="Send exercise answer to be automaticly checked"><p>{t("send")}</p><img src={complete_image} alt="" /></button>
                 }
                 <button className="console__btn open-exercise-btn" onClick={handleExerciseOpenBtnClick}><p>{t("open-exercise")}</p><img src={open_exercise_image} alt="" /></button>
             </div>
             <div className="console">
-                <textarea ref={webConsole} onKeyDown={onConsoleKeyDown} onClick={onConsoleClick} className="console-content"></textarea>
+                <textarea ref={webConsole} onKeyDown={onConsoleKeyDown} onClick={onConsoleClick} className="console-content" readOnly={!waitingForInput}></textarea>
             </div>
         </div>
     )

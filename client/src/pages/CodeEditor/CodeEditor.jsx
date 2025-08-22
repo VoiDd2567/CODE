@@ -1,6 +1,6 @@
 import "./codeEditor.css"
-import { useState, useRef, useEffect, useContext } from "react"
-import Editor from "./Editor"
+import { useState, useEffect, useContext } from "react"
+import Editor from "../../components/Editor/Editor"
 import EditorHeader from "./EditorHeader"
 import Console from "./Console"
 import FileManager from "./FileManager"
@@ -11,11 +11,11 @@ import complete_image from "../../pictures/complete-white.png"
 import cross_image from "../../pictures/cross-white.png"
 
 const CodeEditor = () => {
-    const editor = useRef(null);
     const { lng } = useContext(LanguageContext);
     const [files, setFiles] = useState({})
     const [chosenFile, setChosenFile] = useState(Object.keys(files)[0]);
     const [editorValue, setEditorValue] = useState(files[Object.keys(files)[0]]);
+    const [editorH, setEditorH] = useState(85)
     const [isExerciseOpen, setExerciseOpen] = useState(false);
     const [exercise, setExercise] = useState({}); //{_id: '', type: '', name: 's', description: {…}, files: {…},…}
     const [exerciseText, setExerciseText] = useState(null);
@@ -97,8 +97,12 @@ const CodeEditor = () => {
                 throw new Error(`Error ${res.status}`);
             } else {
                 const data = await res.json();
+                if (data["userSolution"]) {
+                    data["exercise"].files = data["userSolution"]
+                }
                 setExercise(data["exercise"])
                 setExerciseOpen(true);
+                setEditorH(55);
 
                 setExerciseText(data["exercise"].description[lng]);
             }
@@ -144,26 +148,19 @@ const CodeEditor = () => {
             <div className="code-editor-page__workspace-wrap">
                 <div className="code-editor-page__left-part">
                     {isExerciseOpen &&
-                        <ExerciseDisplay setExerciseOpen={setExerciseOpen} exerciseText={exerciseText} />
+                        <ExerciseDisplay setEditorH={setEditorH} setExerciseOpen={setExerciseOpen} exerciseText={exerciseText} />
                     }
-                    <Editor setFileSaved={setFileSaved} saveData={saveData} setEditorValue={handleEditorValueChange} chosenFileValue={files[chosenFile]} editor={editor} mini={isExerciseOpen} />
+                    <div className="ed-wrap">
+                        <Editor w={60} h={editorH} setFileSaved={setFileSaved} saveData={saveData} editorValue={editorValue} setEditorValue={handleEditorValueChange} main={true} />
+                    </div>
                     <div className="code-editor-page__file-saved-label">
-                        {fileSaved ? (
-                            <div>
-                                <img src={complete_image} />
-                                Saved
-                            </div>
-                        ) : (
-                            <div>
-                                <img src={cross_image} />
-                                Not saved
-                            </div>
-                        )}
+                        {fileSaved ? (<div><img src={complete_image} />Saved </div>
+                        ) : (<div><img src={cross_image} />Not saved</div>)}
                     </div>
                 </div>
                 <div className="code-editor-page__right-part">
-                    <Console chosenFile={chosenFile} files={files} getExerciseList={getExercises} saveData={saveData} editorValue={editorValue} setExerciseChoose={setExerciseChoose} exerciseOpened={isExerciseOpen} />
-                    <FileManager fileList={files} setFile={handleNewFileSet} username={user["name"]} saveData={saveData} editorValue={editorValue} />
+                    <Console chosenFile={chosenFile} files={files} getExerciseList={getExercises} saveData={saveData} editorValue={editorValue} setExerciseChoose={setExerciseChoose} exerciseOpened={isExerciseOpen} exercise={exercise} />
+                    <FileManager fileList={files} setFile={handleNewFileSet} username={user["name"]} />
                 </div>
             </div>
         </div>

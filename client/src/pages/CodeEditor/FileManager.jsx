@@ -7,12 +7,11 @@ import new_file_image from "../../pictures/plus.png"
 import rename_file_image from "../../pictures/rename-icon.png"
 import delete_file_image from "../../pictures/delete.png"
 
-const FileManager = ({ editorValue, fileList, setFile, username, saveData }) => {
+const FileManager = ({ fileList, setFile, username }) => {
 
     const filesDiv = useRef(null);
 
     const handleFileClick = (e, fileName) => {
-        saveData(editorValue);
         setFile(fileName);
         const files = filesDiv.current.querySelectorAll(".file_manager__file");
         files.forEach(file => file.classList.remove("active"));
@@ -43,9 +42,9 @@ const FileManager = ({ editorValue, fileList, setFile, username, saveData }) => 
             </div>
 
             <div className="file-manager__buttons">
-                <div className="file-manager__btn new_file-btn"><img src={new_file_image} alt="" /></div>
-                <div className="file-manager__btn rename_file-btn"><img src={rename_file_image} alt="" /></div>
-                <div className="file-manager__btn delete_file-btn"><img src={delete_file_image} alt="" /></div>
+                <div className="file-manager__btn new_file-btn" title="Doesn't work"><img src={new_file_image} alt="" /></div>
+                <div className="file-manager__btn rename_file-btn" title="Doesn't work"><img src={rename_file_image} alt="" /></div>
+                <div className="file-manager__btn delete_file-btn" title="Doesn't work"><img src={delete_file_image} alt="" /></div>
             </div>
         </div>
     )
