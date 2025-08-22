@@ -5,6 +5,11 @@ const path = require('path');
 const { spawn } = require('child_process');
 const logger = require("../../scripts/Logging")
 
+/** Takes code (as string) and all files which needed to render code and renders python code. Renders code until input, 
+ * then returns current output and starts waiting for input. After getting input processes it and waits until next input.
+ * Or if there is no inputs then compeltes code sens output and closes container.
+ * Container automaticly closes after 1 minute. If class died the container automaticly deletes itself after 5 minutes.
+ */
 class PythonRender {
     constructor(python_code, extraFiles = []) {
         this.id = uuidv4();
@@ -26,6 +31,7 @@ class PythonRender {
         }, 1 * 60 * 1000);
     }
 
+    /** Adds tempalte for code so renderer can see inputs*/
     addTemplate(code) {
         return `import sys
 import builtins
@@ -51,7 +57,7 @@ ${code}
         return scriptPath;
     }
 
-    async ensureContainer() {
+    async #ensureContainer() {
         const { exec } = require('child_process');
         const volumeHostPath = this.tempDir.name;
 
@@ -66,6 +72,8 @@ ${code}
                     --memory 128m \
                     --pids-limit 64 \
                     --cpus="0.2" \
+                    --security-opt=no-new-privileges \
+                    --cap-drop=ALL \
                     python:3.12-slim bash`;
                 const containers = stdout.split('\n').filter(Boolean);
                 if (containers.includes(this.containerName)) {
@@ -99,9 +107,9 @@ ${code}
         });
     }
 
-
+    /** Runs code until input or until end. Returns output and ends container if code end.*/
     async runCode() {
-        await this.ensureContainer();
+        await this.#ensureContainer();
 
         const scriptPath = await this.#writeCodeToTemp();
         const filesToCopy = [scriptPath, ...this.extraFiles.map(f => path.join(this.tempDir.name, f.filename))];
@@ -127,6 +135,7 @@ ${code}
             });
 
             this.output = "";
+            let errorOutput = ""; // Store errors from stderr
 
             this.child.stdout.on('data', (data) => {
                 const text = data.toString();
@@ -136,67 +145,107 @@ ${code}
                     this.waitingForInput = true;
                     resolve({
                         status: "waiting_for_input",
-                        output: this.output.replace(/__WAITING_FOR_INPUT__/g, "")
+                        output: this.output.replace(/__WAITING_FOR_INPUT__/g, ""),
+                        error: errorOutput || null // Include errors if any
                     });
                 }
             });
 
             this.child.stderr.on('data', (data) => {
-                this.output += data.toString();
+                errorOutput += data.toString(); // Collect errors from stderr
+                this.output += data.toString(); // Add to output for compatibility
             });
 
-            this.child.on('close', async () => {
+            this.child.on('close', async (code) => {
                 resolve({
                     status: "complete",
-                    output: this.output.replace(/__WAITING_FOR_INPUT__/g, "")
+                    output: this.output.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
+                        .filter(line => line.trim() !== '')
+                        .join('\n'),
+                    error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null) // Include errors or non-zero exit code
                 });
                 await this.cleanup();
+            });
+
+            this.child.on('error', (err) => {
+                // Handle spawn errors
+                reject(new Error("Failed to execute script: " + err.message));
             });
         });
     }
 
     #sanitizeInput(input) {
+        input = input.toString();
         return input.replace(/[\x00-\x1F\x7F;]/g, '').trim();
     }
-
+    /** Adds input and returns output after it until new input or end*/
     async addInput(input) {
-        input = this.#sanitizeInput(input)
-        if (this.child && this.waitingForInput) {
-            this.waitingForInput = false;
-            this.output = "";
-            this.child.stdin.write(input + "\n");
-
-            return new Promise((resolve) => {
-                let buffer = "";
-
-                const onData = (chunk) => {
-                    const text = chunk.toString();
-                    buffer += text;
-
-                    if (text.includes("__WAITING_FOR_INPUT__")) {
-                        this.child.stdout.off('data', onData);
-                        this.waitingForInput = true;
-                        this.output = buffer;
-                        resolve({
-                            status: "waiting_for_input",
-                            output: buffer.replace(/__WAITING_FOR_INPUT__/g, "")
-                        });
-                    } else {
-                        this.child.stdout.off('data', onData);
-                        this.output = buffer;
-                        resolve({
-                            status: "complete",
-                            output: buffer.replace(/__WAITING_FOR_INPUT__/g, "")
-                        });
-                    }
-                };
-
-                this.child.stdout.on('data', onData);
-            });
+        input = this.#sanitizeInput(input);
+        if (!this.child || !this.waitingForInput) {
+            return {
+                status: "complete",
+                output: this.output.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
+                    .filter(line => line.trim() !== '')
+                    .join('\n'),
+                error: "No active process or not waiting for input"
+            };
         }
+
+        this.waitingForInput = false;
+        this.output = "";
+        let errorOutput = ""; // Store errors from stderr
+
+        this.child.stdin.write(input + "\n");
+
+        return new Promise((resolve) => {
+            let buffer = "";
+
+            const onData = (chunk) => {
+                const text = chunk.toString();
+                buffer += text;
+
+                if (text.includes("__WAITING_FOR_INPUT__")) {
+                    if (this.child) {
+                        this.child.stdout.off('data', onData);
+                        this.child.stderr.off('data', onErrorData);
+                    }
+                    this.waitingForInput = true;
+                    this.output = buffer;
+                    resolve({
+                        status: "waiting_for_input",
+                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
+                        error: errorOutput || null
+                    });
+                }
+            };
+
+            const onErrorData = (chunk) => {
+                errorOutput += chunk.toString(); // Collect errors from stderr
+                buffer += chunk.toString(); // Add to output for compatibility
+            };
+
+            this.child.stdout.on('data', onData);
+            this.child.stderr.on('data', onErrorData);
+
+            // Handle process close during input processing
+            this.child.on('close', (code) => {
+                if (this.child) {
+                    this.child.stdout.off('data', onData);
+                    this.child.stderr.off('data', onErrorData);
+                }
+                this.output = buffer;
+                resolve({
+                    status: "complete",
+                    output: buffer.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
+                        .filter(line => line.trim() !== '')
+                        .join('\n'),
+                    error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null)
+                });
+            });
+        });
     }
 
-
+    /**Deletes container */
     async cleanup() {
         clearTimeout(this.autoCleanupTimeout);
         if (this.child) {

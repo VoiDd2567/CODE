@@ -34,17 +34,17 @@ router.post("/save-code", requireAuth, async (req, res) => {
                 if (exercise) {
                     const exerciseFiles = exercise.files;
                     if (fileName in exerciseFiles) {
-                        const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, studentId: user._id })
+                        const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, userId: user._id })
                         let solutionFiles;
                         if (!solution) {
                             solutionFiles = { ...exerciseFiles };
                             solutionFiles[fileName] = value;
-                            await MongoCreateData.createExerciseSolution(exerciseId, value, user._id, files = solutionFiles);
+                            await MongoCreateData.createExerciseSolution(exerciseId, value, user._id, solutionFiles);
                             return res.status(200).json({ success: true });
                         } else {
-                            solutionFiles = solution.files;
+                            solutionFiles = solution.solutionFiles;
                             solutionFiles[fileName] = value;
-                            await MongoUpdateData.update("solution", { _id: solution._id }, { answer: value, files: solutionFiles })
+                            await MongoUpdateData.update("solution", { _id: solution._id }, { solution: value, solutionFiles: solutionFiles })
                             return res.status(200).json({ success: true });
                         }
                     } else {
@@ -109,7 +109,6 @@ router.post("/send-input", requireAuth, async (req, res) => {
 
         const container = ContainerManager.getContainer(id);
         const output = await container.addInput(sanitizedInput);
-
         if (output.status == "complete") {
             return res.status(200).json({ output: output, waiting_for_input: false, complete: true })
         }

@@ -1,31 +1,17 @@
-const mongoConnect = require("./mongo_connect");
-const MongoGetData = require("./mongo_get_data");
-const MongoCreateData = require("./mongo_create_data");
-const MongoUpgradeData = require("./mongo_update_data");
+// Create object with 50 keys
+let myDict = {};
+for (let i = 1; i <= 50; i++) {
+    myDict[`key${i}`] = i;
+}
 
-const ExerciseModel = require("./schemas/Exercise");
+// Get keys
+let keys = Object.keys(myDict);
 
-(async () => {
-  await mongoConnect();
+if (keys.length > 5) {
+    // Shuffle keys
+    keys = keys.sort(() => Math.random() - 0.5);
+    // Take first 5
+    keys = keys.slice(0, 5);
+}
 
-  // ➕ Пример упражнения
-  const exampleExercise = new ExerciseModel({
-    type: "basic",
-    name: "Sum of Digits",
-    description: new Map([
-      ["en", "Write a function that returns the sum of digits of a given number."],
-      ["et", "Kirjuta funktsioon, mis tagastab arvu numbrite summa."],
-      ["ru", "Напиши функцию, возвращающую сумму цифр числа."]
-    ]),
-    files: new Map([
-      ["main.py", "# Write your solution here\n"],
-      ["README.txt", "This exercise is about summing digits."]
-    ]),
-    programmingLng: "python",
-    answer: "def sum_digits(n): return sum(map(int, str(n)))",
-    choises: []
-  });
-
-  await exampleExercise.save();
-  console.log("✅ Пример задания успешно добавлен в базу.");
-})();
+console.log(keys); // Random 5 keys

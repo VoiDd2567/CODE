@@ -7,7 +7,6 @@ const rateLimit = require("express-rate-limit");
 const expressSession = require("express-session");
 
 const mongoConnect = require("./database/mongo_connect");
-const ContainerManagerImport = require("./codeProcessing/ContainerManager");
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,

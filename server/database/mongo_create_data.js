@@ -43,7 +43,7 @@ class MongoCreateData {
     }
   }
 
-  static async createExerciseSolution(exerciseId, answer, userId, files = {}, answerCorrect = null) {
+  static async createExerciseSolution(exerciseId, answer, userId, solutionFiles = {}, answerCorrect = null) {
     try {
       const exercise = await MongoGetData.getExercise({ _id: exerciseId })
       if (!exercise) {
@@ -51,7 +51,7 @@ class MongoCreateData {
         throw new Error("No exercise found");
       }
 
-      const exerciseSolution = new ExerciseSolution({ exerciseId: exerciseId, answer: answer, userId: userId, answerCorrect: answerCorrect, files: files });
+      const exerciseSolution = new ExerciseSolution({ exerciseId: exerciseId, answer: answer, userId: userId, answerCorrect: answerCorrect, solutionFiles: solutionFiles });
       const savedExerciseSolution = await exerciseSolution.save();
       return savedExerciseSolution._id;
     } catch (err) {
