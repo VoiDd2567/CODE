@@ -39,58 +39,47 @@ class NodeJSRender {
     addTemplate(code) {
         return `const readline = require('readline');
 
-// Keep process alive for multiple inputs
+// Keep process alive
 process.stdin.setEncoding('utf8');
 
-// Override readline.createInterface
-const originalCreateInterface = readline.createInterface;
-readline.createInterface = function(options) {
-    const rl = {
-        question: function(prompt, callback) {
-            process.stdout.write(prompt + '__WAITING_FOR_INPUT__');
-            
-            // Wait for stdin input
-            process.stdin.resume();
-            process.stdin.once('data', (data) => {
-                process.stdin.pause();
-                callback(data.toString().trim());
-            });
-        },
-        close: function() {
-            // Don't actually close, just pause stdin
-            process.stdin.pause();
-        }
-    };
-    
-    return rl;
-};
-
-// Custom input function
+// Custom input function (like Python's)
 function input(prompt = '') {
     return new Promise((resolve) => {
         process.stdout.write(prompt + '__WAITING_FOR_INPUT__');
         process.stdin.resume();
         process.stdin.once('data', (data) => {
-            process.stdin.pause();
             resolve(data.toString().trim());
         });
     });
 }
 
+// Make input available globally
 global.input = input;
 
-// Wrap user code and keep process alive
+// Override readline for compatibility
+const originalCreateInterface = readline.createInterface;
+readline.createInterface = function(options) {
+    return {
+        question: function(prompt, callback) {
+            input(prompt).then(callback);
+        },
+        close: function() {
+            // Do nothing - keep process alive
+        }
+    };
+};
+
+// Keep process alive
+process.stdin.resume();
+
+// User code wrapped in async function
 (async () => {
     try {
 ${code.split('\n').map(line => '        ' + line).join('\n')}
     } catch (error) {
         console.error(error.message);
     }
-    
-    // Don't exit immediately, wait a bit for potential cleanup
-    setTimeout(() => {
-        process.exit(0);
-    }, 100);
+    // Don't exit! Keep process alive like Python does
 })();
 `;
     }
@@ -243,9 +232,9 @@ ${code.split('\n').map(line => '        ' + line).join('\n')}
         return input.replace(/[\x00-\x1F\x7F;]/g, '').trim();
     }
 
-    /** Adds input and returns output after it until new input or end */
     async addInput(input) {
         input = this.#sanitizeInput(input);
+
         if (!this.child || !this.waitingForInput) {
             return {
                 status: "complete",
@@ -258,55 +247,77 @@ ${code.split('\n').map(line => '        ' + line).join('\n')}
 
         this.waitingForInput = false;
         this.output = "";
-        let errorOutput = ""; // Store errors from stderr
+        let errorOutput = "";
 
+        // Send input immediately
         this.child.stdin.write(input + "\n");
 
         return new Promise((resolve) => {
             let buffer = "";
+            let resolved = false;
+
+            const cleanup = () => {
+                if (this.child && !resolved) {
+                    this.child.stdout.off('data', onData);
+                    this.child.stderr.off('data', onErrorData);
+                    this.child.off('close', onClose);
+                }
+            };
 
             const onData = (chunk) => {
                 const text = chunk.toString();
                 buffer += text;
 
                 if (text.includes("__WAITING_FOR_INPUT__")) {
-                    if (this.child) {
-                        this.child.stdout.off('data', onData);
-                        this.child.stderr.off('data', onErrorData);
+                    if (!resolved) {
+                        resolved = true;
+                        cleanup();
+                        this.waitingForInput = true;
+                        this.output = buffer;
+                        resolve({
+                            status: "waiting_for_input",
+                            output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
+                            error: errorOutput || null
+                        });
                     }
-                    this.waitingForInput = true;
-                    this.output = buffer;
-                    resolve({
-                        status: "waiting_for_input",
-                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
-                        error: errorOutput || null
-                    });
                 }
             };
 
             const onErrorData = (chunk) => {
-                errorOutput += chunk.toString(); // Collect errors from stderr
-                buffer += chunk.toString(); // Add to output for compatibility
+                errorOutput += chunk.toString();
+                buffer += chunk.toString();
+            };
+
+            const onClose = (code) => {
+                if (!resolved) {
+                    resolved = true;
+                    cleanup();
+                    this.output = buffer;
+                    resolve({
+                        status: "complete",
+                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
+                            .filter(line => line.trim() !== '')
+                            .join('\n'),
+                        error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null)
+                    });
+                }
             };
 
             this.child.stdout.on('data', onData);
             this.child.stderr.on('data', onErrorData);
+            this.child.on('close', onClose);
 
-            // Handle process close during input processing
-            this.child.on('close', (code) => {
-                if (this.child) {
-                    this.child.stdout.off('data', onData);
-                    this.child.stderr.off('data', onErrorData);
+            setTimeout(() => {
+                if (!resolved) {
+                    resolved = true;
+                    cleanup();
+                    resolve({
+                        status: "complete",
+                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
+                        error: "Input processing timeout (2s)"
+                    });
                 }
-                this.output = buffer;
-                resolve({
-                    status: "complete",
-                    output: buffer.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
-                        .filter(line => line.trim() !== '')
-                        .join('\n'),
-                    error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null)
-                });
-            });
+            }, 2000);
         });
     }
 

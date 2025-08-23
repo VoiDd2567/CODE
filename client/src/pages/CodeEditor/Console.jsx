@@ -14,6 +14,8 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
     const [inputCursorPos, setInputCursorPos] = useState(0);
     const [inputHistory, setInputHistory] = useState([""]);
     const [consoleId, setConsoleId] = useState(null);
+    // eslint-disable-next-line no-unused-vars
+    const [runningCodeTimeout, setRunningCodeTimeout] = useState(null)
 
     useEffect(() => {
         webConsole.current.setSelectionRange(lockedText.length, lockedText.length);
@@ -21,7 +23,7 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
 
     const handleRunBtnClick = () => {
         const fileType = chosenFile.split(".")[1]
-        textToConsole("Running code...", false);
+        startRunningCodeText();
         fetch("https://localhost:3001/api/code/render-code", {
             method: "POST",
             credentials: "include",
@@ -30,6 +32,12 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
             },
             body: JSON.stringify({ files: files, mainFile: chosenFile, fileType })
         }).then(async res => {
+            setRunningCodeTimeout(prevTimeout => {
+                if (prevTimeout) {
+                    clearTimeout(prevTimeout);
+                }
+                return null;
+            });
             if (!res.ok) {
                 const errorData = await res.text();
                 if (errorData.includes("Can't run this file")) {
@@ -165,13 +173,19 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
 
     const handleSendBtnClick = () => {
         saveData(editorValue);
-        textToConsole("Running code...", false);
+        startRunningCodeText();
         fetch("https://localhost:3001/api/exercise/check-exercise", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ exerciseId: exercise._id })
         }).then(async res => {
+            setRunningCodeTimeout(prevTimeout => {
+                if (prevTimeout) {
+                    clearTimeout(prevTimeout);
+                }
+                return null;
+            });
             if (!res.ok) {
                 const errorData = await res.text();
                 textToConsole(errorData, false);
@@ -184,6 +198,26 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
             }
         })
     }
+
+    const startRunningCodeText = () => {
+        setRunningCodeTimeout(prevTimeout => {
+            if (prevTimeout) {
+                clearTimeout(prevTimeout);
+            }
+            return null;
+        });
+
+        textToConsole("Running code...\n", false);
+
+        const timeoutId = setTimeout(() => {
+            textToConsole(
+                "Running takes too long, server can be down, or there may have appeared error\n"
+            );
+            setRunningCodeTimeout(null);
+        }, 15000);
+
+        setRunningCodeTimeout(timeoutId);
+    };
 
     return (
         <div className="console-wrap">
