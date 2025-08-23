@@ -119,7 +119,6 @@ router.post("/send-input", requireAuth, async (req, res) => {
 
         const container = ContainerManager.getContainer(id);
         const output = await container.addInput(sanitizedInput);
-        console.log(output)
         if (output.status == "complete") {
             return res.status(200).json({ output: output, waiting_for_input: false, complete: true })
         }

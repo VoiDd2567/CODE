@@ -12,7 +12,10 @@ import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 
 const PrivateRoute = ({ children }) => {
     const { user } = useContext(UserContext);
-    return user ? children : <Navigate to="/login" replace />;
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+    return children;
 };
 
 const App = () => {
@@ -20,23 +23,30 @@ const App = () => {
     const { i18n } = useTranslation();
     const [user, setUser] = useState(null);
     const { setLng } = useContext(LanguageContext);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetch('https://localhost:3001/api/user/user', {
             method: 'GET',
             credentials: 'include'
-        }).then(async res => {
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.log("Error getting user : ", errorText)
-            } else {
-                const data = await res.json();
-                setLng(data.lng)
-                i18n.changeLanguage(data.lng);
-                setUser(data.user)
-            }
-        }).catch(err => console.error("Ping failed:", err));
+        })
+            .then(async res => {
+                if (res.ok) {
+                    const data = await res.json();
+                    setLng(data.lng);
+                    i18n.changeLanguage(data.lng);
+                    setUser(data.user);
+                } else {
+                    console.log("Error getting user:", await res.text());
+                }
+            })
+            .catch(err => console.error("Ping failed:", err))
+            .finally(() => setLoading(false));
     }, [i18n, setLng]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <UserContext.Provider value={{ user, setUser }}>
