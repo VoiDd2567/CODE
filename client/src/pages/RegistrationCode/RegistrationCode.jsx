@@ -37,7 +37,6 @@ const RegistrationCode = () => {
             } else {
                 const data = await res.json();
                 setCodeEndTime(data.data.codeExpires);
-                console.log(data)
                 setNewCodeSend(data.data.newCodeSend)
                 setEmail(data.data.email)
             }
