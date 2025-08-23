@@ -9,6 +9,7 @@ const { requireAuth } = require("../scripts/SecurityChecks");
 const logger = require("../scripts/Logging");
 
 const PythonRender = require("../codeProcessing/python/PythonRender");
+const NodeJSRender = require("../codeProcessing/js/NodeJSRender");
 const ContainerManagerImport = require("../codeProcessing/ContainerManager");
 const ContainerManager = new ContainerManagerImport();
 
@@ -70,9 +71,14 @@ router.post("/render-code", requireAuth, async (req, res) => {
             content
         }));
 
-        if (fileType === "py") {
+        if (fileType === "py" || fileType === "js") {
             const mainCode = formatedFiles.find(f => f.filename === mainFile)?.content;
-            const container = new PythonRender(mainCode, formatedFiles);
+            let container;
+            if (fileType === "py") {
+                container = new PythonRender(mainCode, formatedFiles);
+            } else if (fileType === "js") {
+                container = new NodeJSRender(mainCode, formatedFiles);
+            }
             ContainerManager.add(container.id, container);
             try {
                 const output = await container.runCode();

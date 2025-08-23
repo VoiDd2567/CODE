@@ -1,4 +1,5 @@
 const PythonRender = require("./python/PythonRender");
+const NodeJSRender = require("./js/NodeJSRender");
 
 const MongoGetData = require("../database/mongo_get_data");
 const MongoUpdateData = require("../database/mongo_update_data");
@@ -133,7 +134,7 @@ class ExerciseCheck {
 
     async #processFuncOutputCheck() {
         try {
-            if (/\binput\s*\(.*\)/.test(this.userSolution.solution)) {
+            if (!this.#detectInput(this.userSolution, this.programmingLng)) {
                 throw new Error("Code contains input")
             }
             let funcName = this.exerciseFunctionName;
@@ -175,7 +176,7 @@ class ExerciseCheck {
             if (this.programmingLng === "py") {
                 container = new PythonRender(code, formatedFiles)
             } else if (this.programmingLng === "js") {
-                // We don't have js logic done((((
+                container = new NodeJSRender(code, formatedFiles)
             }
             ContainerManager.add(container.id, container);
         } catch (err) {
@@ -263,10 +264,18 @@ class ExerciseCheck {
     }
 
     #addFuncRunIntoCode(funcName, code, funcParameters, funcReturn) {
-        return code + `\n\nFuncReturnCheckFuncByCODE = ${funcName}(${funcParameters.toString()})\n`
-            + `print("---RESULT@@#:")\n`
-            + `print(FuncReturnCheckFuncByCODE == ${funcReturn})\n`
-            + `print(FuncReturnCheckFuncByCODE)`;
+        if (this.programmingLng === "py") {
+            return code + `\n\nFuncReturnCheckFuncByCODE = ${funcName}(${funcParameters.toString()})\n`
+                + `print("---RESULT@@#:")\n`
+                + `print(FuncReturnCheckFuncByCODE == ${funcReturn})\n`
+                + `print(FuncReturnCheckFuncByCODE)`;
+        }
+        if (this.programmingLng === "js") {
+            return code + `\n\nconst FuncReturnCheckFuncByCODE = ${funcName}(${funcParameters.toString()})\n`
+                + `console.log("---RESULT@@#:")\n`
+                + `console.log(FuncReturnCheckFuncByCODE == ${funcReturn})\n`
+                + `console.log(FuncReturnCheckFuncByCODE)`;
+        }
     }
 
     #checkOutputReturn(output, waitedOutput) {
@@ -282,6 +291,20 @@ class ExerciseCheck {
         const correct = result[0].toLowerCase().includes("true");
         const funcOutput = result[1];
         return { correct: correct, funcOutput: funcOutput, userOutput: userOutput };
+    }
+
+    #detectInput(code, language) {
+        if (!code || typeof code !== 'string') return false;
+
+        const lang = language.toLowerCase();
+
+        if (lang === 'python' || lang === 'py') {
+            return /\binput\s*\(/.test(code);
+        } else if (lang === 'javascript' || lang === 'js' || lang === 'nodejs') {
+            return /\.question\s*\(|prompt\s*\(/.test(code);
+        }
+
+        return false;
     }
 };
 

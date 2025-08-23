@@ -3,7 +3,7 @@ const router = express.Router()
 
 const MongoGetData = require("../database/mongo_get_data");
 const { getUsersAllowedExercises, requireAuth } = require("../scripts/SecurityChecks")
-const PythonExerciseCheck = require("../codeProcessing/ExerciseCheck")
+const ExerciseCheck = require("../codeProcessing/ExerciseCheck")
 const logger = require("../scripts/Logging");
 
 router.get("/get-exercises", requireAuth, async (req, res) => {
@@ -53,8 +53,8 @@ router.post("/check-exercise", requireAuth, async (req, res) => {
         const user = await MongoGetData.getUserBySession(sessionId)
         const exercise = await MongoGetData.getExercise({ _id: exerciseId });
 
-        if (exercise.programmingLng === "py") {
-            const check = new PythonExerciseCheck(exercise._id, user._id);
+        if (exercise.programmingLng === "py" || exercise.programmingLng === "js") {
+            const check = new ExerciseCheck(exercise._id, user._id);
             await check.init();
             const check_result = await check.checkSolution();
             res.status(200).json({ correct: check_result.correct, output: check_result.output })

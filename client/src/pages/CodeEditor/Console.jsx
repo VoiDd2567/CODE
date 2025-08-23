@@ -179,7 +179,7 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
             } else {
                 const data = await res.json();
                 textToConsole(data["output"], false);
-                textToConsole(data["correct"] ? "\n------------------------Correct solution-------------------------" : "\n--------------------------Wrong solution--------------------------");
+                textToConsole(data["correct"] ? "\n------------------------Correct solution-------------------------" : "\n-------------------------Wrong solution--------------------------");
                 textToConsole("\n\n---------------------Answer check completed-----------------------");
             }
         })

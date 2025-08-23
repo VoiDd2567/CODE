@@ -3,22 +3,22 @@ const fs = require("fs-extra");
 const tmp = require('tmp');
 const path = require('path');
 const { spawn } = require('child_process');
-const logger = require("../../scripts/Logging")
+const logger = require("../../scripts/Logging");
 const config = require("../../config.js")
 
-/** Takes code (as string) and all files which needed to render code and renders python code. Renders code until input, 
+/** Takes code (as string) and all files which needed to render code and renders Node.js code. Renders code until input, 
  * then returns current output and starts waiting for input. After getting input processes it and waits until next input.
- * Or if there is no inputs then compeltes code sens output and closes container.
- * Container automaticly closes after 1 minute. If class died the container automaticly deletes itself after 5 minutes.
+ * Or if there is no inputs then completes code sends output and closes container.
+ * Container automatically closes after 1 minute. If class died the container automatically deletes itself after 5 minutes.
  */
-class PythonRender {
-    constructor(python_code, extraFiles = []) {
-        this.PYTHON_VERSION = config["PYTHON_VERSION"];
+class NodeJSRender {
+    constructor(js_code, extraFiles = []) {
+        this.NODE_VERSION = config["NODE_VERSION"]; // Version variable for easy updates
         this.id = uuidv4();
         this.tempDir = tmp.dirSync({ unsafeCleanup: true });
-        this.python_code = this.addTemplate(python_code);
+        this.js_code = this.addTemplate(js_code);
         this.extraFiles = extraFiles;
-        this.containerName = `safe-python-${this.id}`;
+        this.containerName = `safe-nodejs-${this.id}`;
         this.output = "";
         this.waitingForInput = false;
         this.inputs = [];
@@ -33,23 +33,83 @@ class PythonRender {
         }, 1 * 60 * 1000);
     }
 
-    /** Adds tempalte for code so renderer can see inputs*/
+    /** Adds template for code so renderer can see inputs */
+    /** Adds template for code so renderer can see inputs */
+    /** Adds template for code so renderer can see inputs */
     addTemplate(code) {
-        return `import sys
-import builtins
-def custom_input(prompt=''):
-    sys.stdout.write(prompt + '__WAITING_FOR_INPUT__')
-    sys.stdout.flush()
-    return sys.stdin.readline().strip()
-builtins.input = custom_input
+        return `const readline = require('readline');
 
-${code}
+// Keep process alive for multiple inputs
+process.stdin.setEncoding('utf8');
+
+// Override readline.createInterface
+const originalCreateInterface = readline.createInterface;
+readline.createInterface = function(options) {
+    const rl = {
+        question: function(prompt, callback) {
+            process.stdout.write(prompt + '__WAITING_FOR_INPUT__');
+            
+            // Wait for stdin input
+            process.stdin.resume();
+            process.stdin.once('data', (data) => {
+                process.stdin.pause();
+                callback(data.toString().trim());
+            });
+        },
+        close: function() {
+            // Don't actually close, just pause stdin
+            process.stdin.pause();
+        }
+    };
+    
+    return rl;
+};
+
+// Custom input function
+function input(prompt = '') {
+    return new Promise((resolve) => {
+        process.stdout.write(prompt + '__WAITING_FOR_INPUT__');
+        process.stdin.resume();
+        process.stdin.once('data', (data) => {
+            process.stdin.pause();
+            resolve(data.toString().trim());
+        });
+    });
+}
+
+global.input = input;
+
+// Wrap user code and keep process alive
+(async () => {
+    try {
+${code.split('\n').map(line => '        ' + line).join('\n')}
+    } catch (error) {
+        console.error(error.message);
+    }
+    
+    // Don't exit immediately, wait a bit for potential cleanup
+    setTimeout(() => {
+        process.exit(0);
+    }, 100);
+})();
 `;
     }
 
     async #writeCodeToTemp() {
-        const scriptPath = path.join(this.tempDir.name, `${this.id}.py`);
-        await fs.writeFile(scriptPath, this.python_code);
+        const scriptPath = path.join(this.tempDir.name, `${this.id}.js`);
+        await fs.writeFile(scriptPath, this.js_code);
+
+        // Create package.json for any potential dependencies
+        const packageJson = {
+            "name": "safe-js-runner",
+            "version": "1.0.0",
+            "description": "Safe JavaScript runner",
+            "main": `${this.id}.js`,
+            "type": "commonjs"
+        };
+
+        const packagePath = path.join(this.tempDir.name, 'package.json');
+        await fs.writeFile(packagePath, JSON.stringify(packageJson, null, 2));
 
         for (const file of this.extraFiles) {
             const fullPath = path.join(this.tempDir.name, file.filename);
@@ -76,7 +136,8 @@ ${code}
                     --cpus="0.2" \
                     --security-opt=no-new-privileges \
                     --cap-drop=ALL \
-                    python:${this.PYTHON_VERSION}-slim bash`;
+                    node:${this.NODE_VERSION}-slim bash`;
+
                 const containers = stdout.split('\n').filter(Boolean);
                 if (containers.includes(this.containerName)) {
                     exec(`docker inspect -f '{{.State.Running}}' ${this.containerName}`, (err2, stdout2) => {
@@ -109,12 +170,13 @@ ${code}
         });
     }
 
-    /** Runs code until input or until end. Returns output and ends container if code end.*/
+    /** Runs code until input or until end. Returns output and ends container if code end. */
     async runCode() {
         await this.#ensureContainer();
 
         const scriptPath = await this.#writeCodeToTemp();
-        const filesToCopy = [scriptPath, ...this.extraFiles.map(f => path.join(this.tempDir.name, f.filename))];
+        const packagePath = path.join(this.tempDir.name, 'package.json');
+        const filesToCopy = [scriptPath, packagePath, ...this.extraFiles.map(f => path.join(this.tempDir.name, f.filename))];
 
         for (const filePath of filesToCopy) {
             const filenameInContainer = path.basename(filePath);
@@ -131,7 +193,7 @@ ${code}
         return new Promise(async (resolve, reject) => {
             this.child = spawn('docker', [
                 'exec', '-i', this.containerName,
-                'bash', '-c', `cd /tmp && timeout 300 python3 ${this.id}.py`
+                'bash', '-c', `cd /tmp && timeout 300 node ${this.id}.js`
             ], {
                 stdio: ['pipe', 'pipe', 'pipe']
             });
@@ -180,7 +242,8 @@ ${code}
         input = input.toString();
         return input.replace(/[\x00-\x1F\x7F;]/g, '').trim();
     }
-    /** Adds input and returns output after it until new input or end*/
+
+    /** Adds input and returns output after it until new input or end */
     async addInput(input) {
         input = this.#sanitizeInput(input);
         if (!this.child || !this.waitingForInput) {
@@ -247,7 +310,7 @@ ${code}
         });
     }
 
-    /**Deletes container */
+    /** Deletes container */
     async cleanup() {
         clearTimeout(this.autoCleanupTimeout);
         if (this.child) {
@@ -263,8 +326,7 @@ ${code}
                 logger.error(`Failed to remove container ${this.containerName}:`, error);
             }
         });
-
     }
 }
 
-module.exports = PythonRender;
+module.exports = NodeJSRender;
