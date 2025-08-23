@@ -3,19 +3,19 @@ const redis = new Redis();
 const logger = require("../../scripts/Logging")
 
 class getCache {
-    static async getUser(findBy) { return await this.#getByQuery(findBy, ["_id", "username", "email"]) }
+    static async getUser(findBy) { return await this.#getByQuery("user", findBy, ["_id", "username", "email"]) }
 
     static async getClass(id) { return await this.#getById(id, "class") }
 
     static async getExercise(id) { return await this.#getById(id, "exercise"); }
 
-    static async getExerciseSolution(findBy) { return await this.#getByQuery(findBy, ["_id", "userId", "exerciseId"]) }
+    static async getExerciseSolution(findBy) { return await this.#getByQuery("solution", findBy, ["_id", "userId", "exerciseId"]) }
 
-    static async getSession(findBy) { return await this.#getByQuery(findBy, ["userId", "sessionId"]) }
+    static async getSession(findBy) { return await this.#getByQuery("session", findBy, ["userId", "sessionId"]) }
 
-    static async getRegistrationCode(findBy) { return await this.#getByQuery(findBy, ["_id", "sessionId", "email"]) }
+    static async getRegistrationCode(findBy) { return await this.#getByQuery("regCode", findBy, ["_id", "sessionId", "email"]) }
 
-    static async getCourse(findBy) { return await this.#getByQuery(findBy, ["_id", "creator"]) }
+    static async getCourse(findBy) { return await this.#getByQuery("course", findBy, ["_id", "creator"]) }
 
     static async #getById(id, item) {
         this.#validateQuery(id, ["_id"]);
@@ -23,9 +23,9 @@ class getCache {
         return await this.#checkKey(key)
     }
 
-    static async #getByQuery(findBy, allowed) {
+    static async #getByQuery(item, findBy, allowed) {
         this.#validateQuery(findBy, allowed);
-        const key = `user:${JSON.stringify(findBy)}`;
+        const key = `${item}:${JSON.stringify(findBy)}`;
         return await this.#checkKey(key)
     }
 
@@ -67,16 +67,16 @@ class deleteCache {
         await deleteCache.deleteWithId(exerciseId, "exercise");
     }
     static async deleteExerciseSolution(solution) {
-        await deleteCache.deleteWithQuery(solution, "user", ["_id", "userId", "exerciseId"]);
+        await deleteCache.deleteWithQuery(solution, "solution", ["_id", "userId", "exerciseId"]);
     }
     static async deleteSession(session) {
-        await deleteCache.deleteWithQuery(session, "user", ["userId", "sessionId"]);
+        await deleteCache.deleteWithQuery(session, "session", ["userId", "sessionId"]);
     }
     static async deleteRegistrationCode(code) {
-        await deleteCache.deleteWithQuery(code, "user", ["_id", "sessionId", "email"]);
+        await deleteCache.deleteWithQuery(code, "regCode", ["_id", "sessionId", "email"]);
     }
     static async deleteCourse(course) {
-        await deleteCache.deleteWithQuery(course, "user", ["_id", "creator"]);
+        await deleteCache.deleteWithQuery(course, "course", ["_id", "creator"]);
     }
 
     static async deleteWithId(id, itemName) {

@@ -90,7 +90,6 @@ router.post("/registration", RegLimiter, async (req, res) => {
                 res.status(500).json({ error: "Failed to send email" });
             }
         }
-
         res.status(200).json({ message: "Success" });
     } catch (err) {
         logger.error(err)
@@ -105,7 +104,6 @@ router.get("/reg-code-time", async (req, res) => {
 
         const registrationInfo = await MongoGetData.getRegistrationCode({ sessionId: sessionId });
         const safeInfo = safeRegistrationCode(registrationInfo);
-
         res.status(200).json({ data: safeInfo });
     } catch (err) {
         logger.error(err)
