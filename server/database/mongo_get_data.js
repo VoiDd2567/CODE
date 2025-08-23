@@ -6,6 +6,8 @@ const Session = require("./schemas/Session");
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
 const logger = require("../scripts/Logging")
+const { getCache, setCache } = require("./cache/MongoCache")
+
 
 class MongoGetData {
   static async getUser(findBy) {
@@ -43,20 +45,26 @@ class MongoGetData {
 
   static async #getData(collectionType, findBy) {
     try {
-      const model = {
-        user: User,
-        schoolclass: SchoolClass,
-        exercise: Exercise,
-        exerciseSolution: ExerciseSolution,
-        session: Session,
-        registrationCode: RegistrationCode,
-        course: Course
+      const [model, getFn, ttl] = {
+        user: [User, getCache.getUser, 86400],
+        schoolclass: [SchoolClass, getCache.getClass, 86400],
+        exercise: [Exercise, getCache.getExercise, 43200],
+        exerciseSolution: [ExerciseSolution, getCache.getExerciseSolution, 3600],
+        session: [Session, getCache.getSession, 3600],
+        registrationCode: [RegistrationCode, getCache.getRegistrationCode, 600],
+        course: [Course, getCache.getCourse, 86400]
       }[collectionType];
 
-      const data = await model.findOne(findBy);
-      if (!data) {
-        return null;
+
+      const cache = await getFn.call(getCache, findBy);
+      if (typeof cache === "object") {
+        return cache;
       }
+
+      const data = await model.findOne(findBy);
+      if (!data) return null;
+
+      await setCache.set(cache, data, ttl);
       return data;
     } catch (err) {
       logger.error("FAILED : Error finding data: " + err.message);

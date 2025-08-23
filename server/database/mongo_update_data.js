@@ -6,24 +6,31 @@ const ExerciseSolution = require("./schemas/ExerciseSolution");
 const Session = require("./schemas/Session");
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
-
+const { deleteCache } = require("./cache/MongoCache")
 
 class MongoUpdateData {
   static async update(modelName, updateParameter, updateData) {
     try {
-      const models = {
-        user: User,
-        schoolclass: SchoolClass,
-        exercise: Exercise,
-        solution: ExerciseSolution,
-        session: Session,
-        registrationCode: RegistrationCode,
-        course: Course
+      const mapping = {
+        user: [User, deleteCache.deleteUser],
+        schoolclass: [SchoolClass, deleteCache.deleteClass],
+        exercise: [Exercise, deleteCache.deleteExercise],
+        solution: [ExerciseSolution, deleteCache.deleteExerciseSolution],
+        session: [Session, deleteCache.deleteSession],
+        registrationCode: [RegistrationCode, deleteCache.deleteRegistrationCode],
+        course: [Course, deleteCache.deleteCourse]
       };
 
-      const model = models[modelName];
+      const tuple = mapping[modelName];
+      if (!tuple) throw new Error(`Unknown model name: ${modelName}`);
+
+      const [model, delCache] = tuple;
+
       this.#checkKeys(updateData, model, model.blockedFields || []);
+      const item = await model.findOne(updateParameter);
+      if (item) delCache(item);
       await model.updateOne(updateParameter, { $set: updateData });
+
     } catch (err) {
       logger.error(`FAILED : ${err.message}`);
       throw err;

@@ -7,6 +7,7 @@ const rateLimit = require("express-rate-limit");
 const expressSession = require("express-session");
 
 const mongoConnect = require("./database/mongo_connect");
+const { ensureRedis } = require('./middlewares/redisStart');
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,
@@ -24,21 +25,23 @@ app.use(limiter);
 //app.set('trust proxy', true); Set on for cloudflare
 
 (async () => {
+    await ensureRedis();
     await mongoConnect();
+
+    app.use(require("./middlewares/session"));
+
+    app.use("/api/user", require("./routes/user"));
+    app.use("/api/auth", require("./routes/auth"));
+    app.use("/api/exercise", require("./routes/exercise"));
+    app.use("/api/code", require("./routes/code"));
+
+    const PORT = 3001;
+    const options = {
+        key: fs.readFileSync('../server.key'),
+        cert: fs.readFileSync('../server.cert')
+    };
+
+    https.createServer(options, app).listen(PORT, () => {
+        console.log(`HTTPS server working on ${PORT}`);
+    });
 })();
-app.use(require("./middlewares/session"));
-
-app.use("/api/user", require("./routes/user"));
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/exercise", require("./routes/exercise"));
-app.use("/api/code", require("./routes/code"));
-
-const PORT = 3001;
-const options = {
-    key: fs.readFileSync('../server.key'),
-    cert: fs.readFileSync('../server.cert')
-};
-
-https.createServer(options, app).listen(PORT, () => {
-    console.log(`HTTPS server working on ${PORT}`);
-});

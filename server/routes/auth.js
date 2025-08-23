@@ -83,7 +83,12 @@ router.post("/registration", RegLimiter, async (req, res) => {
         const code = await MongoGetData.getRegistrationCode({ _id: codeId })
 
         if (!checkCode) {
-            await EmailSend.sendRegistartionCode(email, username, code.code, lng);
+            try {
+                await EmailSend.sendRegistartionCode(email, username, code.code, lng);
+            } catch (err) {
+                logger.error("FAILED: Failed to send email: " + err);
+                res.status(500).json({ error: "Failed to send email" });
+            }
         }
 
         res.status(200).json({ message: "Success" });
