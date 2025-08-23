@@ -33,53 +33,97 @@ class NodeJSRender {
         }, 1 * 60 * 1000);
     }
 
-    /** Adds template for code so renderer can see inputs */
-    /** Adds template for code so renderer can see inputs */
-    /** Adds template for code so renderer can see inputs */
     addTemplate(code) {
         return `const readline = require('readline');
+const util = require('util');
 
-// Keep process alive
-process.stdin.setEncoding('utf8');
+// Store callbacks for readline operations
+let pendingCallbacks = [];
+let isWaitingForInput = false;
+let codeFinished = false;
 
-// Custom input function (like Python's)
+// Override readline.createInterface
+const originalCreateInterface = readline.createInterface;
+readline.createInterface = function(options) {
+    const rl = {
+        question: function(prompt, callback) {
+            // Store the callback
+            pendingCallbacks.push(callback);
+            isWaitingForInput = true;
+            
+            // Output prompt with marker
+            process.stdout.write(prompt + '__WAITING_FOR_INPUT__');
+        },
+        close: function() {
+            // Signal that readline is closed
+            isWaitingForInput = false;
+            checkIfShouldExit();
+        }
+    };
+    
+    return rl;
+};
+
+// Custom input function
 function input(prompt = '') {
     return new Promise((resolve) => {
+        pendingCallbacks.push(resolve);
+        isWaitingForInput = true;
         process.stdout.write(prompt + '__WAITING_FOR_INPUT__');
-        process.stdin.resume();
-        process.stdin.once('data', (data) => {
-            resolve(data.toString().trim());
-        });
     });
 }
 
-// Make input available globally
 global.input = input;
 
-// Override readline for compatibility
-const originalCreateInterface = readline.createInterface;
-readline.createInterface = function(options) {
-    return {
-        question: function(prompt, callback) {
-            input(prompt).then(callback);
-        },
-        close: function() {
-            // Do nothing - keep process alive
+// Handle stdin input
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', (data) => {
+    const inputValue = data.toString().trim();
+    
+    if (pendingCallbacks.length > 0) {
+        const callback = pendingCallbacks.shift();
+        isWaitingForInput = false;
+        
+        try {
+            if (callback.constructor.name === 'AsyncFunction' || callback.then) {
+                // It's a Promise resolve function
+                callback(inputValue);
+            } else {
+                // It's a regular callback
+                callback(inputValue);
+            }
+            
+            // Check if we should exit after processing input
+            setTimeout(checkIfShouldExit, 100);
+        } catch (error) {
+            console.error(error.message);
         }
-    };
-};
+    }
+});
 
-// Keep process alive
+// Function to check if process should exit
+function checkIfShouldExit() {
+    if (codeFinished && !isWaitingForInput && pendingCallbacks.length === 0) {
+        process.exit(0);
+    }
+}
+
+// Keep process alive initially
 process.stdin.resume();
 
-// User code wrapped in async function
+// Execute user code
 (async () => {
     try {
 ${code.split('\n').map(line => '        ' + line).join('\n')}
     } catch (error) {
         console.error(error.message);
+    } finally {
+        // Mark code as finished
+        codeFinished = true;
+        
+        // Give a moment for any pending operations
+        setTimeout(checkIfShouldExit, 100);
     }
-    // Don't exit! Keep process alive like Python does
 })();
 `;
     }
@@ -232,9 +276,9 @@ ${code.split('\n').map(line => '        ' + line).join('\n')}
         return input.replace(/[\x00-\x1F\x7F;]/g, '').trim();
     }
 
+    /** Adds input and returns output after it until new input or end */
     async addInput(input) {
         input = this.#sanitizeInput(input);
-
         if (!this.child || !this.waitingForInput) {
             return {
                 status: "complete",
@@ -247,77 +291,55 @@ ${code.split('\n').map(line => '        ' + line).join('\n')}
 
         this.waitingForInput = false;
         this.output = "";
-        let errorOutput = "";
+        let errorOutput = ""; // Store errors from stderr
 
-        // Send input immediately
         this.child.stdin.write(input + "\n");
 
         return new Promise((resolve) => {
             let buffer = "";
-            let resolved = false;
-
-            const cleanup = () => {
-                if (this.child && !resolved) {
-                    this.child.stdout.off('data', onData);
-                    this.child.stderr.off('data', onErrorData);
-                    this.child.off('close', onClose);
-                }
-            };
 
             const onData = (chunk) => {
                 const text = chunk.toString();
                 buffer += text;
 
                 if (text.includes("__WAITING_FOR_INPUT__")) {
-                    if (!resolved) {
-                        resolved = true;
-                        cleanup();
-                        this.waitingForInput = true;
-                        this.output = buffer;
-                        resolve({
-                            status: "waiting_for_input",
-                            output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
-                            error: errorOutput || null
-                        });
+                    if (this.child) {
+                        this.child.stdout.off('data', onData);
+                        this.child.stderr.off('data', onErrorData);
                     }
+                    this.waitingForInput = true;
+                    this.output = buffer;
+                    resolve({
+                        status: "waiting_for_input",
+                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
+                        error: errorOutput || null
+                    });
                 }
             };
 
             const onErrorData = (chunk) => {
-                errorOutput += chunk.toString();
-                buffer += chunk.toString();
-            };
-
-            const onClose = (code) => {
-                if (!resolved) {
-                    resolved = true;
-                    cleanup();
-                    this.output = buffer;
-                    resolve({
-                        status: "complete",
-                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
-                            .filter(line => line.trim() !== '')
-                            .join('\n'),
-                        error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null)
-                    });
-                }
+                errorOutput += chunk.toString(); // Collect errors from stderr
+                buffer += chunk.toString(); // Add to output for compatibility
             };
 
             this.child.stdout.on('data', onData);
             this.child.stderr.on('data', onErrorData);
-            this.child.on('close', onClose);
 
-            setTimeout(() => {
-                if (!resolved) {
-                    resolved = true;
-                    cleanup();
-                    resolve({
-                        status: "complete",
-                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
-                        error: "Input processing timeout (2s)"
-                    });
+            // Handle process close during input processing
+            this.child.on('close', (code) => {
+                if (this.child) {
+                    this.child.stdout.off('data', onData);
+                    this.child.stderr.off('data', onErrorData);
                 }
-            }, 2000);
+                this.output = buffer;
+                resolve({
+                    status: "complete",
+                    output: buffer.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
+                        .filter(line => line.trim() !== '')
+                        .join('\n'),
+                    error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null)
+                });
+            });
         });
     }
 

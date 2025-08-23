@@ -19,6 +19,10 @@ router.post("/save-code", requireAuth, async (req, res) => {
         const { type, fileName, value, exerciseId } = req.body;
         const user = await MongoGetData.getUserBySession(sessionId)
 
+        if (typeof fileName !== "string" || typeof value !== "string" || !fileName || !value) {
+            return res.status(400).json({ error: "fileName and value must be non-empty strings" });
+        }
+
         if (type === "user") {
             if (fileName in user.userFiles) {
                 const userFiles = user.userFiles;
@@ -115,6 +119,7 @@ router.post("/send-input", requireAuth, async (req, res) => {
 
         const container = ContainerManager.getContainer(id);
         const output = await container.addInput(sanitizedInput);
+        console.log(output)
         if (output.status == "complete") {
             return res.status(200).json({ output: output, waiting_for_input: false, complete: true })
         }
