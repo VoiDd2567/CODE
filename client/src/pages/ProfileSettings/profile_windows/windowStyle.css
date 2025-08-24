@@ -1,0 +1,16 @@
+.profile_page-window {
+    margin-top: 4vh;
+    margin-left: 2vw;
+    width: 70vw;
+    height: 70vh;
+    background-color: #ededf0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2vw;
+}
+
+.profile_page-window-main {
+    width: 95%;
+    height: 90%;
+}

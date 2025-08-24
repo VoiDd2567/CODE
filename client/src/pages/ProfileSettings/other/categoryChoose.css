@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Electrolize&display=swap');
+
+.category_choose {
+    width: 20vw;
+    height: 35vh;
+    margin-left: 3vw;
+    margin-top: 4vh;
+    background-color: #d8d9db;
+    display: flex;
+    border-radius: 2vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.category_choose-main {
+    width: 90%;
+    height: 100%;
+}
+
+.category_choose-selector-item {
+    width: 100%;
+    height: 5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "Electrolize";
+    font-size: 3vh;
+    border-radius: 2vh;
+    margin-top: 1vh;
+    cursor: pointer;
+}
+
+.category_choose-selector-item.active {
+    background-color: #a9aaad;
+}
+
+.category_choose-selector-item.active:hover {
+    background-color: #a9aaad;
+}
+
+.category_choose-selector-item:hover {
+    background-color: #b9babd;
+}

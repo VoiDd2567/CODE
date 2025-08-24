@@ -1,0 +1,12 @@
+.profile-page__header {
+    height: 12vh;
+    background-color: #222831;
+    display: flex;
+    align-items: center;
+}
+
+.profile-page__header img {
+    width: 12vw;
+    margin-left: 2vw;
+    cursor: pointer;
+}

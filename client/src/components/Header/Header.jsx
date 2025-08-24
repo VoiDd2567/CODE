@@ -13,6 +13,7 @@ function Header() {
   const { lng, setLng } = useContext(LanguageContext);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const [redirectToCourses, setRedirectToCourses] = useState(false);
+  const [redirectToProfile, setRedirectToProfile] = useState(false)
   const [isLngOpen, setIsLngOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const loginLabel = useRef(null);
@@ -38,21 +39,6 @@ function Header() {
     }
   }, [user, lng, isLngOpen]);
 
-  const accountBtnClick = () => {
-    setIsAccountOpen(!isAccountOpen)
-  }
-
-  const editorBtnClick = () => {
-    setRedirectToCourses(true)
-  }
-
-  const lngBtnClick = () => {
-    setIsLngOpen(!isLngOpen);
-  };
-
-  const handleLoginClick = () => {
-    setRedirectToLogin(true);
-  };
 
   const changeLng = (lng) => {
     const newLng = lng;
@@ -96,6 +82,10 @@ function Header() {
     return <Navigate to="/code-editor" replace />;
   }
 
+  if (redirectToProfile) {
+    return <Navigate to="/profile-settings" replace />;
+  }
+
   return (
     <header>
       <div className="header__logo">
@@ -103,7 +93,7 @@ function Header() {
       </div>
       <div className="header__item-list">
         <div className="header__lng-change-wrap">
-          <div className="header__item header__lng" id="lngButton" onClick={lngBtnClick}>
+          <div className="header__item header__lng" id="lngButton" onClick={() => { setIsLngOpen(!isLngOpen); }}>
             {isLngOpen ? "▼" : "►"} {lng.toUpperCase()}
           </div>
           {isLngOpen && (
@@ -113,16 +103,16 @@ function Header() {
             </div>
           )}
         </div>
-        <div className="header__item" onClick={editorBtnClick}>{t("editor")}</div>
-        <div className="header__item" ref={loginLabel} onClick={handleLoginClick}>{t("login")} </div>
+        <div className="header__item" onClick={() => { setRedirectToCourses(true) }}>{t("editor")}</div>
+        <div className="header__item" ref={loginLabel} onClick={() => { setRedirectToLogin(true) }}>{t("login")} </div>
         <div className="header__account-wrap" ref={account}>
-          <div className="header__account" onClick={accountBtnClick}>
+          <div className="header__account" onClick={() => { setIsAccountOpen(!isAccountOpen) }}>
             <div className="header__account-name" ref={accountName}></div>
             <div className="header__account-icon"><img src={account_image} alt="Account" className="header__account-image" /></div>
           </div>
           {isAccountOpen && (
             <div className="header__account-menu">
-              <div>{t("settings")}</div>
+              <div onClick={() => { setRedirectToProfile(true) }}>{t("settings")}</div>
               <div>{t("courses")}</div>
               <div onClick={logout}>{t("logout")}</div>
             </div>

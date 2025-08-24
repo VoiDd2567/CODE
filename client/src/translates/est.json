@@ -32,5 +32,10 @@
     "too_many_strings_editor": "Sa ei saa kirjutada rohkem kui 999 rida.",
     "exercise_choose": "Vali harjutus",
     "select": "Valida",
-    "teapot" : "Ma olen teekann"
+    "teapot": "Ma olen teekann",
+    "general": "Üldine",
+    "class": "Klass",
+    "security": "Turvalisus",
+    "delAccount": "Kustuta konto",
+    "payment": "Makse ja tellimus"
 }

@@ -1,0 +1,6 @@
+.profile_page-main {
+    width: 100vw;
+    height: 88vh;
+    display: flex;
+    flex-direction: row;
+}

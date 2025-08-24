@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserContext } from "./components/UserContext";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,8 @@ import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
 import RegistrationCode from "./pages/RegistrationCode/RegistrationCode";
 import CodeEditor from "./pages/CodeEditor/CodeEditor";
+import CourseEditor from "./pages/CourseEditor/CourseEditor";
+import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Teapot from "./pages/Teapot/Teapot"
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 
@@ -45,7 +47,7 @@ const App = () => {
     }, [i18n, setLng]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="loadingScreen">Loading...</div>;
     }
 
     return (
@@ -60,6 +62,16 @@ const App = () => {
                     <Route path="/code-editor" element={
                         <PrivateRoute>
                             <CodeEditor />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/course-editor" element={
+                        <PrivateRoute>
+                            <CourseEditor />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/profile-settings" element={
+                        <PrivateRoute>
+                            <ProfileSettings />
                         </PrivateRoute>
                     } />
                     <Route path="*" element={<Navigate to="/" replace />} />

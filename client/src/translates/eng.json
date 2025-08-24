@@ -32,5 +32,10 @@
   "too_many_strings_editor": "You can't write more than 999 lines.",
   "exercise_choose": "Choose an exercise",
   "select": "Select",
-  "teapot" : "I am a teapot"
+  "teapot": "I am a teapot",
+  "general": "General",
+  "class": "Class",
+  "security": "Security",
+  "delAccount": "Delete account",
+  "payment": "Payment and subscription"
 }
