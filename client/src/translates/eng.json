@@ -37,5 +37,9 @@
   "class": "Class",
   "security": "Security",
   "delAccount": "Delete account",
-  "payment": "Payment and subscription"
+  "payment": "Payment and subscription",
+  "your_username": "Your username",
+  "change_password": "Change password",
+  "language": "Language",
+  "last_password_change": "Last password change"
 }

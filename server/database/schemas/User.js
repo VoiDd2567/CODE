@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
   madeCourses: { type: [String], default: [] },
   solvedExercises: { type: String, default: 0 },
   nameIsMutable: { type: Boolean, default: true },
-  userFiles: { type: Object, default: { "main.py": "#Write you code here" , "text.txt" : "Write your text here"} },
+  userFiles: { type: Object, default: { "main.py": "#Write you code here", "text.txt": "Write your text here" } },
+  passwordChangedAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now }
 });
 

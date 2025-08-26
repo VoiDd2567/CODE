@@ -37,5 +37,8 @@
     "class": "Klass",
     "security": "Turvalisus",
     "delAccount": "Kustuta konto",
-    "payment": "Makse ja tellimus"
+    "payment": "Makse ja tellimus",
+    "change_password": "Vahetada parooli",
+    "language": "Keel",
+    "last_password_change": "Viimane parooli muudatus"
 }

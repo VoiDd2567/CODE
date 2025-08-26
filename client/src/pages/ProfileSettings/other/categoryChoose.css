@@ -18,16 +18,16 @@
 }
 
 .category_choose-selector-item {
-    width: 100%;
+    width: 90%;
     height: 5vh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: start;
     font-family: "Electrolize";
     font-size: 3vh;
     border-radius: 2vh;
     margin-top: 1vh;
+    padding-left: 1vw;
     cursor: pointer;
 }
 

@@ -13,6 +13,7 @@ function Header() {
   const { lng, setLng } = useContext(LanguageContext);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const [redirectToCourses, setRedirectToCourses] = useState(false);
+  const [redirectToCodeEditor, setRedirectToCodeEditor] = useState(false);
   const [redirectToProfile, setRedirectToProfile] = useState(false)
   const [isLngOpen, setIsLngOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -78,12 +79,16 @@ function Header() {
     return <Navigate to="/login" replace />;
   }
 
-  if (redirectToCourses) {
+  if (redirectToCodeEditor) {
     return <Navigate to="/code-editor" replace />;
   }
 
   if (redirectToProfile) {
     return <Navigate to="/profile-settings" replace />;
+  }
+
+  if (redirectToCourses) {
+    return <Navigate to="/my-courses" replace />;
   }
 
   return (
@@ -103,7 +108,7 @@ function Header() {
             </div>
           )}
         </div>
-        <div className="header__item" onClick={() => { setRedirectToCourses(true) }}>{t("editor")}</div>
+        <div className="header__item" onClick={() => { setRedirectToCodeEditor(true) }}>{t("editor")}</div>
         <div className="header__item" ref={loginLabel} onClick={() => { setRedirectToLogin(true) }}>{t("login")} </div>
         <div className="header__account-wrap" ref={account}>
           <div className="header__account" onClick={() => { setIsAccountOpen(!isAccountOpen) }}>
@@ -113,7 +118,7 @@ function Header() {
           {isAccountOpen && (
             <div className="header__account-menu">
               <div onClick={() => { setRedirectToProfile(true) }}>{t("settings")}</div>
-              <div>{t("courses")}</div>
+              <div onClick={() => { setRedirectToCourses(true) }}>{t("courses")}</div>
               <div onClick={logout}>{t("logout")}</div>
             </div>
           )}

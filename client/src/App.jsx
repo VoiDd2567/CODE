@@ -8,6 +8,7 @@ import Registration from "./pages/Registration/Registration";
 import RegistrationCode from "./pages/RegistrationCode/RegistrationCode";
 import CodeEditor from "./pages/CodeEditor/CodeEditor";
 import CourseEditor from "./pages/CourseEditor/CourseEditor";
+import UserCourses from "./pages/UserCourses/UserCourses";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Teapot from "./pages/Teapot/Teapot"
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
@@ -72,6 +73,11 @@ const App = () => {
                     <Route path="/profile-settings" element={
                         <PrivateRoute>
                             <ProfileSettings />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/my-courses" element={
+                        <PrivateRoute>
+                            <UserCourses />
                         </PrivateRoute>
                     } />
                     <Route path="*" element={<Navigate to="/" replace />} />

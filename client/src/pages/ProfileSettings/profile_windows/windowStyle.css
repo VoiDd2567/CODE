@@ -13,4 +13,53 @@
 .profile_page-window-main {
     width: 95%;
     height: 90%;
+    font-family: "Electrolize";
+    display: flex;
+    flex-direction: column;
+}
+
+.profile_page-window-main form {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile_page-window-main-input {
+    width: 50%;
+    height: 3vh;
+    margin-top: 1vh;
+    padding-left: 1vw;
+    border-radius: 1vh;
+    font-family: "Electrolize";
+}
+
+.profile_page-window-main-label {
+    margin-top: 1vh;
+    margin-left: 0.5vw;
+    font-size: 2vh;
+}
+
+.change_password_btn {
+    margin-top: 1vh;
+    width: 8vw;
+    height: 4vh;
+    border-radius: 2vh;
+    background-color: #797a7c;
+    border-width: 0;
+    transition: transform 0.5s;
+}
+
+.change_password_btn:hover {
+    transform: scale(1.1);
+}
+
+.change_password_btn:active {
+    background-color: #606162;
+}
+
+.profile_page-window-main-select {
+    margin-top: 1vh;
+    height: 3vh;
+    width: 7vw;
+    border-radius: 2vh;
+    padding-left: 1vw;
 }

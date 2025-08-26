@@ -13,17 +13,34 @@ const ProfileSettings = () => {
 
     const [openedWindow, setOpenedWindow] = useState("general");
     const [openedWindowDiv, setOpenedWindowDiv] = useState(<GeneralWindow />)
+    const [user, setUser] = useState(null)
+
+    useEffect(() => {
+        fetch("https://localhost:3001/api/user/user", {
+            method: "GET",
+            credentials: "include"
+        }).then(async res => {
+            if (!res.ok) {
+                const errorData = await res.text;
+                alert(errorData)
+                console.log(errorData)
+            } else {
+                const data = await res.json();
+                setUser(data["user"])
+            }
+        })
+    }, [])
 
     useEffect(() => {
         const all_windows = {
-            "general": <GeneralWindow />,
+            "general": <GeneralWindow user={user} />,
             "class": <ClassWindow />,
             "security": <SecurityWindow />,
             "payment": <PaymentSettingsWindow />,
             "delAccount": <DelAccountWindow />
         }
         setOpenedWindowDiv(all_windows[openedWindow])
-    }, [openedWindow])
+    }, [openedWindow, user])
 
     return (
         <div>
