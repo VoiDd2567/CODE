@@ -7,7 +7,7 @@ import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
 import RegistrationCode from "./pages/RegistrationCode/RegistrationCode";
 import CodeEditor from "./pages/CodeEditor/CodeEditor";
-import CourseEditor from "./pages/CourseEditor/CourseEditor";
+import CourseEditor from "./pages/CourseEditor/CourseEditorPage";
 import UserCourses from "./pages/UserCourses/UserCourses";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Teapot from "./pages/Teapot/Teapot"

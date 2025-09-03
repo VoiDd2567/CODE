@@ -88,7 +88,7 @@ function Header() {
   }
 
   if (redirectToCourses) {
-    return <Navigate to="/my-courses" replace />;
+    return <Navigate to="/course-editor" replace />;
   }
 
   return (

@@ -101,6 +101,7 @@ header {
     align-items: center;
     border-radius: 2vw;
     margin-top: 1vh;
+    padding-left: 1vw;
 }
 
 .header__account-wrap[hidden] {

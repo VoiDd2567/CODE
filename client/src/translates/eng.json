@@ -41,5 +41,9 @@
   "your_username": "Your username",
   "change_password": "Change password",
   "language": "Language",
-  "last_password_change": "Last password change"
+  "last_password_change": "Last password change",
+  "add_text": "Add text",
+  "add_exercise": "Add exercise",
+  "add_code": "Add code",
+  "add_img": "Add image"
 }

@@ -40,5 +40,9 @@
     "payment": "Makse ja tellimus",
     "change_password": "Vahetada parooli",
     "language": "Keel",
-    "last_password_change": "Viimane parooli muudatus"
+    "last_password_change": "Viimane parooli muudatus",
+    "add_text": "Lisa tekst",
+    "add_exercise": "Lisa harjutus",
+    "add_code": "Lisa kood",
+    "add_img": "Lisa pilt"
 }
