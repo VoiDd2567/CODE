@@ -3,49 +3,44 @@ import CourseEditorMenu from "./CourseEditorMenu.jsx"
 
 const CourseEditor = () => {
     const chooseMenu = useRef(null);
+    const isFirstRender = useRef(true);
+    const initializedBlocks = useRef(new Set());
     const [coursorPos, setCoursorPos] = useState([])
     const [isMenuVisible, setIsMenuVisible] = useState(false);
-    const [editorValue, setEditorValue] = useState({
-        "text": "Lol i dnt know",
-        "text": "Lol i dnt know",
-        "editor": "AAAAAAAAAA",
-        "exercise": "LOL",
-        "img": "?????"
-    })
+    const [editorValue, setEditorValue] = useState([
+        { 1: { value: "Lol i dnt know", type: "text" } },
+        { 2: { value: "text", type: "text" } },
+        { 3: { value: "editor", type: "editor" } },
+        { 4: { value: "exercise", type: "exercise" } },
+        { 5: { value: "img", type: "img" } }
+    ]);
     const [chosenBlock, setChosenBlock] = useState(0)
+
+    useEffect(() => {
+        isFirstRender.current = false;
+    });
 
     useEffect(() => {
         const handleMouseMove = (e) => {
             if (chooseMenu.current) {
-                const menuElements = chooseMenu.current.querySelectorAll('*');
-                const allRects = [chooseMenu.current.getBoundingClientRect()];
-
-                menuElements.forEach(element => {
-                    allRects.push(element.getBoundingClientRect());
-                });
-
-                const inside = allRects.some(rect =>
-                    e.clientX >= rect.left &&
-                    e.clientX <= rect.right &&
-                    e.clientY >= rect.top &&
-                    e.clientY <= rect.bottom
-                );
+                const menuRect = chooseMenu.current.getBoundingClientRect();
+                const inside = e.clientX >= menuRect.left &&
+                    e.clientX <= menuRect.right &&
+                    e.clientY >= menuRect.top &&
+                    e.clientY <= menuRect.bottom;
 
                 if (!inside) setIsMenuVisible(false);
             }
         };
 
         window.addEventListener("mousemove", handleMouseMove);
-
         return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, [chooseMenu, setIsMenuVisible]);
-
+    }, []);
 
     const clickHandeler = (e) => {
         const block = e.target.closest('.course_editor-block');
-        if (block && !block.classList.contains('active')) {
-            return;
-        }
+        if (block && !block.classList.contains('active')) return;
+
         setCoursorPos({ x: e.clientX, y: e.clientY })
         setIsMenuVisible(true);
     }
@@ -55,39 +50,74 @@ const CourseEditor = () => {
     const addExerciseBlock = () => { }
     const addImageBlock = () => { }
 
-    const normalizeTextBlock = (value) => {
-        return (<p className="course_editor-block-text" contentEditable="true">{value}</p>)
+    const normalizeTextBlock = (value, id) => {
+        return (
+            <p
+                ref={(el) => {
+                    if (el && (!initializedBlocks.current.has(id) || el.textContent === '')) {
+                        el.textContent = value;
+                        initializedBlocks.current.add(id);
+                    }
+                }}
+                className="course_editor-block-text"
+                contentEditable="true"
+                suppressContentEditableWarning={true}
+                onInput={(e) => {
+                    e.stopPropagation();
+                    updateBlockValue(id, e.target.textContent);
+                }}
+                onBlur={(e) => {
+                    e.stopPropagation();
+                    updateBlockValue(id, e.target.textContent);
+                }}
+            />
+        )
     }
 
-    const blockClickHandeler = (index) => {
-        setChosenBlock(index)
+    const updateBlockValue = (blockId, blockValue) => {
+        setEditorValue(prev => {
+            return prev.map(item => {
+                const [id, block] = Object.entries(item)[0];
+                if (id === blockId) {
+                    return { [id]: { ...block, value: blockValue } }
+                }
+                return item;
+            })
+        })
     }
 
     return (
         <div className="main-area" onClick={clickHandeler}>
             <div className="course_ediotr-blocks">
-                {
-                    Object.entries(editorValue).map(([blockType, blockValue], index) => {
-                        let innerHtml = <div>Te</div>;
-                        if (blockType === "text") {
-                            console.log(normalizeTextBlock(blockValue))
-                            innerHtml = normalizeTextBlock(blockValue)
-                        }
-                        return <div
-                            key={index}
+                {editorValue.map((item, index) => {
+                    const [id, block] = Object.entries(item)[0];
+
+                    let innerHtml = <div>Te</div>;
+
+                    if (block.type === "text") {
+                        innerHtml = normalizeTextBlock(block.value, id);
+                    }
+
+                    return (
+                        <div
+                            key={id}
                             className={`course_editor-block ${index === chosenBlock ? "active" : ""}`}
-                            onClick={() => blockClickHandeler(index)}>{innerHtml}
+                            onClick={() => setChosenBlock(index)}
+                        >
+                            {innerHtml}
                         </div>
-                    })
-                }
+                    );
+                })}
             </div>
-            <CourseEditorMenu chooseMenu={chooseMenu}
+            <CourseEditorMenu
+                chooseMenu={chooseMenu}
                 coursorPos={coursorPos}
                 isMenuVisible={isMenuVisible}
                 addTextBlock={addTextBlock}
                 addCodeBlock={addCodeBlock}
                 addExerciseBlock={addExerciseBlock}
-                addImageBlock={addImageBlock} />
+                addImageBlock={addImageBlock}
+            />
         </div>
     )
 }

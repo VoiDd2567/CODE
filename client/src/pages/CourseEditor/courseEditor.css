@@ -6,7 +6,7 @@
 }
 
 .left_pannel {
-    width: 13%;
+    min-width: 14vw;
     height: 80%;
     margin-left: 2vw;
     margin-top: 2vh;
@@ -15,7 +15,8 @@
 }
 
 .main-area {
-    width: 90%;
+    min-width: 83vw;
+    max-width: 83vw;
     margin-left: 1vw;
     border: 0.1vh black solid;
     background-color: #a9aaad;
@@ -96,6 +97,8 @@
 }
 
 .course_editor-block-text {
+    position: relative;
     margin: 1vw;
     padding: 1vh;
+    max-width: 100%;
 }
