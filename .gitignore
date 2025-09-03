@@ -20,6 +20,7 @@ pnpm-debug.log*
 lerna-debug.log*
 server_copy.js
 test.js*
+lineCount.py*
 
 node_modules
 dist
