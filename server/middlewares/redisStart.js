@@ -8,7 +8,11 @@ async function ensureRedis() {
     const client = new Redis({
         port: REDIS_PORT,
         host: '127.0.0.1',
-        lazyConnect: true, // Don't connect immediately
+        lazyConnect: true,
+        connectTimeout: 10000,        // 10 seconds to establish connection
+        commandTimeout: 5000,         // 5 seconds for individual commands
+        retryDelayOnFailover: 100,    // Delay between retry attempts
+        maxRetriesPerRequest: 3,
     });
 
     try {

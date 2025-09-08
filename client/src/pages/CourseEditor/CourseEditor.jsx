@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import CourseEditorMenu from "./CourseEditorMenu.jsx"
+import { TextBlock } from "./Blocks.jsx";
 
 const CourseEditor = () => {
     const chooseMenu = useRef(null);
@@ -21,27 +22,28 @@ const CourseEditor = () => {
     });
 
     useEffect(() => {
-        const handleMouseMove = (e) => {
-            if (chooseMenu.current) {
-                const menuRect = chooseMenu.current.getBoundingClientRect();
-                const inside = e.clientX >= menuRect.left &&
-                    e.clientX <= menuRect.right &&
-                    e.clientY >= menuRect.top &&
-                    e.clientY <= menuRect.bottom;
-
-                if (!inside) setIsMenuVisible(false);
-            }
+        const handleMouseLeave = () => {
+            setIsMenuVisible(false);
         };
 
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, []);
+        if (chooseMenu.current) {
+            chooseMenu.current.addEventListener("mouseleave", handleMouseLeave);
+
+            return () => {
+                if (chooseMenu.current) {
+                    // eslint-disable-next-line react-hooks/exhaustive-deps
+                    chooseMenu.current.removeEventListener("mouseleave", handleMouseLeave);
+                }
+            };
+        }
+    }, [isMenuVisible]);
 
     const clickHandeler = (e) => {
         const block = e.target.closest('.course_editor-block');
         if (block && !block.classList.contains('active')) return;
 
         setCoursorPos({ x: e.clientX, y: e.clientY })
+        setChosenBlock(null);
         setIsMenuVisible(true);
     }
 
@@ -49,30 +51,6 @@ const CourseEditor = () => {
     const addCodeBlock = () => { }
     const addExerciseBlock = () => { }
     const addImageBlock = () => { }
-
-    const normalizeTextBlock = (value, id) => {
-        return (
-            <p
-                ref={(el) => {
-                    if (el && (!initializedBlocks.current.has(id) || el.textContent === '')) {
-                        el.textContent = value;
-                        initializedBlocks.current.add(id);
-                    }
-                }}
-                className="course_editor-block-text"
-                contentEditable="true"
-                suppressContentEditableWarning={true}
-                onInput={(e) => {
-                    e.stopPropagation();
-                    updateBlockValue(id, e.target.textContent);
-                }}
-                onBlur={(e) => {
-                    e.stopPropagation();
-                    updateBlockValue(id, e.target.textContent);
-                }}
-            />
-        )
-    }
 
     const updateBlockValue = (blockId, blockValue) => {
         setEditorValue(prev => {
@@ -86,6 +64,7 @@ const CourseEditor = () => {
         })
     }
 
+
     return (
         <div className="main-area" onClick={clickHandeler}>
             <div className="course_ediotr-blocks">
@@ -95,7 +74,9 @@ const CourseEditor = () => {
                     let innerHtml = <div>Te</div>;
 
                     if (block.type === "text") {
-                        innerHtml = normalizeTextBlock(block.value, id);
+                        innerHtml = (
+                            <TextBlock value={block.value} id={id} initializedBlocks={initializedBlocks} updateBlockValue={updateBlockValue} opened={index === chosenBlock} />
+                        );
                     }
 
                     return (

@@ -99,6 +99,43 @@
 .course_editor-block-text {
     position: relative;
     margin: 1vw;
+    margin-top: 0;
     padding: 1vh;
     max-width: 100%;
+}
+
+.course_editor-text_align_choices-wrap {
+    width: 83vw;
+    display: flex;
+    justify-content: end;
+
+}
+
+.course_editor-text_align_choices {
+    display: flex;
+    margin-right: 1.5vw;
+    border: 0.1vh solid black;
+    border-radius: 0.7vh;
+    margin-top: 0.4vh;
+    margin-bottom: 0.4vh;
+}
+
+.course_editor-text_align-choice {
+    width: 1.2vw;
+    height: 1.2vw;
+    margin: 0.5vh;
+    margin-left: 0;
+
+}
+
+.course_editor-text_align-choice:first-of-type {
+    margin-left: 0.5vh;
+}
+
+.course_editor-text_align-choice img {
+    width: 100%;
+}
+
+.course_editor-text_align-choice img:hover {
+    transform: scale(1.1);
 }
