@@ -1,0 +1,67 @@
+.loadingScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-family: "Oswald", sans-serif;
+    font-size: 8vh;
+    color: #d8d9db;
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#loadingDot3,
+#loadingDot1 {
+    animation: dotsUp 2s infinite;
+    animation-iteration-count: infinite;
+}
+
+#loadingDot2 {
+    animation: dotsDown 2s infinite;
+    animation-delay: 0.5s;
+    animation-iteration-count: infinite;
+}
+
+#loadingDot3 {
+    animation-delay: 1s;
+}
+
+@keyframes dotsUp {
+
+    0% {
+        transform: translateY(0);
+    }
+
+    16.67% {
+        transform: translateY(-1vh);
+    }
+
+    33.33% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes dotsDown {
+    0% {
+        transform: translateY(0);
+    }
+
+    16.67% {
+        transform: translateY(1vh);
+    }
+
+    33.33% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

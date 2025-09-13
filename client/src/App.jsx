@@ -11,6 +11,7 @@ import CourseEditor from "./pages/CourseEditor/CourseEditorPage";
 import UserCourses from "./pages/UserCourses/UserCourses";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Teapot from "./pages/Teapot/Teapot"
+import LoadingScreen from "./components/Loading/LoadingScreem";
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 
 const PrivateRoute = ({ children }) => {
@@ -48,7 +49,7 @@ const App = () => {
     }, [i18n, setLng]);
 
     if (loading) {
-        return <div className="loadingScreen">Loading...</div>;
+        return <LoadingScreen />;
     }
 
     return (

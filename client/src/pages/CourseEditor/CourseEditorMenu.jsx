@@ -7,7 +7,7 @@ import add_text_img from "../../pictures/add_text_icon.png"
 import add_exercise_img from "../../pictures/add_exercise_icon.png"
 import add_code_img from "../../pictures/add_code_icon.png"
 import add_image_img from "../../pictures/add_image_icon.png"
-
+import "./hoveringMenu.css"
 
 const CourseEditorMenu = ({ chooseMenu, coursorPos, isMenuVisible, addTextBlock, addCodeBlock, addExerciseBlock, addImageBlock }) => {
 

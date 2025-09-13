@@ -1,0 +1,36 @@
+.choose_menu-block_btn-insert_choise_wrap {
+    position: absolute;
+    top: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-2vh);
+    transition: all 0.3s ease;
+    background-color: #ededf0;
+    width: 130%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1vh;
+}
+
+.choose_menu-block_btn:hover .choose_menu-block_btn-insert_choise_wrap {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.choose_menu-block_btn-insert-choise {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.7vh;
+}
+
+.choose_menu-block_btn-insert-choise:first-of-type {
+    margin-top: 0.7vh;
+}
+
+.choose_menu-block_btn-insert-choise:hover {
+    transform: scale(1.1);
+}

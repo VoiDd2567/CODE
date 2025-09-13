@@ -9,13 +9,13 @@ const CourseEditor = () => {
     const [coursorPos, setCoursorPos] = useState([])
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [editorValue, setEditorValue] = useState([
-        { 1: { value: "Lol i dnt know", type: "text" } },
+        { 1: { value: "<text color:white>Lol <text color:red font-size:4vh>i</text> dnt know</text>", type: "text" } },
         { 2: { value: "text", type: "text" } },
         { 3: { value: "editor", type: "editor" } },
         { 4: { value: "exercise", type: "exercise" } },
         { 5: { value: "img", type: "img" } }
     ]);
-    const [chosenBlock, setChosenBlock] = useState(0)
+    const [chosenBlock, setChosenBlock] = useState(-1)
 
     useEffect(() => {
         isFirstRender.current = false;
@@ -39,12 +39,17 @@ const CourseEditor = () => {
     }, [isMenuVisible]);
 
     const clickHandeler = (e) => {
-        const block = e.target.closest('.course_editor-block');
-        if (block && !block.classList.contains('active')) return;
+        e.preventDefault()
+        const block = e.target.closest('.course_editor-block-text');
+        const blockSettings = e.target.closest('.block-settings');
+        if (block || blockSettings) {
+            setIsMenuVisible(false);
+            return
+        }
 
         setCoursorPos({ x: e.clientX, y: e.clientY })
-        setChosenBlock(null);
         setIsMenuVisible(true);
+        setChosenBlock(-1);
     }
 
     const addTextBlock = () => { }
@@ -67,7 +72,7 @@ const CourseEditor = () => {
 
     return (
         <div className="main-area" onClick={clickHandeler}>
-            <div className="course_ediotr-blocks">
+            <div className="course_ediotor-blocks">
                 {editorValue.map((item, index) => {
                     const [id, block] = Object.entries(item)[0];
 
@@ -75,7 +80,7 @@ const CourseEditor = () => {
 
                     if (block.type === "text") {
                         innerHtml = (
-                            <TextBlock value={block.value} id={id} initializedBlocks={initializedBlocks} updateBlockValue={updateBlockValue} opened={index === chosenBlock} />
+                            <TextBlock value={block.value} id={id} initializedBlocks={initializedBlocks} updateBlockValue={updateBlockValue} opened={index === chosenBlock} setChosenBlock={setChosenBlock} index={index} />
                         );
                     }
 
@@ -83,7 +88,7 @@ const CourseEditor = () => {
                         <div
                             key={id}
                             className={`course_editor-block ${index === chosenBlock ? "active" : ""}`}
-                            onClick={() => setChosenBlock(index)}
+
                         >
                             {innerHtml}
                         </div>
