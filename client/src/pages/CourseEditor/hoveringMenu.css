@@ -1,3 +1,48 @@
+.choose_menu {
+    position: absolute;
+    height: 4vh;
+    background-color: #ededf0;
+    border-radius: 2vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.choose_menu-block_btn {
+    width: 20%;
+    min-width: 1.5vw;
+    max-width: 1.7vw;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.choose_menu-block_btn:first-of-type {
+    margin-left: 1vw;
+}
+
+.choose_menu-block_btn:last-of-type {
+    margin-right: 1vw;
+}
+
+.choose_menu-block_btn img {
+    width: 70%;
+}
+
+.choose_menu-block_btn img:hover {
+    width: 80%;
+}
+
+
+.menu-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .choose_menu-block_btn-insert_choise_wrap {
     position: absolute;
     top: 100%;

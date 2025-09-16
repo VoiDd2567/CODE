@@ -29,35 +29,6 @@ html {
     overflow-x: hidden;
 }
 
-.choose_menu {
-    position: absolute;
-    width: 8vw;
-    height: 4vh;
-    background-color: #ededf0;
-    border-radius: 2vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.choose_menu-block_btn {
-    width: 20%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    cursor: pointer;
-}
-
-.choose_menu-block_btn img {
-    width: 70%;
-}
-
-.choose_menu-block_btn img:hover {
-    width: 80%;
-}
-
 .course_editor-block {
     min-height: 1vh;
 }

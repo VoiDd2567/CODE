@@ -1,12 +1,14 @@
 import { useEffect, useState, useRef } from "react"
-import CourseEditorMenu from "./CourseEditorMenu.jsx"
+import CourseEditorBtnMenu from "./CourseEditorBtnMenu.jsx"
 import { TextBlock } from "./Blocks.jsx";
+import { TextCompile } from "./BlockDecompiler"
 
 const CourseEditor = () => {
     const chooseMenu = useRef(null);
     const isFirstRender = useRef(true);
     const initializedBlocks = useRef(new Set());
     const [coursorPos, setCoursorPos] = useState([])
+    const [currentSelection, setCurrentSelection] = useState(null);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [editorValue, setEditorValue] = useState([
         { 1: { value: "<text color:white>Lol <text color:red font-size:4vh>i</text> dnt know</text>", type: "text" } },
@@ -16,6 +18,22 @@ const CourseEditor = () => {
         { 5: { value: "img", type: "img" } }
     ]);
     const [chosenBlock, setChosenBlock] = useState(-1)
+    const [menuType, setMenuType] = useState("standart")
+
+    useEffect(() => { console.log(editorValue) }, [editorValue])
+
+    const handleTextSelection = (selectionInfo) => {
+        console.log('Text selected:', selectionInfo);
+        setCurrentSelection(selectionInfo);
+        if (selectionInfo.selectedText.trim().length > 0 && selectionInfo.selectionRect) {
+            setCoursorPos({
+                x: selectionInfo.selectionRect.x,
+                y: selectionInfo.selectionRect.y
+            });
+            setMenuType("text");
+            setIsMenuVisible(true);
+        }
+    };
 
     useEffect(() => {
         isFirstRender.current = false;
@@ -42,26 +60,27 @@ const CourseEditor = () => {
         e.preventDefault()
         const block = e.target.closest('.course_editor-block-text');
         const blockSettings = e.target.closest('.block-settings');
+
         if (block || blockSettings) {
             setIsMenuVisible(false);
-            return
+            setCurrentSelection(null);
+            return;
         }
 
-        setCoursorPos({ x: e.clientX, y: e.clientY })
+        setMenuType("standart");
+        setCoursorPos({ x: e.clientX, y: e.clientY });
         setIsMenuVisible(true);
         setChosenBlock(-1);
+        setCurrentSelection(null);
     }
-
-    const addTextBlock = () => { }
-    const addCodeBlock = () => { }
-    const addExerciseBlock = () => { }
-    const addImageBlock = () => { }
 
     const updateBlockValue = (blockId, blockValue) => {
         setEditorValue(prev => {
             return prev.map(item => {
                 const [id, block] = Object.entries(item)[0];
                 if (id === blockId) {
+                    blockValue = blockValue.toString();
+                    blockValue = TextCompile(blockValue)
                     return { [id]: { ...block, value: blockValue } }
                 }
                 return item;
@@ -80,7 +99,14 @@ const CourseEditor = () => {
 
                     if (block.type === "text") {
                         innerHtml = (
-                            <TextBlock value={block.value} id={id} initializedBlocks={initializedBlocks} updateBlockValue={updateBlockValue} opened={index === chosenBlock} setChosenBlock={setChosenBlock} index={index} />
+                            <TextBlock value={block.value}
+                                id={id}
+                                initializedBlocks={initializedBlocks}
+                                updateBlockValue={updateBlockValue}
+                                opened={index === chosenBlock}
+                                setChosenBlock={setChosenBlock}
+                                index={index}
+                                onTextSelection={handleTextSelection} />
                         );
                     }
 
@@ -88,21 +114,21 @@ const CourseEditor = () => {
                         <div
                             key={id}
                             className={`course_editor-block ${index === chosenBlock ? "active" : ""}`}
-
+                            data-block-id={id}
                         >
                             {innerHtml}
                         </div>
                     );
                 })}
             </div>
-            <CourseEditorMenu
+            <CourseEditorBtnMenu
                 chooseMenu={chooseMenu}
                 coursorPos={coursorPos}
                 isMenuVisible={isMenuVisible}
-                addTextBlock={addTextBlock}
-                addCodeBlock={addCodeBlock}
-                addExerciseBlock={addExerciseBlock}
-                addImageBlock={addImageBlock}
+                editorValue={editorValue}
+                setEditorValue={setEditorValue}
+                menuType={menuType}
+                currentSelection={currentSelection}
             />
         </div>
     )

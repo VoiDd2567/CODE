@@ -23,4 +23,28 @@ const TextDecompile = (value) => {
     return result
 }
 
-export { TextDecompile };
+const TextCompile = (value) => {
+    let result = value;
+
+    result = result.replace(/<span([^>]*)>/g, (match, attributes) => {
+        if (!attributes.trim()) return "<text>";
+
+        let styles = "";
+        const styleMatch = attributes.match(/style\s*=\s*["']?([^"'>]*)["']?/);
+
+        if (styleMatch) {
+            styles = styleMatch[1]
+                .split(";")
+                .map(s => s.trim())
+                .filter(s => s.length > 0)
+                .join(" ");
+        }
+
+        return `<text${styles ? " " + styles : ""}>`;
+    });
+
+    result = result.replace(/<\/span>/g, "</text>");
+    return result;
+};
+
+export { TextDecompile, TextCompile };
