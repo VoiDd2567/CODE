@@ -22,17 +22,13 @@ const CourseEditorBtnMenu = ({ chooseMenu, coursorPos, menuType, isMenuVisible, 
 
 
     const makeBold = () => {
-        console.log('makeBold called', currentSelection);
         if (!currentSelection) return;
-        console.log(currentSelection)
-        const { blockId, selectedText, beforeHTML, afterHTML } = currentSelection;
-        console.log('blockId:', blockId, 'selectedText:', selectedText);
 
+        const { blockId, selectedText, beforeHTML, afterHTML } = currentSelection;
         const currentBlock = editorValue.find(item => Object.keys(item)[0] === blockId);
         if (!currentBlock) return;
-
+        
         const newValue = beforeHTML + `<text font-weight:bold>${selectedText}</text>` + afterHTML;
-
         setEditorValue(prev => prev.map(item => {
             const [id, blockData] = Object.entries(item)[0];
             return id === blockId ? { [id]: { ...blockData, value: newValue } } : item;

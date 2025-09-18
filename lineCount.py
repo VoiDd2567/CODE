@@ -3,7 +3,7 @@ import os
 all_items = os.listdir("./")
 
 forbidden_items = ["node_modules", "eslint.config.js", "package-lock.json","package.json",".gitignore","server.cert","server.key",
-"temp","vite.config.js","README.md","pictures",".git"]
+"temp","vite.config.js","README.md","pictures",".git","html"]
 
 line_count = 0
 

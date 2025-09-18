@@ -5,6 +5,7 @@ const ExerciseSolution = require("./schemas/ExerciseSolution");
 const Session = require("./schemas/Session")
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
+const PasswordReset = require("./schemas/PasswordReset")
 const logger = require("../scripts/Logging")
 const MongoGetData = require("./mongo_get_data");
 const MongoDeleteData = require("./mongo_delete_data")
@@ -111,11 +112,22 @@ class MongoCreateData {
 
   static async createCourse(courseId, creator) {
     try {
-      const course = new Course({ courseId, creator, });
+      const course = new Course({ courseId, creator });
       const savedCourse = await course.save();
       return savedCourse._id;
     } catch (err) {
       logger.error("Error creating course: " + err.message)
+      throw err;
+    }
+  }
+
+  static async createPasswordReset(token, userId) {
+    try {
+      const passwordReset = new PasswordReset({ token, userId });
+      const savedPasswordReset = await passwordReset.save();
+      return savedPasswordReset._id;
+    } catch (err) {
+      logger.error("Error creating savedPasswordReset: " + err.message)
       throw err;
     }
   }

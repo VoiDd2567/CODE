@@ -2,18 +2,6 @@
     margin: 0;
 }
 
-
-.registration-page__logo {
-    margin-top: 10vh;
-    width: 25vw;
-    padding-bottom: 5vh;
-}
-
-.registration-page__logo img {
-    width: 100%;
-    height: auto;
-}
-
 .registration-page {
     display: flex;
     flex-direction: column;

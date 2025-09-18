@@ -7,16 +7,19 @@ import "./header.css";
 import logo from "../../pictures/logo.png";
 import account_image from "../../pictures/account_icon.png"
 
+const developer_mode = true;
+
 function Header() {
   const { t, i18n } = useTranslation();
 
   const { lng, setLng } = useContext(LanguageContext);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
-  const [redirectToCourses, setRedirectToCourses] = useState(false);
   const [redirectToCodeEditor, setRedirectToCodeEditor] = useState(false);
+  const [redirectToCourseEditor, setRedirectToCourseEditor] = useState(false);
   const [redirectToProfile, setRedirectToProfile] = useState(false)
   const [isLngOpen, setIsLngOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [pageMode, setPageMode] = useState("student");
   const loginLabel = useRef(null);
   const accountName = useRef(null);
   const account = useRef(null);
@@ -87,8 +90,16 @@ function Header() {
     return <Navigate to="/profile-settings" replace />;
   }
 
-  if (redirectToCourses) {
+  if (redirectToCourseEditor) {
     return <Navigate to="/course-editor" replace />;
+  }
+
+  const handleSwitchClick = () => {
+    if (pageMode === "student") {
+      setPageMode("teacher");
+    } else {
+      setPageMode("student");
+    }
   }
 
   return (
@@ -96,6 +107,15 @@ function Header() {
       <div className="header__logo">
         <img src={logo} alt="Logo" />
       </div>
+      {developer_mode && (
+        <div className="switch-wrap">
+          <div className="dev-mode">{pageMode}</div>
+          <label className="switch">
+            <input type="checkbox" onClick={() => handleSwitchClick()} />
+            <span className="slider"></span>
+          </label>
+        </div>)
+      }
       <div className="header__item-list">
         <div className="header__lng-change-wrap">
           <div className="header__item header__lng" id="lngButton" onClick={() => { setIsLngOpen(!isLngOpen); }}>
@@ -109,6 +129,9 @@ function Header() {
           )}
         </div>
         <div className="header__item" onClick={() => { setRedirectToCodeEditor(true) }}>{t("editor")}</div>
+        {pageMode === "teacher" && (
+          <div className="header__item" onClick={() => { setRedirectToCourseEditor(true) }}>{t("course_editor")}</div>
+        )}
         <div className="header__item" ref={loginLabel} onClick={() => { setRedirectToLogin(true) }}>{t("login")} </div>
         <div className="header__account-wrap" ref={account}>
           <div className="header__account" onClick={() => { setIsAccountOpen(!isAccountOpen) }}>
@@ -118,7 +141,7 @@ function Header() {
           {isAccountOpen && (
             <div className="header__account-menu">
               <div onClick={() => { setRedirectToProfile(true) }}>{t("settings")}</div>
-              <div onClick={() => { setRedirectToCourses(true) }}>{t("courses")}</div>
+              <div>{t("courses")}</div>
               <div onClick={logout}>{t("logout")}</div>
             </div>
           )}

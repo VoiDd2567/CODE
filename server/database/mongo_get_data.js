@@ -5,6 +5,7 @@ const ExerciseSolution = require("./schemas/ExerciseSolution");
 const Session = require("./schemas/Session");
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
+const PasswordReset = require("./schemas/PasswordReset")
 const logger = require("../scripts/Logging")
 const { getCache, setCache } = require("./cache/MongoCache")
 
@@ -38,6 +39,10 @@ class MongoGetData {
     return await this.#getData("course", findBy)
   }
 
+  static async getPasswordReset(findBy) {
+    return await this.#getData("passwordReset", findBy)
+  }
+
   static async getUserBySession(sessionId) {
     const session = await this.#getData("session", { sessionId: sessionId })
     return await this.#getData("user", { _id: session.userId });
@@ -52,19 +57,23 @@ class MongoGetData {
         exerciseSolution: [ExerciseSolution, getCache.getExerciseSolution, 3600],
         session: [Session, getCache.getSession, 3600],
         registrationCode: [RegistrationCode, getCache.getRegistrationCode, 600],
-        course: [Course, getCache.getCourse, 86400]
+        course: [Course, getCache.getCourse, 86400],
+        passwordReset: [PasswordReset, null, null]
       }[collectionType];
-
-
-      const cache = await getFn.call(getCache, findBy);
-      if (typeof cache === "object") {
-        return cache;
+      let cache;
+      if (collectionType != "passwordReset") {
+        cache = await getFn.call(getCache, findBy);
+        if (typeof cache === "object") {
+          return cache;
+        }
       }
 
       const data = await model.findOne(findBy);
       if (!data) return null;
 
-      await setCache.set(cache, data, ttl);
+      if (collectionType != "passwordReset") {
+        await setCache.set(cache, data, ttl);
+      }
       return data;
     } catch (err) {
       logger.error("FAILED : Error finding data: " + err.message);

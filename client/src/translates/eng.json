@@ -45,5 +45,16 @@
   "add_text": "Add text",
   "add_exercise": "Add exercise",
   "add_code": "Add code",
-  "add_img": "Add image"
+  "add_img": "Add image",
+  "main_page_head": "This is a main page",
+  "main_page_text": "Here will be displayed some info like statistics or just discriprion of web platform features. Right now its placeholder",
+  "ling_for_github": "Link for project Github",
+  "course_editor": "Course editor",
+  "forgot_password_q": "Forgot password?",
+  "write_email_to_get_reset": "Please enter your email. If we find a linked account, we will send a link to reset your password.",
+  "email_reset_sent": "An email with a link to reset your password has been sent to: ",
+  "wrong_token": "The link was pasted incorrectly or doesn’t work.",
+  "enter_new_password": "Please enter new password",
+  "paswords_not_same": "Passwords must be same",
+  "password_changed": "Password is changed"
 }

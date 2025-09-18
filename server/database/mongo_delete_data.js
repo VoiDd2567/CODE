@@ -6,6 +6,7 @@ const ExerciseSolution = require("./schemas/ExerciseSolution");
 const Session = require("./schemas/Session")
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
+const PasswordReset = require("./schemas/PasswordReset")
 const logger = require("../scripts/Logging")
 const { deleteCache } = require("./cache/MongoCache")
 
@@ -81,6 +82,16 @@ class MongoDeleteData {
             }
         } catch (err) {
             logger.error("Error deleting course: " + err);
+        }
+    }
+    static async deletePasswordReset(passwordResetId) {
+        try {
+            const course = await PasswordReset.findOne({ _id: passwordResetId });
+            if (course) {
+                await PasswordReset.deleteOne({ _id: passwordResetId });
+            }
+        } catch (err) {
+            logger.error("Error deleting PasswordReset: " + err);
         }
     }
 }

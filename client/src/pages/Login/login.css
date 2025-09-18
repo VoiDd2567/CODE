@@ -31,7 +31,6 @@
     background-color: #a4a1a1;
     border: 0;
     border-radius: 3vh;
-    font-family: "Electrolize", sans-serif;
 }
 
 .login-page__input {
@@ -62,9 +61,13 @@
 }
 
 .login-page__link {
-    color: #FFD369;
+    color: #f4cd73;
     margin-left: 1vw;
     cursor: pointer;
+}
+
+.login-page__link:hover {
+    color: #c89e3b;
 }
 
 .login-page__back-button {
@@ -97,4 +100,11 @@
     margin-top: 2vh;
     color: rgb(163, 22, 22);
     font-size: 2vh;
+}
+
+.login_page-forgot_password {
+    display: flex;
+    width: 100%;
+    text-align: start;
+    margin-left: 3vw;
 }

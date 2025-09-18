@@ -24,7 +24,7 @@
     "new_code_get_success": "Saatsime uue koodi e-postile",
     "logout": "Logi välja",
     "settings": "Seaded",
-    "editor": "Koodiredaktorid",
+    "editor": "Koodiredaktor",
     "run": "Käivita",
     "send": "Saata",
     "open-exercise": "Avada ülesanne",
@@ -44,5 +44,16 @@
     "add_text": "Lisa tekst",
     "add_exercise": "Lisa harjutus",
     "add_code": "Lisa kood",
-    "add_img": "Lisa pilt"
+    "add_img": "Lisa pilt",
+    "main_page_head": "See on avaleht",
+    "main_page_text": "Siia kuvatakse infot, näiteks statistikat või lihtsalt veebiplatvormi funktsioonide kirjeldust. Praegu on see kohatäide",
+    "ling_for_github": "Projekti GitHubi link",
+    "course_editor": "Kursuste redaktor",
+    "forgot_password_q": "Unustasid parooli?",
+    "write_email_to_get_reset": "Palun sisestage oma e-posti aadress. Kui leiame seotud konto, saadame lingi parooli uuendamiseks.",
+    "email_reset_sent": "Sinu parooli lähtestamise lingiga e-kiri on saadetud aadressile: ",
+    "wrong_token": "Link on sisestatud valesti või ei tööta",
+    "enter_new_password": "Palun sisestage uus parool",
+    "paswords_not_same": "Paroolid peavad olema samad",
+    "password_changed": "Parool on muudetud"
 }

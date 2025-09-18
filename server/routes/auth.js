@@ -12,6 +12,8 @@ const RegistartionDataChecks = require("../scripts/RegistrationDataChecks");
 const EmailSend = require("../scripts/EmailSend");
 const Hash = require("../scripts/Hash");
 const logger = require("../scripts/Logging");
+const config = require("../config");
+const crypto = require('crypto');
 
 const RegLimiter = rateLimit({
     windowMs: 2 * 60 * 1000,
@@ -176,6 +178,86 @@ router.get("/logout", async (req, res) => {
         await MongoDeleteData.deleteSession(session._id)
         res.status(200).json({ success: true })
     } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.post("/send-reset-link", RegLimiter, async (req, res) => {
+    try {
+        const { email } = req.body;
+        console.log
+        if (typeof email != "string") {
+            return res.status(401).json({ error: "Wrong data type" })
+        }
+
+        const user = await MongoGetData.getUser({ email: email });
+        if (user) {
+            const sentCheck = await MongoGetData.getPasswordReset({ userId: user._id });
+            if (!sentCheck) {
+                const token = crypto.randomBytes(32).toString("hex");
+                const tokenHash = await Hash.hash(token);
+                const resetLink = `${config["DOMAIN"]}/reset-password?uid=${user._id}&token=${token}`;
+
+                await MongoCreateData.createPasswordReset(tokenHash, user._id);
+                await EmailSend.sendResetLink(email, resetLink, user.defaultLng);
+                return res.status(200).json({ success: "true" })
+            }
+            return res.status(429).json({ error: "Email already sent" })
+        }
+
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.post("/check-reset-token", async (req, res) => {
+    try {
+        const { token, userId } = req.body;
+
+        const reset = await MongoGetData.getPasswordReset({ userId: userId })
+        if (!reset) {
+            return res.status(401).json({ error: "Reset process not found" })
+        }
+
+        const compare = await Hash.compare(token, reset.token)
+
+        if (compare) {
+            return res.status(200).json({ message: "Right token" })
+        }
+
+        return res.status(401).json({ error: "Reset process not found" })
+    }
+    catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.post("/reset-password", RegLimiter, async (req, res) => {
+    try {
+        const { token, password, userId } = req.body;
+
+        const passwordValidResult = RegistartionDataChecks.passwordChecks(password)
+        if (!passwordValidResult.valid) return res.status(403).json({ error: passwordValidResult.message })
+
+        const reset = await MongoGetData.getPasswordReset({ userId: userId })
+        if (!reset) {
+            return res.status(401).json({ error: "Reset process not found" })
+        }
+
+        const compare = await Hash.compare(token, reset.token)
+        if (compare) {
+            const hashedPassword = await Hash.hash(password);
+            await MongoUpdateData.update("user", { _id: userId }, { password: hashedPassword, passwordChangedAt: new Date() })
+            await MongoDeleteData.deletePasswordReset(reset._id);
+            return res.status(200).json({ message: "Password changed" })
+        }
+
+        return res.status(401).json({ error: "Reset process not found" })
+    }
+    catch (err) {
         logger.error(err)
         res.status(500).json({ error: "Internal server error" })
     }

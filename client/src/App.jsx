@@ -12,6 +12,8 @@ import UserCourses from "./pages/UserCourses/UserCourses";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Teapot from "./pages/Teapot/Teapot"
 import LoadingScreen from "./components/Loading/LoadingScreem";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
+import PasswordResetEmailGet from "./pages/PasswordResetEmailGet/PasswordResetEmailGet";
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 
 const PrivateRoute = ({ children }) => {
@@ -61,6 +63,8 @@ const App = () => {
                     <Route path="/registration" element={<Registration />} />
                     <Route path="/registration-code" element={<RegistrationCode />} />
                     <Route path="/teapot" element={<Teapot />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/password-reseting" element={<PasswordResetEmailGet />} />
                     <Route path="/code-editor" element={
                         <PrivateRoute>
                             <CodeEditor />

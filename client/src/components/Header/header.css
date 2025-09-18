@@ -154,3 +154,51 @@ header {
     transform: scale(1.05);
     color: #a48640;
 }
+
+.switch-wrap {
+    margin-left: 2vw;
+    display: flex;
+    color: white;
+    align-items: center;
+    justify-content: center;
+}
+
+.dev-mode {
+    width: 4vw;
+    font-family: "Electrolize", sans-serif;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: relative;
+    display: inline-block;
+    width: 4vw;
+    height: 4vh;
+    background-color: #ccc;
+    border-radius: 2vw;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 3vh;
+    height: 3vh;
+    left: 0.5vh;
+    bottom: 0.5vh;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+input:checked+.slider {
+    background-color: #4caf50;
+}
+
+input:checked+.slider::before {
+    transform: translateX(1.7vw);
+}

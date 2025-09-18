@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/PasswordInput";
 import TeacherStudentChoose from "./TeacherStudentChoose";
+import LoginingPageLogo from "../../components/other/logginingPagesLogo";
 import "./registration.css";
-import logo from "../../pictures/logo.png";
 
 const Registration = () => {
     const { t } = useTranslation();
@@ -69,7 +69,7 @@ const Registration = () => {
 
     return (
         <div className="registration-page">
-            <div className="registration-page__logo"><img src={logo} alt="Logo" /></div>
+            <LoginingPageLogo />
             <form className="registration-page__form">
                 <label className="registration-page__error" ref={errorMessage} hidden></label>
                 <input name="username" className="registration-page__input" ref={username} placeholder={t("username")} required />
