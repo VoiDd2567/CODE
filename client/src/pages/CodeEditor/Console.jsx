@@ -173,30 +173,34 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
 
     const handleSendBtnClick = () => {
         saveData(editorValue);
-        startRunningCodeText();
-        fetch("https://localhost:3001/api/exercise/check-exercise", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ exerciseId: exercise._id })
-        }).then(async res => {
-            setRunningCodeTimeout(prevTimeout => {
-                if (prevTimeout) {
-                    clearTimeout(prevTimeout);
+        setTimeout(() => {
+            startRunningCodeText();
+            fetch("https://localhost:3001/api/exercise/check-exercise", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ exerciseId: exercise._id })
+            }).then(async res => {
+                setRunningCodeTimeout(prevTimeout => {
+                    if (prevTimeout) {
+                        clearTimeout(prevTimeout);
+                    }
+                    return null;
+                });
+                if (!res.ok) {
+                    const errorData = await res.text();
+                    textToConsole(errorData, false);
+                    throw new Error(`Error ${res.status}`);
+                } else {
+                    const data = await res.json();
+                    textToConsole(data["correct"] >= data["minimal_percent"] ? "SUCESS\n\n" : "WRONG\n\n", false)
+                    textToConsole(data["output"]);
+                    const output = `\n-------------------${data["correct"] >= data["minimal_percent"] ? "Correct" : "Wrong"} solution (${data["correct"]}/100)--------------------`;
+                    textToConsole(output)
+                    textToConsole("\n\n---------------------Answer check completed-----------------------");
                 }
-                return null;
-            });
-            if (!res.ok) {
-                const errorData = await res.text();
-                textToConsole(errorData, false);
-                throw new Error(`Error ${res.status}`);
-            } else {
-                const data = await res.json();
-                textToConsole(data["output"], false);
-                textToConsole(data["correct"] ? "\n------------------------Correct solution-------------------------" : "\n-------------------------Wrong solution--------------------------");
-                textToConsole("\n\n---------------------Answer check completed-----------------------");
-            }
-        })
+            })
+        }, 500)
     }
 
     const startRunningCodeText = () => {

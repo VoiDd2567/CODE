@@ -6,7 +6,7 @@ const exerciseSolutionSchema = new mongoose.Schema({
   solutionFiles: { type: Object, default: null },
   solution: { type: String, default: null },
   completeAnswer: { type: Boolean, default: false },
-  answerCorrect: { type: Boolean, default: null },
+  answerCorrectPercent: { type: Number, default: null }
 });
 
 exerciseSolutionSchema.statics.blockedFields = ["_id", "__v", "exerciseId", "userId"];

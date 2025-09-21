@@ -31,7 +31,7 @@ router.post("/get-exercise", requireAuth, async (req, res) => {
         const user = await MongoGetData.getUserBySession(sessionId)
         const allowedExercises = await getUsersAllowedExercises(user);
 
-        const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, userId: user._id })
+        const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, userId: user.p_id })
         const files = solution ? solution.solutionFiles : null;
         if (exerciseId in allowedExercises) {
             res.status(200).json({ exercise: exercise, userSolution: files })
@@ -57,7 +57,7 @@ router.post("/check-exercise", requireAuth, async (req, res) => {
             const check = new ExerciseCheck(exercise._id, user._id);
             await check.init();
             const check_result = await check.checkSolution();
-            res.status(200).json({ correct: check_result.correct, output: check_result.output })
+            res.status(200).json({ correct: check_result.correct, output: check_result.output, minimal_percent: exercise.minimalPercent })
         } else {
             res.status(400).json({ error: "Unfortunately we still don't have automatic checking for this programming language" })
         }

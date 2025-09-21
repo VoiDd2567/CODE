@@ -1,17 +1,23 @@
-// Create object with 50 keys
-let myDict = {};
-for (let i = 1; i <= 50; i++) {
-    myDict[`key${i}`] = i;
+import { MongoClient } from "mongodb";
+
+const uri = "mongodb://localhost:27017";
+const dbName = "UPT";
+
+async function resetCollection() {
+    const client = new MongoClient(uri);
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const collection = db.collection("exercisesolution");
+
+        await collection.drop();
+
+        console.log(`Collection '${"exercisesolution"}' has been reset`);
+    } catch (err) {
+        console.error("Error:", err);
+    } finally {
+        await client.close();
+    }
 }
 
-// Get keys
-let keys = Object.keys(myDict);
-
-if (keys.length > 5) {
-    // Shuffle keys
-    keys = keys.sort(() => Math.random() - 0.5);
-    // Take first 5
-    keys = keys.slice(0, 5);
-}
-
-console.log(keys); // Random 5 keys
+resetCollection();

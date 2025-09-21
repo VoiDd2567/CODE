@@ -1,7 +1,7 @@
 import "./codeEditor.css"
 import { useState, useEffect, useContext } from "react"
 import Editor from "../../components/Editor/Editor"
-import EditorHeader from "./EditorHeader"
+import MinimizedHeader from "../../components/other/minimizedHeader"
 import Console from "./Console"
 import FileManager from "./FileManager"
 import ExerciseDisplay from "./ExerciseDisplay"
@@ -144,7 +144,7 @@ const CodeEditor = () => {
     return (
         <div>
             {openedExerciseChoose && <ExerciseSelector exercises={exercises} setExerciseChoose={setExerciseChoose} getExercise={getExercise} />}
-            <EditorHeader />
+            <MinimizedHeader />
             <div className="code-editor-page__workspace-wrap">
                 <div className="code-editor-page__left-part">
                     {isExerciseOpen &&

@@ -16,7 +16,8 @@ const exerciseSchema = new mongoose.Schema({
   functionName: { type: String, default: "no-func" },
   functionReturns: { type: Object, default: {} },
   choiceAnswer: { type: String, default: "no-choice-answer" },
-  choises: { type: [String], default: [] }
+  choises: { type: [String], default: [] },
+  minimalPercent: { type: Number, defaul: 50 }
 });
 
 exerciseSchema.statics.blockedFields = ["_id", "__v"];

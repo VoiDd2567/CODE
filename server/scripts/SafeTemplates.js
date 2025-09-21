@@ -1,5 +1,6 @@
 function safeUser(user) {
     try {
+        const passwordLastChanged = new Date(user.passwordChangedAt);
         return {
             username: user.username,
             email: user.email,
@@ -12,7 +13,8 @@ function safeUser(user) {
             madeCourses: user.madeCourses,
             solvedExercises: user.solvedExercises,
             nameIsMutable: user.nameIsMutable,
-            files: user.userFiles
+            files: user.userFiles,
+            passwordLastChanged: passwordLastChanged.toLocaleString()
         }
     } catch (err) {
         return "Unavailable to read user"
@@ -32,5 +34,18 @@ function safeRegistrationCode(regCode) {
     }
 }
 
+function safeCourse(course) {
+    try {
+        return {
+            id: course._id,
+            name: course.name,
+            author: course.creator,
+            content: course.content,
+            codeLng: course.courseCodeLng
+        }
+    } catch (err) {
+        return "Unvailable to read course inforamtion"
+    }
+}
 
-module.exports = { safeUser, safeRegistrationCode };
+module.exports = { safeUser, safeRegistrationCode, safeCourse };

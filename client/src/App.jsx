@@ -14,6 +14,7 @@ import Teapot from "./pages/Teapot/Teapot"
 import LoadingScreen from "./components/Loading/LoadingScreem";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import PasswordResetEmailGet from "./pages/PasswordResetEmailGet/PasswordResetEmailGet";
+import CoursePage from "./pages/CoursePage/CoursePage";
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 
 const PrivateRoute = ({ children }) => {
@@ -80,9 +81,14 @@ const App = () => {
                             <ProfileSettings />
                         </PrivateRoute>
                     } />
-                    <Route path="/my-courses" element={
+                    <Route path="/courses" element={
                         <PrivateRoute>
                             <UserCourses />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/course/:id" element={
+                        <PrivateRoute>
+                            <CoursePage />
                         </PrivateRoute>
                     } />
                     <Route path="*" element={<Navigate to="/" replace />} />

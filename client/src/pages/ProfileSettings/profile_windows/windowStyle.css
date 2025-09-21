@@ -39,7 +39,6 @@
 }
 
 .change_password_btn {
-    margin-top: 1vh;
     width: 8vw;
     height: 4vh;
     border-radius: 2vh;
@@ -62,4 +61,14 @@
     width: 7vw;
     border-radius: 2vh;
     padding-left: 1vw;
+}
+
+.profile_page-window-reset_password {
+    display: flex;
+    align-items: center;
+    margin-top: 2vh;
+}
+
+.profile_page-window-reset_password-message {
+    margin-left: 1vw;
 }

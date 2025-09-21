@@ -5,7 +5,6 @@ import { LanguageContext } from "../LanguageContext/LanguageContext"
 import { UserContext } from "../UserContext";
 import "./header.css";
 import logo from "../../pictures/logo.png";
-import account_image from "../../pictures/account_icon.png"
 
 const developer_mode = true;
 
@@ -16,29 +15,26 @@ function Header() {
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const [redirectToCodeEditor, setRedirectToCodeEditor] = useState(false);
   const [redirectToCourseEditor, setRedirectToCourseEditor] = useState(false);
+  const [redirectToCourses, setRedirectToCourses] = useState(false);
   const [redirectToProfile, setRedirectToProfile] = useState(false)
   const [isLngOpen, setIsLngOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [pageMode, setPageMode] = useState("student");
+  const [logged, setLogged] = useState(false)
   const loginLabel = useRef(null);
-  const accountName = useRef(null);
   const account = useRef(null);
 
   const { user } = useContext(UserContext);
   useEffect(() => {
     if (loginLabel.current && account.current) {
       if (user) {
+        setLogged(true)
         loginLabel.current.hidden = true;
-        account.current.hidden = false;
-        if (user.name) {
-          accountName.current.innerText = user.name;
-        }
-        else {
-          accountName.current.innerText = user.username;
-        }
+        account.current.style.display = "flex";
       } else {
+        setLogged(false)
         loginLabel.current.hidden = false;
-        account.current.hidden = true;
+        account.current.style.display = "none";
       }
     }
   }, [user, lng, isLngOpen]);
@@ -94,6 +90,10 @@ function Header() {
     return <Navigate to="/course-editor" replace />;
   }
 
+  if (redirectToCourses) {
+    return <Navigate to="/courses" replace />;
+  }
+
   const handleSwitchClick = () => {
     if (pageMode === "student") {
       setPageMode("teacher");
@@ -128,26 +128,44 @@ function Header() {
             </div>
           )}
         </div>
-        <div className="header__item" onClick={() => { setRedirectToCodeEditor(true) }}>{t("editor")}</div>
-        {pageMode === "teacher" && (
-          <div className="header__item" onClick={() => { setRedirectToCourseEditor(true) }}>{t("course_editor")}</div>
+        {logged && (
+          <>
+            {pageMode === "student" && (
+              <div className="header__item" onClick={() => setRedirectToCodeEditor(true)}>
+                {t("editor")}
+              </div>
+            )}
+            {pageMode === "teacher" && (
+              <div className="header__item" onClick={() => setRedirectToCourseEditor(true)}>
+                {t("course_editor")}
+              </div>
+            )}
+            <div className="header__item" onClick={() => { setRedirectToCourses(true) }}>{t("courses")}</div>
+          </>
         )}
         <div className="header__item" ref={loginLabel} onClick={() => { setRedirectToLogin(true) }}>{t("login")} </div>
         <div className="header__account-wrap" ref={account}>
-          <div className="header__account" onClick={() => { setIsAccountOpen(!isAccountOpen) }}>
-            <div className="header__account-name" ref={accountName}></div>
-            <div className="header__account-icon"><img src={account_image} alt="Account" className="header__account-image" /></div>
+          <div className="header_menu_draw" onClick={() => { setIsAccountOpen(!isAccountOpen) }}>
+            {isAccountOpen ? (
+              <div className="cross"></div>
+            ) : (
+              <div className="menu-lines">
+                <div className="menu-line"></div>
+                <div className="menu-line"></div>
+                <div className="menu-line"></div>
+              </div>
+            )}
           </div>
           {isAccountOpen && (
             <div className="header__account-menu">
               <div onClick={() => { setRedirectToProfile(true) }}>{t("settings")}</div>
-              <div>{t("courses")}</div>
-              <div onClick={logout}>{t("logout")}</div>
+              {pageMode === "teacher" && (<div>{t("courses")}</div>)}
+              <div style={{ "color": "#c62522ff" }} onClick={logout}>{t("logout")}</div>
             </div>
           )}
         </div>
       </div>
-    </header>
+    </header >
   );
 }
 

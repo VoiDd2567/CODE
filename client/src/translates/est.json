@@ -55,5 +55,9 @@
     "wrong_token": "Link on sisestatud valesti või ei tööta",
     "enter_new_password": "Palun sisestage uus parool",
     "paswords_not_same": "Paroolid peavad olema samad",
-    "password_changed": "Parool on muudetud"
+    "password_changed": "Parool on muudetud",
+    "link_sent": "Link saadeti sinu e-postile",
+    "link_send_failed": "Linki ei õnnestunud saata. Proovi hiljem uuesti",
+    "your_courses": "Sinu kursused:",
+    "author": "Autor"
 }

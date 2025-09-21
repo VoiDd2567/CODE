@@ -79,9 +79,9 @@ class ExerciseCheck {
                     responce = await this.#processFuncOutputCheck();
                     break
             }
-            if (typeof (responce.correct) === "boolean") {
-                await MongoUpdateData.update("solution", { userId: this.userId, exerciseId: this.exerciseId }, { completeAnswer: true, answerCorrect: responce.correct })
-            } else { logger.error("responce.correct wasn't boolean") }
+
+            await MongoUpdateData.update("solution", { userId: this.userId, exerciseId: this.exerciseId }, { completeAnswer: true, answerCorrectPercent: responce.correct })
+
             if (responce) return responce;
             throw new Error("No responce")
         } catch (err) {
@@ -124,7 +124,8 @@ class ExerciseCheck {
             } else {
                 let output = await this.#runOneInstanceCode(this.userSolution.solution, this.withoutInputAnswer);
                 output.output = this.#rightInscription(output);
-                return { correct: output.correct, output: output.output }
+                const correct = output.correct ? 100 : 0;
+                return { correct: correct, output: output.output }
             }
         } catch (err) {
             logger.error("FAILED: Failed to check code output : " + err)
@@ -134,14 +135,14 @@ class ExerciseCheck {
 
     async #processFuncOutputCheck() {
         try {
-            if (!this.#detectInput(this.userSolution, this.programmingLng)) {
+            if (this.#detectInput(this.userSolution.solution, this.programmingLng)) {
                 throw new Error("Code contains input")
             }
             let funcName = this.exerciseFunctionName;
             if (funcName != "no-func") {
                 this.#cutToMaxKeys(true);
                 let totalOutput = "";
-                let correctSolution = true;
+                let correctSolution = 100;
                 for (let test of this.exerciseFunctionReturns) {
                     const { input, output: funcReturn } = test;
                     totalOutput += `---- Inputs : ${JSON.stringify(input)} ----\n`;
@@ -154,7 +155,7 @@ class ExerciseCheck {
                     let instance = await this.#runOneInstanceCode(codeToRun, funcReturn, null, true);
                     totalOutput += this.#rightInscription(instance, true);
                     if (!instance.correct) {
-                        correctSolution = false;
+                        correctSolution -= 100 * (1 / this.exerciseFunctionReturns.length);
                     }
                 }
                 return { correct: correctSolution, output: totalOutput };

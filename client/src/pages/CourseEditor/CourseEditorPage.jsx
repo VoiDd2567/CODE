@@ -1,10 +1,10 @@
 import "./courseEditor.css"
-import EditorHeader from "./EditorHeader";
+import MinimizedHeader from "../../components/other/minimizedHeader";
 import CourseEditor from "./CourseEditor";
 
 const CourseEditorPage = () => {
     return (<div>
-        <EditorHeader />
+        <MinimizedHeader />
         <div className="course_editor-wrap">
             <div className="left_pannel"></div>
             <CourseEditor />

@@ -56,5 +56,9 @@
   "wrong_token": "The link was pasted incorrectly or doesn’t work.",
   "enter_new_password": "Please enter new password",
   "paswords_not_same": "Passwords must be same",
-  "password_changed": "Password is changed"
+  "password_changed": "Password is changed",
+  "link_sent": "Link was sent to your email",
+  "link_send_failed": "Couldn't send link. Try again later",
+  "your_courses": "Your courses:",
+  "author": "Author"
 }

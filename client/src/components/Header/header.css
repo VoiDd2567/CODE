@@ -92,30 +92,8 @@ header {
     margin-bottom: 3vh;
     display: flex;
     justify-content: right;
-    height: 9vh;
-}
-
-.header__account {
-    height: 9vh;
-    display: flex;
     align-items: center;
-    border-radius: 2vw;
-    margin-top: 1vh;
-    padding-left: 1vw;
-}
-
-.header__account-wrap[hidden] {
-    display: none;
-}
-
-.header__account:hover {
-    background-color: #a48640;
-    cursor: pointer;
-    transform: scale(1.05);
-}
-
-.header__account-name {
-    font-size: 3.5vw;
+    height: 100%;
 }
 
 .header__account-icon {
@@ -142,8 +120,8 @@ header {
     padding: 1vw;
     border: 0.1vh black solid;
     border-radius: 1vw;
-    margin-top: 10.5vh;
     cursor: default;
+    margin-top: 25vh;
 }
 
 .header__account-menu div {
@@ -201,4 +179,63 @@ input:checked+.slider {
 
 input:checked+.slider::before {
     transform: translateX(1.7vw);
+}
+
+.header_menu_draw {
+    margin-top: 2vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 1vw;
+}
+
+.header_menu_draw:hover .menu-line {
+    background-color: #a48640;
+    transform: scale(1.08);
+}
+
+.menu-line {
+    width: 3.2vw;
+    height: 1vh;
+    background-color: #FFD369;
+    margin-bottom: 1vh;
+    border-radius: 0.3vh;
+}
+
+.cross {
+    position: relative;
+    width: 6vh;
+    height: 6vh;
+}
+
+.cross::before,
+.cross::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 40%;
+    width: 0.7vh;
+    height: 100%;
+    background: #FFD369;
+}
+
+.cross::before {
+    transform: rotate(45deg);
+}
+
+.cross::after {
+    transform: rotate(-45deg);
+}
+
+.cross:hover::before,
+.cross:hover::after {
+    background: #a48640;
+}
+
+.menu-lines {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }

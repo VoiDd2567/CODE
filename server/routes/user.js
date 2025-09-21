@@ -3,7 +3,8 @@ const router = express.Router();
 const MongoGetData = require("../database/mongo_get_data");
 const MongoDeleteData = require("../database/mongo_delete_data");
 const MongoUpdateData = require("../database/mongo_update_data");
-const { safeUser } = require("../scripts/SafeTemplates");
+const { safeUser, safeCourse } = require("../scripts/SafeTemplates");
+const { requireAuth } = require("../scripts/SecurityChecks");
 const logger = require("../scripts/Logging");
 
 
@@ -44,6 +45,27 @@ router.post("/lng", async (req, res) => {
 
         const session = await MongoGetData.getSession({ sessionId: sessionId })
         await MongoUpdateData.update("user", { _id: session.userId }, { defaultLng: lng })
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.get("/courses", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const user = await MongoGetData.getUserBySession(sessionId);
+
+        if (!user) { return res.status(401).json({ error: "Unauthorized" }) }
+
+        let courses = []
+        for (const courseId of user.accessedCourses) {
+            const course = await MongoGetData.getCourse({ _id: courseId });
+            const sCourse = safeCourse(course);
+            courses.push(sCourse);
+        }
+        return res.status(200).json({ courses: courses })
+
     } catch (err) {
         logger.error(err)
         res.status(500).json({ error: "Internal server error" })

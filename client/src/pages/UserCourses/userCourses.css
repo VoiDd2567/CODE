@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
+
+.courses_page-main-wrap {
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+}
+
+.courses_page-main {
+    margin-top: 10vh;
+    width: 60vw;
+    height: 100%;
+    display: flex;
+    align-items: start;
+    align-items: start;
+    flex-direction: column;
+}
+
+.courses_page-main-heading {
+    font-family: "Archivo Black", sans-serif;
+    font-size: 3vw;
+}
+
+.courses_page-main-courses {
+    margin-top: 2vh;
+    margin-left: 1vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.courses_page-main-course {
+    display: flex;
+    align-items: center;
+    min-width: 35vw;
+    height: 8vh;
+    background-color: #a9aaad;
+    border-radius: 2.5vh;
+    overflow: hidden;
+    margin-top: 1vh;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.courses_page-main-course:hover {
+    transform: scale(1.1);
+}
+
+.courses_page-main-course:active {
+    transition: 0s;
+    background-color: #919294;
+}
+
+.course-name {
+    font-family: "Electrolize", sans-serif;
+    font-weight: bold;
+    font-size: 2vh;
+}
+
+.course-img {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    height: 100%;
+    max-width: 10%;
+    overflow: hidden;
+}
+
+.course-info {
+    margin-left: 3vw;
+}
+
+.course-img img {
+    width: 100%;
+    margin-bottom: 1vh;
+}

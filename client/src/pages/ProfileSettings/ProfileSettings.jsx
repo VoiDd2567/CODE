@@ -7,29 +7,15 @@ import ClassWindow from "./profile_windows/ClassWindow"
 import SecurityWindow from "./profile_windows/SecurityWindow"
 import PaymentSettingsWindow from "./profile_windows/PaymentSettingsWindow"
 import DelAccountWindow from "./profile_windows/DelAccountWindow"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
+import { UserContext } from "../../components/UserContext"
 
 const ProfileSettings = () => {
 
     const [openedWindow, setOpenedWindow] = useState("general");
     const [openedWindowDiv, setOpenedWindowDiv] = useState(<GeneralWindow />)
-    const [user, setUser] = useState(null)
+    const user = useContext(UserContext).user
 
-    useEffect(() => {
-        fetch("https://localhost:3001/api/user/user", {
-            method: "GET",
-            credentials: "include"
-        }).then(async res => {
-            if (!res.ok) {
-                const errorData = await res.text;
-                alert(errorData)
-                console.log(errorData)
-            } else {
-                const data = await res.json();
-                setUser(data["user"])
-            }
-        })
-    }, [])
 
     useEffect(() => {
         const all_windows = {
