@@ -61,7 +61,7 @@ class MongoGetData {
         passwordReset: [PasswordReset, null, null]
       }[collectionType];
       let cache;
-      if (collectionType != "passwordReset") {
+      if (collectionType != "passwordReset" && collectionType != "exercise") {
         cache = await getFn.call(getCache, findBy);
         if (typeof cache === "object") {
           return cache;
@@ -74,6 +74,7 @@ class MongoGetData {
       if (collectionType != "passwordReset") {
         await setCache.set(cache, data, ttl);
       }
+
       return data;
     } catch (err) {
       logger.error("FAILED : Error finding data: " + err.message);

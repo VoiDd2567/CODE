@@ -11,7 +11,6 @@ router.get("/get-exercises", requireAuth, async (req, res) => {
         const sessionId = req.cookies.sessionId;
         const user = await MongoGetData.getUserBySession(sessionId)
         const allowedExercises = await getUsersAllowedExercises(user, true);
-
         res.status(200).json({ exerciseList: allowedExercises })
     } catch (err) {
         logger.error(err)
@@ -31,7 +30,7 @@ router.post("/get-exercise", requireAuth, async (req, res) => {
         const user = await MongoGetData.getUserBySession(sessionId)
         const allowedExercises = await getUsersAllowedExercises(user);
 
-        const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, userId: user.p_id })
+        const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, userId: user._id })
         const files = solution ? solution.solutionFiles : null;
         if (exerciseId in allowedExercises) {
             res.status(200).json({ exercise: exercise, userSolution: files })

@@ -16,7 +16,7 @@ const { response } = require("express");
 
 //NB! It checks by USER SOLUTION. It takes it from db so before checking there has to be user solution writen in db
 
-/** Before using need to init(). Class that takes an exercise solution and runs pre-given instructions on which base it decides is exercise done correctly or not.
+/** Before using need to init(). Class takes exerciseId and userId, finds user solution and checks if its correct.
  * Needs to already have an exercise solution in db
 */
 class ExerciseCheck {
@@ -79,7 +79,6 @@ class ExerciseCheck {
                     responce = await this.#processFuncOutputCheck();
                     break
             }
-
             await MongoUpdateData.update("solution", { userId: this.userId, exerciseId: this.exerciseId }, { completeAnswer: true, answerCorrectPercent: responce.correct })
 
             if (responce) return responce;
@@ -104,20 +103,20 @@ class ExerciseCheck {
             throw err;
         }
     }
-
+    /**Auto check fore exercises with type codeOutputCheck */
     async #processCodeOutputCheck() {
         try {
             if (this.exerciseInputCount > 0) {
                 this.#cutToMaxKeys()
                 let totalOutput = "";
-                let correctSolution = true;
+                let correctSolution = 100;
                 for (let test of this.exerciseInputAnswers) {
                     const { input, output: answer } = test;
                     totalOutput += `---- Inputs : ${JSON.stringify(input)} ----\n`;
                     let output = await this.#runOneInstanceCode(this.userSolution.solution, answer, input);
                     totalOutput += this.#rightInscription(output);
                     if (!output.correct) {
-                        correctSolution = false;
+                        correctSolution -= 100 * (1 / this.exerciseInputAnswers.length);
                     }
                 }
                 return { correct: correctSolution, output: totalOutput };
@@ -133,6 +132,7 @@ class ExerciseCheck {
         }
     }
 
+    /**Auto check fore exercises with type FuncOutputCheck */
     async #processFuncOutputCheck() {
         try {
             if (this.#detectInput(this.userSolution.solution, this.programmingLng)) {
@@ -167,6 +167,7 @@ class ExerciseCheck {
         }
     }
 
+    /**Runs code one time*/
     async #runOneInstanceCode(code, waitedOutput = null, inputs = null, func = false) {
         let container;
         try {
@@ -187,18 +188,19 @@ class ExerciseCheck {
         const startTime = Date.now()
         let instanceOutput;
         try {
-            const runner = await container.runCode();
+            const runner = await container.runCode(inputs ? inputs[0] : "");
             instanceOutput = runner.output;
             if (runner.error) {
                 return this.#outputCheckReturnTemplate(false, instanceOutput, "total-error")
             }
             if (inputs) {
+                instanceOutput += "\n"
                 for (let i = 0; i < this.exerciseInputCount; i++) {
                     if (inputs.length <= 0) {
                         throw new Error('Not enough inputs')
                     }
-                    const output = await container.addInput(inputs[0]);
-                    instanceOutput += output.output;
+                    const output = await container.addInput(inputs[0], true);
+                    instanceOutput += output.output + '\n';
 
                     if (output.error) {
                         return this.#outputCheckReturnTemplate(false, instanceOutput, "total-error")
@@ -245,14 +247,16 @@ class ExerciseCheck {
     }
 
     #rightInscription(output, func = false) {
+        const needPBWaited = output.waitedOutput[0].includes("\n") ? "\n" : ""
+        const needPBGot = output.output.includes("\n") ? "\n" : ""
         if (output.correct) {
-            return `> SUCCESS ${output.completeTime}s\n${func ? `Function return : ${output.funcReturn}\n` : ""}Output : ${output.output}\n\n`
+            return `> SUCCESS ${output.completeTime}s\n${func ? `Function return : ${output.funcReturn}\n` : ""}Output:${needPBGot ? "\n" : " "}${output.output}\n\n`
         } else if (output.errors === "not-right-output") {
-            return `> FAILED\nExercise was waiting this output : ${output.waitedOutput}\n But got : ${output.output}\n\n`
+            return `> FAILED\nExercise was waiting this output:${needPBWaited ? "\n" : ""}${output.waitedOutput}\n${needPBWaited ? "\n" : ""}But got:${needPBGot ? "\n" : " "}${output.output}\n\n`
         } else if (output.errors === "total-error") {
             return `> FAILED\nTotal error :\n ${output.output}\n\n`
         } else if (output.errors === "not-right-return") {
-            return `> FAILED\nFunction return was supposed to be : ${output.waitedOutput}\nBut was : ${output.funcReturn}\n\nTotal output:\n${output.output}\n`
+            return `> FAILED\nFunction return was supposed to be:${needPBWaited ? "\n" : ""}${output.waitedOutput}\n${needPBWaited ? "\n" : ""}But was:${needPBGot ? "\n" : " "}${output.funcReturn}\n\nTotal output:\n${output.output}\n`
         }
         return `> UNKNOWN STATE\n${output.output ? "Output: " + JSON.stringify(output.output) : ""}\n\n`;
     }
@@ -264,6 +268,7 @@ class ExerciseCheck {
         }
     }
 
+    /**Adds code into users code that checks if code output or function is correct */
     #addFuncRunIntoCode(funcName, code, funcParameters, funcReturn) {
         if (this.programmingLng === "py") {
             return code + `\n\nFuncReturnCheckFuncByCODE = ${funcName}(${funcParameters.toString()})\n`

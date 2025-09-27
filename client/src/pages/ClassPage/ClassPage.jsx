@@ -1,6 +1,6 @@
 import MinimizedHeader from "../../components/other/minimizedHeader";
 
-const CoursePage = () => {
+const ClassPage = () => {
     return (<div>
         <MinimizedHeader />
         <div style={{ "display": "flex", "alignItems": "center", "justifyContent": "center", "fontSize": "5vw", "color": "white", "height": "100%" }}>
@@ -9,4 +9,4 @@ const CoursePage = () => {
     </div>)
 }
 
-export default CoursePage;
+export default ClassPage;

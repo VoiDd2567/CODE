@@ -6,8 +6,8 @@ const { spawn } = require('child_process');
 const logger = require("../../scripts/Logging")
 const config = require("../../config.js")
 
-/** Takes code (as string) and all files which needed to render code and renders python code. Renders code until input, 
- * then returns current output and starts waiting for input. After getting input processes it and waits until next input.
+/** Takes code (as string) and all files which needed to render code and after it renders python code. Renders code until input, 
+ * then returns current output and starts waiting for input.
  * Or if there is no inputs then compeltes code sens output and closes container.
  * Container automaticly closes after 1 minute. If class died the container automaticly deletes itself after 5 minutes.
  */
@@ -46,7 +46,7 @@ builtins.input = custom_input
 ${code}
 `;
     }
-
+    /**Writes python file into a temp dir so it can be called after */
     async #writeCodeToTemp() {
         const scriptPath = path.join(this.tempDir.name, `${this.id}.py`);
         await fs.writeFile(scriptPath, this.python_code);
@@ -59,6 +59,7 @@ ${code}
         return scriptPath;
     }
 
+    /** Starts container for Python*/
     async #ensureContainer() {
         const { exec } = require('child_process');
         const volumeHostPath = this.tempDir.name;
@@ -110,7 +111,7 @@ ${code}
     }
 
     /** Runs code until input or until end. Returns output and ends container if code end.*/
-    async runCode() {
+    async runCode(input = "") {
         await this.#ensureContainer();
 
         const scriptPath = await this.#writeCodeToTemp();
@@ -147,7 +148,7 @@ ${code}
                     this.waitingForInput = true;
                     resolve({
                         status: "waiting_for_input",
-                        output: this.output.replace(/__WAITING_FOR_INPUT__/g, ""),
+                        output: this.output.replace(/__WAITING_FOR_INPUT__/g, input),
                         error: errorOutput || null // Include errors if any
                     });
                 }
@@ -161,9 +162,7 @@ ${code}
             this.child.on('close', async (code) => {
                 resolve({
                     status: "complete",
-                    output: this.output.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
-                        .filter(line => line.trim() !== '')
-                        .join('\n'),
+                    output: this.output.replace(/__WAITING_FOR_INPUT__/g, input),
                     error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null) // Include errors or non-zero exit code
                 });
                 await this.cleanup();
@@ -180,15 +179,13 @@ ${code}
         input = input.toString();
         return input.replace(/[\x00-\x1F\x7F;]/g, '').trim();
     }
-    /** Adds input and returns output after it until new input or end*/
-    async addInput(input) {
+    /** Adds input and returns output after it: until new input or end*/
+    async addInput(input, checking = false) {
         input = this.#sanitizeInput(input);
         if (!this.child || !this.waitingForInput) {
             return {
                 status: "complete",
-                output: this.output.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
-                    .filter(line => line.trim() !== '')
-                    .join('\n'),
+                output: this.output.replace(/__WAITING_FOR_INPUT__/g, checking ? input : ""),
                 error: "No active process or not waiting for input"
             };
         }
@@ -215,7 +212,7 @@ ${code}
                     this.output = buffer;
                     resolve({
                         status: "waiting_for_input",
-                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, ""),
+                        output: buffer.replace(/__WAITING_FOR_INPUT__/g, checking ? input : ""),
                         error: errorOutput || null
                     });
                 }
@@ -238,9 +235,7 @@ ${code}
                 this.output = buffer;
                 resolve({
                     status: "complete",
-                    output: buffer.replace(/__WAITING_FOR_INPUT__/g, "").split('\n')
-                        .filter(line => line.trim() !== '')
-                        .join('\n'),
+                    output: buffer.replace(/__WAITING_FOR_INPUT__/g, checking ? input : ""),
                     error: errorOutput || (code !== 0 ? "Process exited with non-zero code" : null)
                 });
             });

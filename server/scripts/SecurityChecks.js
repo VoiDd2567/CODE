@@ -5,34 +5,47 @@ const getUsersAllowedExercises = async (user, byClass = false) => {
     const allowedExercisesByCourse = {};
     const allowedExercises = {};
 
-    const coursePromises = userCourses.map(courseId =>
-        MongoGetData.getCourse({ _id: courseId })
-    );
-    const courses = await Promise.all(coursePromises);
-
-    for (const course of courses) {
-        if (!course) continue;
-        const courseExercises = {};
-
-        const exercisePromises = course.courseExercises.map(exerciseId =>
-            MongoGetData.getExercise({ _id: exerciseId })
-        );
-        const exercises = await Promise.all(exercisePromises);
-
-        exercises.forEach((exercise, index) => {
-            const exerciseId = course.courseExercises[index];
-            if (exercise) {
-                courseExercises[exerciseId] = exercise.name;
-                allowedExercises[exerciseId] = exercise.name;
+    try {
+        const courses = [];
+        for (const courseId of userCourses) {
+            const course = await MongoGetData.getCourse({ _id: courseId });
+            if (course) {
+                courses.push(course);
             }
-        });
+        }
 
-        allowedExercisesByCourse[course.name] = courseExercises;
+        const allExerciseIds = [...new Set(
+            courses.flatMap(course => course.courseExercises)
+        )];
+
+        const exerciseMap = {};
+        for (const exerciseId of allExerciseIds) {
+            const exercise = await MongoGetData.getExercise({ _id: exerciseId });
+            if (exercise) {
+                exerciseMap[exerciseId] = exercise;
+            }
+        }
+
+        for (const course of courses) {
+            const courseExercises = {};
+
+            for (const exerciseId of course.courseExercises) {
+                const exercise = exerciseMap[exerciseId];
+                if (exercise) {
+                    courseExercises[exerciseId] = exercise.name;
+                    allowedExercises[exerciseId] = exercise.name;
+                }
+            }
+
+            allowedExercisesByCourse[course.name] = courseExercises;
+        }
+
+        return byClass ? allowedExercisesByCourse : allowedExercises;
+
+    } catch (error) {
+        console.error('Error fetching user allowed exercises:', error);
+        throw error;
     }
-    if (byClass) {
-        return allowedExercisesByCourse;
-    }
-    return allowedExercises;
 };
 
 const requireAuth = async (req, res, next) => {

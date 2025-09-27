@@ -1,4 +1,4 @@
-import { useContext, useRef, useEffect } from "react";
+import { useContext, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { UserContext } from "../../../components/UserContext";
 
@@ -7,11 +7,10 @@ const SecurityWindow = () => {
     const user = useContext(UserContext);
     const resetMessage = useRef(null);
 
-    useEffect(() => {
-        console.log(user.user)
-    })
-
     const handleChangeClick = () => {
+        resetMessage.current.textContent = "Waiting...";
+        resetMessage.current.style.color = "black";
+        resetMessage.current.hidden = false;
         fetch('https://localhost:3001/api/auth/send-reset-link', {
             method: 'POST',
             credentials: 'include',

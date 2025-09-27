@@ -11,7 +11,7 @@ const CourseEditor = () => {
     const [currentSelection, setCurrentSelection] = useState(null);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [editorValue, setEditorValue] = useState([
-        { 1: { value: "<text color:white>Lol <text color:red font-size:4vh>i</text> dnt know</text>", type: "text" } },
+        { 1: { value: "<text color:white>Here<text color:red font-size:4vh>i</text>s some text</text>", type: "text" } },
         { 2: { value: "text", type: "text" } },
         { 3: { value: "editor", type: "editor" } },
         { 4: { value: "exercise", type: "exercise" } },
@@ -23,7 +23,6 @@ const CourseEditor = () => {
     useEffect(() => { console.log(editorValue) }, [editorValue])
 
     const handleTextSelection = (selectionInfo) => {
-        console.log('Text selected:', selectionInfo);
         setCurrentSelection(selectionInfo);
         if (selectionInfo.selectedText.trim().length > 0 && selectionInfo.selectionRect) {
             setCoursorPos({

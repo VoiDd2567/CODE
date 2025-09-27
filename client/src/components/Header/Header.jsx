@@ -16,6 +16,7 @@ function Header() {
   const [redirectToCodeEditor, setRedirectToCodeEditor] = useState(false);
   const [redirectToCourseEditor, setRedirectToCourseEditor] = useState(false);
   const [redirectToCourses, setRedirectToCourses] = useState(false);
+  const [redirectToClass, setRedirectToClass] = useState(false)
   const [redirectToProfile, setRedirectToProfile] = useState(false)
   const [isLngOpen, setIsLngOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -94,6 +95,10 @@ function Header() {
     return <Navigate to="/courses" replace />;
   }
 
+  if (redirectToClass) {
+    return <Navigate to="/class/12312" replace />;
+  }
+
   const handleSwitchClick = () => {
     if (pageMode === "student") {
       setPageMode("teacher");
@@ -136,8 +141,8 @@ function Header() {
               </div>
             )}
             {pageMode === "teacher" && (
-              <div className="header__item" onClick={() => setRedirectToCourseEditor(true)}>
-                {t("course_editor")}
+              <div className="header__item" onClick={() => setRedirectToClass(true)}>
+                {t("classes")}
               </div>
             )}
             <div className="header__item" onClick={() => { setRedirectToCourses(true) }}>{t("courses")}</div>
@@ -159,7 +164,7 @@ function Header() {
           {isAccountOpen && (
             <div className="header__account-menu">
               <div onClick={() => { setRedirectToProfile(true) }}>{t("settings")}</div>
-              {pageMode === "teacher" && (<div>{t("courses")}</div>)}
+              {pageMode === "teacher" && (<div onClick={() => setRedirectToCourseEditor(true)}>{t("course_editor")}</div>)}
               <div style={{ "color": "#c62522ff" }} onClick={logout}>{t("logout")}</div>
             </div>
           )}

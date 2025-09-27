@@ -60,5 +60,6 @@
   "link_sent": "Link was sent to your email",
   "link_send_failed": "Couldn't send link. Try again later",
   "your_courses": "Your courses:",
-  "author": "Author"
+  "author": "Author",
+  "classes": "Classes"
 }

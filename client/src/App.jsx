@@ -15,6 +15,7 @@ import LoadingScreen from "./components/Loading/LoadingScreem";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import PasswordResetEmailGet from "./pages/PasswordResetEmailGet/PasswordResetEmailGet";
 import CoursePage from "./pages/CoursePage/CoursePage";
+import ClassPage from "./pages/ClassPage/ClassPage";
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 
 const PrivateRoute = ({ children }) => {
@@ -84,6 +85,11 @@ const App = () => {
                     <Route path="/courses" element={
                         <PrivateRoute>
                             <UserCourses />
+                        </PrivateRoute>
+                    } />
+                    <Route path="/class/:id" element={
+                        <PrivateRoute>
+                            <ClassPage />
                         </PrivateRoute>
                     } />
                     <Route path="/course/:id" element={

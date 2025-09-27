@@ -119,7 +119,9 @@ router.get("/get-new-reg-code", async (req, res) => {
         const sessionId = req.cookies.sessionId
         const codeInfo = await MongoGetData.getRegistrationCode({ sessionId: sessionId });
         const now = new Date();
-        if (codeInfo.newCodeSend <= now) {
+        const newCondSendTime = new Date(codeInfo.newCodeSend)
+
+        if (newCondSendTime.getTime() <= now.getTime()) {
             const newCode = String(Math.floor(100000 + Math.random() * 900000));
             const newCodeExpires = new Date(Date.now() + 60 * 1000);
             await MongoUpdateData.update("registrationCode", { sessionId: sessionId }, { code: newCode, newCodeSend: newCodeExpires })
