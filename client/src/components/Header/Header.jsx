@@ -20,7 +20,7 @@ function Header() {
   const [redirectToProfile, setRedirectToProfile] = useState(false)
   const [isLngOpen, setIsLngOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const [pageMode, setPageMode] = useState("student");
+  const [pageMode, setPageMode] = useState("teacher");
   const [logged, setLogged] = useState(false)
   const loginLabel = useRef(null);
   const account = useRef(null);

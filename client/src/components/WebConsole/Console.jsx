@@ -5,9 +5,22 @@ import complete_image from "../../pictures/complete-btn.png"
 import open_exercise_image from "../../pictures/open-exercise-btn.png"
 import { useRef, useState, useEffect } from "react";
 
-const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, chosenFile, saveData, editorValue, exercise }) => {
+const Console = ({
+    setExerciseChoose = null,
+    files = null,
+    getExerciseList = null,
+    exerciseOpened = false,
+    chosenFile = null,
+    saveData = null,
+    editorValue = null,
+    exercise = null,
+    inserted = false,
+    h = "auto" }) => {
+
     const { t } = useTranslation();
     const webConsole = useRef(null);
+    const consoleWrap = useRef(null);
+    const pageWrap = useRef(null);
     const [lockedText, setLockedText] = useState("");
     const [waitingForInput, setWaitingForInput] = useState(false);
     const [input, setInput] = useState("")
@@ -20,6 +33,13 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
     useEffect(() => {
         webConsole.current.setSelectionRange(lockedText.length, lockedText.length);
     }, [lockedText])
+
+    useEffect(() => {
+        if (inserted) {
+            pageWrap.current.style.height = `${h}vh`
+            consoleWrap.current.style.height = `${h - 5.5}vh`;
+        }
+    }, [inserted, h, exerciseOpened])
 
     const handleRunBtnClick = () => {
         const fileType = chosenFile.split(".")[1]
@@ -224,15 +244,15 @@ const Console = ({ setExerciseChoose, files, getExerciseList, exerciseOpened, ch
     };
 
     return (
-        <div className="console-wrap">
+        <div className="console-wrap" ref={pageWrap}>
             <div className="console__buttons-wrap">
                 <button className="console__btn run-btn" onClick={handleRunBtnClick} title="Run code"><p>{t("run")}</p><img src={run_image} alt="" /></button>
-                {exerciseOpened &&
+                {(exerciseOpened || inserted) &&
                     <button className="console__btn send-btn" onClick={handleSendBtnClick} title="Send exercise answer to be automaticly checked"><p>{t("send")}</p><img src={complete_image} alt="" /></button>
                 }
-                <button className="console__btn open-exercise-btn" onClick={handleExerciseOpenBtnClick}><p>{t("open-exercise")}</p><img src={open_exercise_image} alt="" /></button>
+                {!inserted && (<button className="console__btn open-exercise-btn" onClick={handleExerciseOpenBtnClick}><p>{t("open-exercise")}</p><img src={open_exercise_image} alt="" /></button>)}
             </div>
-            <div className="console">
+            <div className="console" ref={consoleWrap}>
                 <textarea ref={webConsole} onKeyDown={onConsoleKeyDown} onClick={onConsoleClick} className="console-content" readOnly={!waitingForInput}></textarea>
             </div>
         </div>

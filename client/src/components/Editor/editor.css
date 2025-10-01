@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&display=swap');
+
 
 .editor-wrap {
-    height: 100%;
+    height: auto;
     display: flex;
     flex-direction: row;
-    margin-top: 2vh;
     padding-bottom: 1vh;
     background-color: #a9aaad;
     border-radius: 2.5vh;
@@ -16,6 +16,7 @@
 .editor__string-numbers {
     width: 10%;
     height: 100%;
+    max-width: 2vw;
     padding-top: 2vh;
     margin-right: 1vw;
     margin-left: 0.5vw;
@@ -70,4 +71,21 @@
     background-color: #494a4d;
     border-radius: 1vw;
     width: 0.5vh;
+}
+
+.editor-description {
+    height: 3vh;
+    background-color: #494a4d;
+    border-top-left-radius: 1vh;
+    border-top-right-radius: 1vh;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding-left: 1vh;
+    font-family: "Alan Sans", sans-serif;
+}
+
+.editor-description img {
+    width: 1.3vw;
+    margin-right: 1vh;
 }

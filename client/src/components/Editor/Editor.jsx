@@ -1,8 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import "./editor.css"
+import python_icon from "../../pictures/py-icon.png"
+import js_icon from "../../pictures/js-icon.png"
 
-const Editor = ({ w, h, editorValue, setEditorValue = null, saveData = null, setFileSaved = null, canBeChanged = true, main = false }) => {
+const Editor = ({
+    w = null,
+    h = null,
+    editorValue = "",
+    setEditorValue = null,
+    saveData = null,
+    setFileSaved = null,
+    canBeChanged = true,
+    main = false,
+    color = "#a9aaad",
+    getValue = null,
+    description = null,
+    icon = "py" }) => {
+
     const { t } = useTranslation();
     const [numbersTextareaValue, setNumbersTextareaValue] = useState("");
     const editorWrap = useRef(null);
@@ -10,23 +25,42 @@ const Editor = ({ w, h, editorValue, setEditorValue = null, saveData = null, set
     const numbersTa = useRef(null);
     const isSyncing = useRef(false);
     const [previousText, setPreviousText] = useState("");
+    const [dicon, setdIcon] = useState(python_icon);
 
 
     useEffect(() => {
-        editorWrap.current.style.width = `${w < 10 ? 10 : w}vw`
-        editorWrap.current.style.height = `${h < 3.7 ? 3.7 : h}vh`
+        editorWrap.current.style.width = w ? `${w < 10 ? 10 : w}vw` : "auto"
+        editorWrap.current.style.height = h ? `${h < 3.7 ? 3.7 : h}vh` : "auto"
         editorWrap.current.style.borderRadius = main ? "2.5vh" : "1vh";
         editor.current.style.fontSize = main ? "1vw" : "1.5vh";
         numbersTa.current.style.fontSize = main ? "1vw" : "1.5vh";
         editor.current.style.paddingTop = main ? "2vh" : "1vh";
         numbersTa.current.style.paddingTop = main ? "2vh" : "1vh";
         numbersTa.current.style.width = main ? "2.5vw" : "10%";
-    }, [w, h, main])
+        editor.current.style.backgroundColor = color;
+        numbersTa.current.style.backgroundColor = color;
+        editorWrap.current.style.backgroundColor = color;
+    }, [w, h, main, color])
+
+    useEffect(() => {
+        if (description) {
+            addDescription();
+        }
+    }, [description])
+
+    useEffect(() => {
+        if (icon === "py") {
+            setdIcon(python_icon)
+        } else if (icon === "js") {
+            setdIcon(js_icon);
+        }
+    }, [icon])
 
     useEffect(() => {
         editor.current.value = editorValue;
         setPreviousText(editorValue);
         setNumbers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editorValue]);
 
     useEffect(() => {
@@ -100,16 +134,32 @@ const Editor = ({ w, h, editorValue, setEditorValue = null, saveData = null, set
             editor.current.value = previousText;
             alert(t("too_many_strings_editor"))
         }
-
-        setFileSaved(false);
-        setPreviousText(editor.current.value)
-        setEditorValue(editor.current.value)
+        if (setFileSaved) {
+            setFileSaved(false);
+            setPreviousText(editor.current.value)
+            setEditorValue(editor.current.value)
+        }
+        if (getValue) {
+            getValue(editor.current.value)
+        }
     };
 
+    const addDescription = () => {
+        editorWrap.current.style.borderTopRightRadius = "0vh";
+        editorWrap.current.style.borderTopLeftRadius = "0vh"
+    }
+
     return (
-        <div ref={editorWrap} className="editor-wrap">
-            <textarea ref={numbersTa} className="editor__string-numbers" defaultValue={numbersTextareaValue}></textarea>
-            <textarea ref={editor} onScroll={handleScroll} onChange={handleChange} onKeyDown={(e) => textareaPress(e)} readOnly={!canBeChanged} type="text" className="editor" defaultValue={editorValue} />
+        <div>
+            {description && (<div>
+                <div className="editor-description">
+                    <img src={dicon} /><p>{description}</p>
+                </div>
+            </div>)}
+            <div ref={editorWrap} className="editor-wrap">
+                <textarea ref={numbersTa} className="editor__string-numbers" defaultValue={numbersTextareaValue}></textarea>
+                <textarea ref={editor} onScroll={handleScroll} onChange={handleChange} onKeyDown={(e) => textareaPress(e)} readOnly={!canBeChanged} type="text" className="editor" defaultValue={editorValue} />
+            </div>
         </div>
     )
 }

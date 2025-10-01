@@ -1,0 +1,59 @@
+.exercise_settings-wrap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.exercise_settings {
+    width: 50vw;
+    height: 70vh;
+    background-color: #797a7c;
+    border-radius: 2vh;
+}
+
+.cross-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.cross {
+    margin-top: 1vh;
+    margin-right: 1vh;
+    position: relative;
+    width: 3vh;
+    height: 3vh;
+}
+
+.cross::before,
+.cross::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 40%;
+    width: 0.3vh;
+    height: 100%;
+    background: #FFD369;
+    border-radius: 0.3vh;
+}
+
+.cross::before {
+    transform: rotate(45deg);
+}
+
+.cross::after {
+    transform: rotate(-45deg);
+}
+
+.cross:hover::before,
+.cross:hover::after {
+    background: #a48640;
+}
