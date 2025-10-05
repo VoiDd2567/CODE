@@ -61,5 +61,12 @@
   "link_send_failed": "Couldn't send link. Try again later",
   "your_courses": "Your courses:",
   "author": "Author",
-  "classes": "Classes"
+  "classes": "Classes",
+  "name": "Name",
+  "description": "Description",
+  "exercise_settings": "Exercise settings",
+  "exercise_type": "Exercise type",
+  "select_type": "Select from list",
+  "code_type": "Write code",
+  "autocheck": "Autocheck"
 }

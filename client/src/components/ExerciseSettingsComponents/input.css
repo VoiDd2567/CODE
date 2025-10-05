@@ -1,0 +1,40 @@
+.settingsInput {
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    margin-left: 1vw;
+    gap: 0.4vh;
+    font-family: "Electrolize", sans-serif;
+    font-weight: 600;
+    font-size: 2vh;
+}
+
+.settingsInput textarea {
+    width: 100%;
+    height: 2vh;
+    border-radius: 0.7vh;
+    font-size: 1.5vh;
+    padding: 0.5vh;
+    padding-left: 1vh;
+    resize: none;
+    vertical-align: top;
+    font-family: "Electrolize", sans-serif;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.exerciseSelect {
+    font-family: "Alan Sans";
+    height: 4vh;
+    font-size: 2vh;
+    border-radius: 1vh;
+}
+
+.settingCheckbox {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    height: 100%;
+    gap: 0.4vw;
+}

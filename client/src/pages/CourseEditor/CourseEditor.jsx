@@ -53,7 +53,7 @@ const CourseEditor = ({ borders }) => {
                 {editorValue.map((item, index) => {
                     const [id, block] = Object.entries(item)[0];
 
-                    let innerHtml = <div>Te</div>;
+                    let innerHtml = <div></div>;
 
 
                     if (block.type === "text") {
@@ -66,7 +66,7 @@ const CourseEditor = ({ borders }) => {
                         );
                     } else if (block.type === "exercise") {
                         innerHtml = (
-                            <ExerciseBlock />
+                            <ExerciseBlock borders={borders} />
                         );
                     }
                     return (

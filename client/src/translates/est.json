@@ -60,5 +60,12 @@
     "link_send_failed": "Linki ei õnnestunud saata. Proovi hiljem uuesti",
     "your_courses": "Sinu kursused:",
     "author": "Autor",
-    "classes": "Klassid"
+    "classes": "Klassid",
+    "name": "Nimi",
+    "description": "Kirjeldus",
+    "exercise_settings": "Harjutuse seaded",
+    "exercise_type": "Harjutuse tüüp",
+    "select_type": "Vali nimekirjast",
+    "code_type": "Kirjuta kood",
+    "autocheck": "Autokontroll"
 }

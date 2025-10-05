@@ -58,10 +58,15 @@ const EditorBlock = ({ borders }) => {
     )
 }
 
-const ExerciseBlock = () => {
+const ExerciseBlock = ({ borders }) => {
     const [openSettings, setOpenSettings] = useState(false)
+    const block = useRef(null)
 
-    return (<div className="exercise_block-wrap block">
+    useEffect(() => {
+        block.current.style.border = borders ? "1px solid black" : "none"
+    }, [borders])
+
+    return (<div ref={block} className="exercise_block-wrap block">
         <div className="exercise_block-settings">
             <img src={setting_icon} alt="Settings" onClick={() => setOpenSettings(prev => !prev)} />
         </div>

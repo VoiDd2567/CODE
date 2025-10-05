@@ -18,19 +18,14 @@
     border-radius: 2vh;
 }
 
-.cross-wrap {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: end;
-}
-
 .cross {
+    position: absolute;
     margin-top: 1vh;
     margin-right: 1vh;
     position: relative;
     width: 3vh;
     height: 3vh;
+    left: 48vw;
 }
 
 .cross::before,
@@ -56,4 +51,30 @@
 .cross:hover::before,
 .cross:hover::after {
     background: #a48640;
+}
+
+.line {
+    position: relative;
+    display: flex;
+    align-items: end;
+    gap: 2vw;
+    margin-top: 1vh;
+}
+
+.line:first-of-type {
+    margin-top: 0vh;
+}
+
+label {
+    font-family: "Electrolize", sans-serif;
+    font-weight: 600;
+    font-size: 2vh;
+}
+
+.heading {
+    font-family: "Electrolize", sans-serif;
+    margin-left: 1vw;
+    font-size: 4vh;
+    font-weight: 800;
+    margin-bottom: 2vh;
 }
