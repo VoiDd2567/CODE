@@ -67,5 +67,11 @@
     "exercise_type": "Harjutuse tüüp",
     "select_type": "Vali nimekirjast",
     "code_type": "Kirjuta kood",
-    "autocheck": "Autokontroll"
+    "autocheck": "Autokontroll",
+    "autocheck_type": "Autokontrolli tüüp",
+    "output_check": "Programmi väljundi kontroll (ilma sisenditeta)",
+    "output_check_input": "Programmi väljundi kontroll (sisenditega)",
+    "func_check": "Funktsiooni väljundi kontroll",
+    "input": "Sisend",
+    "output": "Väljund"
 }

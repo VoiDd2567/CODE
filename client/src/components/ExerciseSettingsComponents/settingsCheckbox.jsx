@@ -1,10 +1,18 @@
-const SettingsCheckbox = ({ label, checkBoxRef }) => {
+const SettingsCheckbox = ({ label, checked, onChange, divClass = "" }) => {
+    const handleClick = () => {
+        onChange({ target: { checked: !checked } });
+    };
+
     return (
-        <div className="settingCheckbox">
-            <input type="checkbox" ref={checkBoxRef} />
+        <div className={`settingCheckbox ${divClass}`} onClick={handleClick}>
+            <input
+                type="checkbox"
+                checked={checked}
+                readOnly
+            />
             <label>{label}</label>
         </div>
-    )
-}
+    );
+};
 
-export default SettingsCheckbox
+export default SettingsCheckbox;

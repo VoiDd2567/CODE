@@ -218,6 +218,8 @@ input:checked+.slider::before {
     width: 0.7vh;
     height: 100%;
     background: #FFD369;
+    border-radius: 1vh;
+    overflow: hidden;
 }
 
 .cross::before {

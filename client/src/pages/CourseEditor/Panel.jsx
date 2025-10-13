@@ -3,11 +3,11 @@ const Panel = ({ setBorders }) => {
         <div className="left_panel">
             <div className="panel-options">
                 <div className="panel-option">
-                    <label>Show block border</label>
+                    <p>Show block border</p>
                     <input type="checkbox" onChange={() => setBorders(false)} />
                 </div>
                 <div className="panel-option">
-                    <label>Student view</label>
+                    <p>Student view</p>
                     <input type="checkbox" />
                 </div>
             </div>

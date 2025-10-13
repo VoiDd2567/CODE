@@ -18,7 +18,7 @@
     border-radius: 2vh;
 }
 
-.cross {
+.cross-ex {
     position: absolute;
     margin-top: 1vh;
     margin-right: 1vh;
@@ -28,8 +28,8 @@
     left: 48vw;
 }
 
-.cross::before,
-.cross::after {
+.cross-ex::before,
+.cross-ex::after {
     content: "";
     position: absolute;
     top: 0;
@@ -40,16 +40,16 @@
     border-radius: 0.3vh;
 }
 
-.cross::before {
+.cross-ex::before {
     transform: rotate(45deg);
 }
 
-.cross::after {
+.cross-ex::after {
     transform: rotate(-45deg);
 }
 
-.cross:hover::before,
-.cross:hover::after {
+.cross-ex:hover::before,
+.cross-ex:hover::after {
     background: #a48640;
 }
 
@@ -63,6 +63,10 @@
 
 .line:first-of-type {
     margin-top: 0vh;
+}
+
+.centered-line {
+    align-items: center;
 }
 
 label {

@@ -68,5 +68,11 @@
   "exercise_type": "Exercise type",
   "select_type": "Select from list",
   "code_type": "Write code",
-  "autocheck": "Autocheck"
+  "autocheck": "Autocheck",
+  "autocheck_type": "Autocheck type",
+  "output_check": "Programm output check (no inputs)",
+  "output_check_input": "Programm output check (with inputs)",
+  "func_check": "Function output check",
+  "input": "Input",
+  "output": "Output"
 }
