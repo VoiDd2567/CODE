@@ -16,6 +16,31 @@
     height: 70vh;
     background-color: #797a7c;
     border-radius: 2vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-bottom-right-radius: 0%;
+    border-top-right-radius: 0%;
+}
+
+.exercise_settings::-webkit-scrollbar {
+    background-color: transparent;
+    width: 1vh;
+}
+
+.exercise_settings::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+
+}
+
+.exercise_settings::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+.exercise_settings::-webkit-scrollbar-thumb {
+    background-color: #494a4d;
+    border-radius: 1vw;
+    width: 0.5vh;
+    margin-right: 0.5vh;
 }
 
 .cross-ex {

@@ -2,7 +2,7 @@ import "./exerciseSettings.css"
 import SettingsInput from "../../components/ExerciseSettingsComponents/settingsInput";
 import SettingsSelect from "../../components/ExerciseSettingsComponents/settingsSelect";
 import SettingsCheckbox from "../../components/ExerciseSettingsComponents/settingsCheckbox";
-import InOut from "../../components/ExerciseSettingsComponents/InOutPair";
+import AutoCheckInput from "../../components/ExerciseSettingsComponents/AutoCheckInput";
 import { useRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -80,7 +80,11 @@ const ExerciseSettings = ({ setOpenSettings }) => {
                     <SettingsSelect label={t("autocheck_type")} options={[t("output_check"), t("output_check_input"), t("func_check")]} onChange={(e) => handleAutocheckTypeChange(e)} />
                 </div>
             )}
-            <div className="line"><InOut /></div>
+            {(openAutoCheckType === t("output_check_input") || openAutoCheckType === t("func_check")) && (
+                <div className="line">
+                    <AutoCheckInput setList={(e) => console.log(e)} />
+                </div>
+            )}
 
         </div>
     </div>)

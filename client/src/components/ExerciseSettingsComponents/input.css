@@ -61,8 +61,7 @@
 .inOut {
     width: 100%;
     display: grid;
-    grid-template-columns: 40% 10% 40%;
-    grid-template-rows: 1;
+    grid-template-columns: 42.5% 10% 42.5% 4%;
     align-items: bottom;
     justify-items: start;
 }
@@ -74,4 +73,50 @@
 
 .arrow-img img {
     width: 100%;
+}
+
+.autoCheckInput {
+    width: 100%;
+    background-color: #a9aaad;
+    border-radius: 2vh;
+    margin: 1vw;
+    user-select: none;
+}
+
+.addPair {
+    height: 3vh;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin-right: 1vh;
+    margin-top: 1vh;
+}
+
+.addPair img {
+    height: 100%;
+    transition: 0.3s ease;
+}
+
+.addPair img:hover {
+    transform: scale(1.1);
+}
+
+.addPair img:active {
+    background-color: black;
+    border-radius: 50%;
+}
+
+.delete {
+    height: 3vh;
+    width: 90%;
+    display: flex;
+    margin-top: 70%;
+    background-image: url("../../pictures/delete.png");
+    background-size: cover;
+    transition: 0.3s ease;
+}
+
+.delete:hover {
+    background-image: url("../../pictures/delete-red.png");
+    transform: scale(1.1);
 }
