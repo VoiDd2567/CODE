@@ -9,17 +9,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
 }
 
 .exercise_settings {
-    width: 50vw;
-    height: 70vh;
+    width: 45vw;
+    max-height: 70vh;
     background-color: #797a7c;
     border-radius: 2vh;
     overflow-y: auto;
     overflow-x: hidden;
-    border-bottom-right-radius: 0%;
-    border-top-right-radius: 0%;
+    border-bottom-right-radius: 0vh;
+    border-bottom-left-radius: 0vh;
+    padding-bottom: 3vh;
+    padding-top: 3vh;
 }
 
 .exercise_settings::-webkit-scrollbar {
@@ -43,42 +46,8 @@
     margin-right: 0.5vh;
 }
 
-.cross-ex {
-    position: absolute;
-    margin-top: 1vh;
-    margin-right: 1vh;
-    position: relative;
-    width: 3vh;
-    height: 3vh;
-    left: 48vw;
-}
-
-.cross-ex::before,
-.cross-ex::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 40%;
-    width: 0.3vh;
-    height: 100%;
-    background: #FFD369;
-    border-radius: 0.3vh;
-}
-
-.cross-ex::before {
-    transform: rotate(45deg);
-}
-
-.cross-ex::after {
-    transform: rotate(-45deg);
-}
-
-.cross-ex:hover::before,
-.cross-ex:hover::after {
-    background: #a48640;
-}
-
 .line {
+    width: 45vw;
     position: relative;
     display: flex;
     align-items: end;
@@ -98,6 +67,11 @@ label {
     font-family: "Electrolize", sans-serif;
     font-weight: 600;
     font-size: 2vh;
+    user-select: none;
+}
+
+img {
+    user-select: none;
 }
 
 .heading {
@@ -106,4 +80,95 @@ label {
     font-size: 4vh;
     font-weight: 800;
     margin-bottom: 2vh;
+}
+
+.changeMenu-wrap {
+    height: 5vh;
+    width: 45vw;
+    background-color: #494a4d;
+    border-bottom-right-radius: 2vh;
+    border-bottom-left-radius: 2vh;
+}
+
+.changeMenu {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding-right: 2vw;
+    gap: 1vw;
+    height: 100%;
+}
+
+.changeMenuBtn {
+    height: 80%;
+    width: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1vh;
+    font-family: "Electrolize", sans-serif;
+    transition: 0.3s ease;
+    cursor: pointer;
+}
+
+.changeMenuBtn:hover {
+    transform: scale(1.1);
+}
+
+.red {
+    background-color: rgb(142, 49, 49);
+}
+
+.red:active {
+    transition: 0s ease;
+    background-color: rgb(203, 45, 45);
+}
+
+.green {
+    background-color: rgb(61, 146, 61);
+}
+
+.green:active {
+    transition: 0s ease;
+    background-color: rgb(34, 205, 34);
+}
+
+.e-wrap {
+    padding: 1vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.close-wrap {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    font-family: "Electrolize";
+    margin-top: 0.4vh;
+}
+
+.sepLine-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4vh;
+    margin-bottom: 4vh;
+}
+
+.sepLine {
+    background-color: #494a4d;
+    width: 90%;
+    height: 0.4vh;
+    border-radius: 1vh;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.requiredError {
+    color: red;
+    font-family: "Electrolize";
 }

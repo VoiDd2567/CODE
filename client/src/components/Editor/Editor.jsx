@@ -16,7 +16,9 @@ const Editor = ({
     color = "#a9aaad",
     getValue = null,
     description = null,
-    icon = "py" }) => {
+    icon = "py",
+    fixedHeight = true,
+    lineHeight = 2.5 }) => {
 
     const { t } = useTranslation();
     const [numbersTextareaValue, setNumbersTextareaValue] = useState("");
@@ -30,7 +32,13 @@ const Editor = ({
 
     useEffect(() => {
         editorWrap.current.style.width = w ? `${w < 10 ? 10 : w}vw` : "auto"
-        editorWrap.current.style.height = h ? `${h < 3.7 ? 3.7 : h}vh` : "auto"
+
+        if (fixedHeight) {
+            editorWrap.current.style.height = h ? `${h < 3.7 ? 3.7 : h}vh` : "auto"
+        } else {
+            updateDynamicHeight();
+        }
+
         editorWrap.current.style.borderRadius = main ? "2.5vh" : "1vh";
         editor.current.style.fontSize = main ? "1vw" : "1.5vh";
         numbersTa.current.style.fontSize = main ? "1vw" : "1.5vh";
@@ -40,7 +48,12 @@ const Editor = ({
         editor.current.style.backgroundColor = color;
         numbersTa.current.style.backgroundColor = color;
         editorWrap.current.style.backgroundColor = color;
-    }, [w, h, main, color])
+
+        if (!fixedHeight) {
+            editor.current.style.overflow = "hidden";
+            numbersTa.current.style.overflow = "hidden";
+        }
+    }, [w, h, main, color, fixedHeight])
 
     useEffect(() => {
         if (description) {
@@ -60,6 +73,9 @@ const Editor = ({
         editor.current.value = editorValue;
         setPreviousText(editorValue);
         setNumbers();
+        if (!fixedHeight) {
+            updateDynamicHeight();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editorValue]);
 
@@ -72,6 +88,19 @@ const Editor = ({
 
         return () => clearTimeout(timeout);
     }, [previousText, saveData]);
+
+    const updateDynamicHeight = () => {
+        if (fixedHeight || !editor.current) return;
+
+        const lineCount = (editor.current.value.match(/\n/g) || []).length + 1;
+        const calculatedHeight = lineCount * lineHeight;
+        const minHeight = 3.7;
+        const finalHeight = Math.max(calculatedHeight, minHeight);
+
+        editorWrap.current.style.height = `${finalHeight}vh`;
+        editor.current.style.height = "100%";
+        numbersTa.current.style.height = "100%";
+    };
 
     const syncScroll = (source, target) => {
         if (target.current) {
@@ -102,11 +131,13 @@ const Editor = ({
             textareaNewValue += `${i + 1}\n`;
         }
         setNumbersTextareaValue(textareaNewValue);
-        syncScroll(editor, numbersTa);
+        if (fixedHeight) {
+            syncScroll(editor, numbersTa);
+        }
     }
 
     const handleScroll = () => {
-        if (isSyncing.current) return;
+        if (isSyncing.current || !fixedHeight) return;
 
         isSyncing.current = true;
         numbersTa.current.scrollTop = editor.current.scrollTop;
@@ -119,6 +150,10 @@ const Editor = ({
         const eValue = editor.current.value
 
         setNumbers();
+
+        if (!fixedHeight) {
+            updateDynamicHeight();
+        }
 
         if (!eValue) return;
         if (previousText) {

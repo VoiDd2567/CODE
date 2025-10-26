@@ -1,6 +1,4 @@
-import "./input.css"
-
-const SettingsInput = ({ label, inputRef, inputType = "text", width = null, enterAllowed = false, onChange = "", value = "" }) => {
+const SettingsInput = ({ label, inputRef, width = null, enterAllowed = false, onChange = () => { }, value = "" }) => {
     const handleKeyDown = (e) => {
         if (!enterAllowed) {
             if (e.key === "Enter") {
@@ -13,7 +11,7 @@ const SettingsInput = ({ label, inputRef, inputType = "text", width = null, ente
     return (
         <div className="settingsInput" style={{ "width": width ? width : "auto" }}>
             {label && (<label>{label}</label>)}
-            <textarea ref={inputRef} type={inputType} onKeyDown={handleKeyDown} defaultValue={value} onChange={(e) => onChange(e)} />
+            <textarea ref={inputRef} onKeyDown={handleKeyDown} defaultValue={value} onChange={(e) => onChange(e)} />
         </div>
     )
 }
