@@ -63,5 +63,5 @@ async function waitForRedis() {
         }
     }
 }
-
+//It works
 module.exports = { ensureRedis };
