@@ -54,6 +54,7 @@ html {
     border: 0.1vh black solid;
     background-color: #a9aaad;
     overflow-x: hidden;
+    padding-bottom: 20vh;
 }
 
 .course_editor-block {

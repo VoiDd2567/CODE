@@ -1,34 +1,35 @@
-.main_page{
+.main_page {
     display: flex;
     align-items: center;
-    justify-content: center;
     flex-direction: column;
-    color:white;
+    color: white;
+    min-height: 83vh;
 }
 
-.main_page-h{
+.main_page-h {
     font-size: 5vw;
     margin-top: 10vh;
 }
 
-.main_page-p{
+.main_page-p {
     margin-top: 3vh;
     font-size: 2vh;
     max-width: 40vw;
     text-align: center;
 }
 
-.gh_link-wrap{
+.gh_link-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 5vh;
 }
 
-.gh_link-wrap img{
+.gh_link-wrap img {
     width: 3vw;
     margin-left: 1vw;
 }
-.main_page-gh_link{
-    color : white;
+
+.main_page-gh_link {
+    color: white;
 }

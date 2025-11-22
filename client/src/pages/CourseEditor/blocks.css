@@ -54,3 +54,75 @@
 .exercise_block-settings img:hover {
     transform: scale(1.1);
 }
+
+.choose-block-wrap,
+.choose {
+    display: flex;
+    flex-direction: column;
+}
+
+.choose {
+    padding: 1vh;
+    font-family: "Electrolize";
+}
+
+.choose-question {
+    padding: 1vh;
+    background-color: #393E46;
+    color: white;
+    border-top-left-radius: 1vh;
+    border-top-right-radius: 1vh;
+}
+
+.choose-option-area {
+    background-color: #d8d9db;
+    padding: 1vh;
+    border-bottom-left-radius: 1vh;
+    border-bottom-right-radius: 1vh;
+}
+
+.choose-option-line {
+    min-width: 20vw;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1vh;
+}
+
+.choose-option {
+    padding: 1vh;
+    background-color: #a9aaad;
+    border-radius: 1vh;
+    display: flex;
+    align-items: center;
+    width: 90%;
+}
+
+.choose-check {
+    height: 1.7vw;
+    width: 1.7vw;
+    margin-left: 2vw;
+    border: 0.3vh solid black;
+    border-radius: 0.5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.choose-check img {
+    width: 90%;
+}
+
+.choose_block-settings {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.choose_block-settings img {
+    width: 4vh;
+    cursor: pointer;
+}
+
+.choose_block-settings img:hover {
+    transform: scale(1.1);
+}

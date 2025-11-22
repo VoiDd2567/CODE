@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import CourseEditorBtnMenu from "./BtnMenu.jsx"
-import { EditorBlock, TextBlock, ExerciseBlock } from "./Blocks.jsx";
+import { EditorBlock, TextBlock, ExerciseBlock, ChooseBlock } from "./Blocks.jsx";
+import ExerciseSettings from "./ExerciseSettings.jsx";
 
 const CourseEditor = ({ borders }) => {
     const chooseMenu = useRef(null);
@@ -10,10 +11,43 @@ const CourseEditor = ({ borders }) => {
         { 1: { value: "Text aasdample", type: "text" } },
         { 2: { value: "text", type: "text" } },
         { 3: { value: "editor", type: "editor" } },
-        { 4: { value: "exercise", type: "exercise" } },
-        { 5: { value: "img", type: "img" } }
+        {
+            4: {
+                value: {
+                    answerCheckType: "checkFuncReturn",
+                    autoCheck: true,
+                    description: { est: "ASDASDASD" },
+                    files: { "My_file.py": "# I hate my life" },
+                    inputCount: 0,
+                    name: "asdasd",
+                    type: "code",
+                    withoutInputAnswer: "Answer",
+                    functionName: "Ypur dick",
+                    functionReturns: [
+                        { input: "fUCK YOU", output: "fUCK YOU" },
+                        { input: "fUCK YOU", output: "fUCK YOU" }
+                    ]
+                },
+                type: "exercise"
+            }
+        },
+        {
+            5: {
+                value: {
+                    description: { est: 'Choose which titan you love' },
+                    name: "I hate my life",
+                    options: {
+                        1: { option: 'Eren Yeger', correct: true },
+                        2: { option: 'I dont remember others', correct: false }
+                    }
+                }, type: "choose"
+            }
+        }
     ]);
+
     const [chosenBlock, setChosenBlock] = useState(-1)
+    const [exerciseSetttingsVisible, setExerciseSettingsVisible] = useState(false)
+    const [currentExerciseId, setCurrentExerciseId] = useState(-1);
 
     useEffect(() => {
         const handleMouseLeave = () => {
@@ -36,8 +70,9 @@ const CourseEditor = ({ borders }) => {
         e.preventDefault()
         const block = e.target.closest('.block');
         const blockSettings = e.target.closest('.block-settings');
+        const exerciseSettings = e.target.closest(".exercise_settings-wrap")
 
-        if (block || blockSettings) {
+        if (block || blockSettings || exerciseSettings) {
             setIsMenuVisible(false);
             return;
         }
@@ -47,28 +82,100 @@ const CourseEditor = ({ borders }) => {
         setChosenBlock(-1);
     }
 
+    const addEditorItem = (value, type, id = null) => {
+        setEditorValue(prev => {
+            const nextId = id ?? (prev.length > 0 ? Math.max(...prev.map(obj => +Object.keys(obj)[0])) + 1 : 1);
+
+            const existingIndex = prev.findIndex(obj => Object.keys(obj)[0] == nextId);
+
+            if (existingIndex !== -1) {
+                const updated = [...prev];
+                updated[existingIndex] = { [nextId]: { value, type } };
+                return updated;
+            } else {
+                return [...prev, { [nextId]: { value, type } }];
+            }
+        });
+    };
+
+
+    const addExercise = (id, type, value) => {
+        console.log("----------------------------------------")
+        console.log(id)
+        console.log(type)
+        console.log(value)
+        console.log("----------------------------------------")
+        addEditorItem(value, type, id)
+    }
+
+    const getNextIndex = () => {
+        if (!Array.isArray(editorValue) || editorValue.length === 0) return 1;
+        const ids = editorValue.map(obj => Number(Object.keys(obj)[0]));
+        return Math.max(...ids) + 1;
+    }
+
+    const closeExerciseSettings = () => {
+        setExerciseSettingsVisible(false);
+        setCurrentExerciseId(-1);
+    }
+
+    const getExerciseData = (id) => {
+        id = parseInt(id)
+        const item = editorValue.find(obj => obj[id]);
+        return item[id].value;
+    }
+
     return (
         <div className="main-area" onClick={clickHandeler}>
+            {exerciseSetttingsVisible && (() => {
+                let exData = null;
+                if (currentExerciseId !== -1) {
+                    exData = getExerciseData(currentExerciseId)
+                }
+                return (
+                    <ExerciseSettings
+                        setOpenSettings={closeExerciseSettings}
+                        setBlock={addExercise}
+                        exerciseId={currentExerciseId !== -1 ? currentExerciseId : getNextIndex()}
+                        exerciseSettings={exData}
+                    />
+                );
+            })()}
             <div className="course_ediotor-blocks">
                 {editorValue.map((item, index) => {
                     const [id, block] = Object.entries(item)[0];
 
                     let innerHtml = <div></div>;
-
-
                     if (block.type === "text") {
                         innerHtml = (
                             <TextBlock id={id} value={block.value} borders={borders} setEditorValue={setEditorValue} />
                         );
                     } else if (block.type === "editor") {
                         innerHtml = (
-                            <EditorBlock borders={borders} />
+                            <EditorBlock borders={borders} startValue={block.value} />
                         );
                     } else if (block.type === "exercise") {
+                        const data = getExerciseData(id);
                         innerHtml = (
-                            <ExerciseBlock borders={borders} />
+                            <ExerciseBlock
+                                borders={borders}
+                                setOpenSettings={() => {
+                                    setCurrentExerciseId(id);
+                                    setExerciseSettingsVisible(true);
+                                }}
+                                data={data}
+                            />
                         );
+                    } else if (block.type === "choose") {
+                        const data = getExerciseData(id);
+                        innerHtml = (<ChooseBlock borders={borders}
+                            setOpenSettings={() => {
+                                setCurrentExerciseId(id);
+                                setExerciseSettingsVisible(true);
+                            }}
+                            data={data} />)
                     }
+
                     return (
                         <div
                             key={id}
@@ -84,8 +191,8 @@ const CourseEditor = ({ borders }) => {
                 chooseMenu={chooseMenu}
                 coursorPos={coursorPos}
                 isMenuVisible={isMenuVisible}
-                editorValue={editorValue}
-                setEditorValue={setEditorValue}
+                addEditorItem={addEditorItem}
+                openExerciseSettings={() => setExerciseSettingsVisible(true)}
             />
         </div>
     )

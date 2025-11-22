@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import MinimizedHeader from "../../components/other/minimizedHeader";
+import Footer from "../../components/Footer/Footer";
 import "./userCourses.css"
 import js from "../../pictures/js-icon.png"
 import py from "../../pictures/py-icon.png"
@@ -53,6 +54,7 @@ const UserCourses = () => {
                 </div>
             </div>
         </div >
+        <Footer />
     </div >)
 }
 

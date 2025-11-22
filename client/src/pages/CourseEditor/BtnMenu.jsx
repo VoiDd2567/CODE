@@ -9,14 +9,18 @@ import add_code_img from "../../pictures/add_code_icon.png"
 import add_image_img from "../../pictures/add_image_icon.png"
 import "./hoveringMenu.css"
 
-const CourseEditorBtnMenu = ({ chooseMenu, coursorPos, isMenuVisible, editorValue, setEditorValue }) => {
+const CourseEditorBtnMenu = ({ chooseMenu, coursorPos, isMenuVisible, addEditorItem, openExerciseSettings }) => {
     const { t } = useTranslation();
 
     const addTextBlock = () => {
-        console.log(editorValue)
+        addEditorItem("Add text", "text")
     }
-    const addCodeBlock = () => { setEditorValue(null) }
-    const addExerciseBlock = () => { }
+    const addCodeBlock = () => {
+        addEditorItem("", "editor")
+    }
+    const addExerciseBlock = () => {
+        openExerciseSettings()
+    }
     const addImageBlock = () => { }
 
 

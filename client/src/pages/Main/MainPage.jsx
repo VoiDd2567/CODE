@@ -1,5 +1,5 @@
-import React from "react";
 import Header from "../../components/Header/Header"
+import Footer from "../../components/Footer/Footer";
 import "./mainPage.css"
 import github from "../../pictures/github-logo.png"
 import { useTranslation } from "react-i18next";
@@ -18,6 +18,7 @@ const MainPage = () => {
                 <img src={github} alt="" />
             </div>
         </main>
+        <Footer />
     </div>)
 }
 

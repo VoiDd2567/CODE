@@ -3,20 +3,25 @@ import deleteRedImg from "../../../pictures/delete-red.png";
 import complete from "../../../pictures/complete-green.png";
 import incomplete from "../../../pictures/incomplete.png";
 import plus from "../../../pictures/plus.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const SelectChoice = ({ setOutOptions, givenOptions = null }) => {
     const [options, setOptions] = useState({
-        1: { option: "blablabal", correct: true },
-        2: { option: "asdasdasd", correct: false },
+        1: { option: "", correct: true },
+        2: { option: "", correct: false },
     });
+
+    const editableRefs = useRef({});
 
     useEffect(() => {
         if (givenOptions) setOptions(givenOptions);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [givenOptions]);
 
     const handleOptionChange = (id, newOption) => {
+        // Save cursor position
+        const selection = window.getSelection();
+        const cursorPosition = selection.anchorOffset;
+
         setOptions((prev) => {
             const updated = {
                 ...prev,
@@ -25,6 +30,24 @@ const SelectChoice = ({ setOutOptions, givenOptions = null }) => {
             setOutOptions(updated);
             return updated;
         });
+
+        // Restore cursor position after React updates the DOM
+        setTimeout(() => {
+            const element = editableRefs.current[id];
+            if (element && element.firstChild) {
+                const range = document.createRange();
+                const sel = window.getSelection();
+
+                try {
+                    range.setStart(element.firstChild, Math.min(cursorPosition, element.textContent.length));
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } catch {
+                    element.focus();
+                }
+            }
+        }, 0);
     };
 
     const handleCorrectChange = (id, correct) => {
@@ -77,6 +100,7 @@ const SelectChoice = ({ setOutOptions, givenOptions = null }) => {
                     <div className="select-option-block" key={id}>
                         <div className="select-option-line">
                             <p
+                                ref={(el) => (editableRefs.current[id] = el)}
                                 className="select-option"
                                 contentEditable
                                 suppressContentEditableWarning

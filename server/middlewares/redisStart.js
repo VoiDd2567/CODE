@@ -5,23 +5,9 @@ const REDIS_PORT = 6379;
 const CONTAINER_NAME = 'redis-temp';
 
 async function ensureRedis() {
-    const client = new Redis({
-        port: REDIS_PORT,
-        host: '127.0.0.1',
-        lazyConnect: true,
-        connectTimeout: 10000,        // 10 seconds to establish connection
-        commandTimeout: 5000,         // 5 seconds for individual commands
-        retryDelayOnFailover: 100,    // Delay between retry attempts
-        maxRetriesPerRequest: 3,
-    });
-
-    try {
-        await startRedisContainer();
-        await waitForRedis(client);  // Wait until Redis is really ready
-        console.log("Redis started and ready!");
-    } finally {
-        client.disconnect();
-    }
+    await startRedisContainer();
+    await waitForRedis();
+    console.log("Redis started and ready!");
 }
 
 function startRedisContainer() {
@@ -50,14 +36,29 @@ function startRedisContainer() {
     });
 }
 
-async function waitForRedis(client) {
-    let connected = false;
-    while (!connected) {
+async function waitForRedis() {
+    const maxAttempts = 30; // 15 seconds total
+
+    for (let i = 0; i < maxAttempts; i++) {
+        const client = new Redis({
+            port: REDIS_PORT,
+            host: '127.0.0.1',
+            lazyConnect: true,
+            connectTimeout: 1000,
+            maxRetriesPerRequest: 1,
+            retryDelayOnFailover: 100,
+        });
+
         try {
-            await client.connect(); // Explicit connect
+            await client.connect();
             await client.ping();
-            connected = true;
-        } catch {
+            client.disconnect();
+            return;
+        } catch (err) {
+            client.disconnect();
+            if (i === maxAttempts - 1) {
+                throw new Error('Redis failed to start within timeout period');
+            }
             await new Promise(resolve => setTimeout(resolve, 500));
         }
     }

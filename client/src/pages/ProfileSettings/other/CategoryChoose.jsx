@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 const CategoryChoose = ({ setOpenedWindow }) => {
     const { t } = useTranslation();
-    const categories = ["general", "class", "security", "payment", "delAccount"];
+    const categories = ["general", "security", "payment", "delAccount"];
     const [activeCategory, setActiveCategory] = useState("general");
 
     const handleCategoryClick = (category) => {

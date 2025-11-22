@@ -12,14 +12,14 @@ import { useRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./components/components.css"
 
-const ExerciseSettings = ({ setOpenSettings }) => {
+const ExerciseSettings = ({ setOpenSettings, setBlock, exerciseId, exerciseSettings = null }) => {
     const { t } = useTranslation()
     const exName = useRef(null)
     const exDescription = useRef(null)
     const [exLngValue, setExLngValue] = useState("est");
     const [openAutoCheck, setOpenAutoCheck] = useState(false)
     const [openAutoCheckTypeOpen, setOpenAutoCheckTypeOpen] = useState(false)
-    const [openAutoCheckType, setOpenAutoCheckType] = useState(null)
+    const [autoCheckType, setAutoCheckType] = useState(null)
     const [openFileManager, setOpenFileManager] = useState(false)
     const [openFileEditor, setOpenFileEditor] = useState(false)
     const [openSelectChoices, setOpenSelectChoices] = useState(true)
@@ -27,14 +27,91 @@ const ExerciseSettings = ({ setOpenSettings }) => {
     const [fileManager, setFileManager] = useState(false);
     const [files, setFiles] = useState({})
     const [chosenFile, setChosenFile] = useState(1)
-    const [exercise, setExercise] = useState(null)
+    const [exercise, setExercise] = useState({ type: "choose" })
     const [errorText, setErrorText] = useState(null)
     const [options, setOptions] = useState({
         1: { option: "Option 1", correct: true },
         2: { option: "Option 2", correct: false }
     })
 
-    // resize logic only once
+    useEffect(() => {
+        if (exerciseSettings) {
+            changeExercise("description", exerciseSettings.description)
+            changeExercise("name", exerciseSettings.name)
+
+            if (Object.keys(exerciseSettings).includes("options")) {
+                setOptions(exerciseSettings.options)
+            } else {
+                setOpenAutoCheck(true)
+                setOpenSelectChoices(false)
+                if (exerciseSettings?.type) {
+                    changeExercise("type", exerciseSettings?.type)
+                }
+                if (exerciseSettings?.autoCheck) {
+                    changeExercise("autoCheck", exerciseSettings?.autoCheck)
+                }
+                if (exerciseSettings?.inputCount) {
+                    changeExercise("inputCount", exerciseSettings?.inputCount)
+                }
+                if (exerciseSettings?.answerCheckType) {
+                    changeExercise("answerCheckType", exerciseSettings?.answerCheckType)
+                    setAutoCheck(true)
+                    handleAutocheckChange(null, true)
+                    const typeMap = {
+                        "checkCodeOutput": "output_check",
+                        "checkFuncReturn": "func_check",
+                        "input": "output_check_input"
+                    };
+                    let opt = typeMap[exerciseSettings?.answerCheckType]
+                    if (exerciseSettings?.inputCount) {
+                        if (exerciseSettings?.inputCount > 0 && opt != "func_check") {
+                            opt = typeMap["input"]
+                        }
+                    }
+                    console.log(opt)
+                    setAutoCheckType(t(opt))
+                    handleAutocheckTypeChange(null, opt)
+                }
+                if (exerciseSettings?.inputAnswers) {
+                    changeExercise("inputAnswers", exerciseSettings?.inputAnswers)
+                }
+                if (exerciseSettings?.minimalPercent) {
+                    changeExercise("minimalPercent", exerciseSettings?.minimalPercent)
+                }
+                if (exerciseSettings?.files) {
+                    const changeFiles = Object.entries(exerciseSettings.files).map(([name, content]) => ({
+                        name,
+                        content
+                    }));
+                    setFiles(changeFiles)
+                    setFileManager(true)
+                    setOpenFileManager(true)
+                }
+                if (exerciseSettings?.withoutInputAnswer) {
+                    changeExercise("withoutInputAnswer", exerciseSettings?.withoutInputAnswer)
+                }
+                if (exerciseSettings?.functionName) {
+                    changeExercise("files", exerciseSettings?.functionName)
+                }
+                if (exerciseSettings?.programmingLng) {
+                    changeExercise("programmingLng", exerciseSettings?.programmingLng)
+                }
+                if (exerciseSettings?.inputCount) {
+                    changeExercise("inputCount", exerciseSettings?.inputCount)
+                }
+                if (exerciseSettings?.functionName) {
+                    changeExercise("functionName", exerciseSettings?.functionName)
+                }
+                if (exerciseSettings?.functionReturns) {
+                    changeExercise("inputAnswers", exerciseSettings?.functionReturns)
+                    console.log(exerciseSettings?.functionReturns)
+                }
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [exerciseSettings])
+
+
     useEffect(() => {
         const el = exDescription.current;
         if (!el) return;
@@ -55,8 +132,10 @@ const ExerciseSettings = ({ setOpenSettings }) => {
     useEffect(() => {
         const newFiles = {}
         Object.entries(files).forEach(([, file]) => {
+            console.log(file)
             newFiles[file.name] = file.content
         });
+        console.log(files)
         changeExercise("files", newFiles)
     }, [files])
 
@@ -86,7 +165,7 @@ const ExerciseSettings = ({ setOpenSettings }) => {
             setOpenSelectChoices(true);
             setOpenAutoCheckTypeOpen(false)
             setOpenFileManager(false)
-            setOpenAutoCheckType(false)
+            setAutoCheckType(false)
         }
         changeExercise("type", type)
     }
@@ -97,23 +176,33 @@ const ExerciseSettings = ({ setOpenSettings }) => {
         setOpenFileManager(checked)
     }
 
-    const handleAutocheckChange = (e) => {
-        const checked = e.target.checked
+    const handleAutocheckChange = (e, data = null) => {
+        let checked = data
+        if (e) {
+            checked = e.target.checked
+        }
         setAutoCheck(checked)
-        setOpenAutoCheckType(null)
+        setAutoCheckType(null)
         setOpenAutoCheckTypeOpen(checked);
         changeExercise("autoCheck", true)
     }
 
-    const handleAutocheckTypeChange = (e) => {
-        const changed = e.target.value
-        setOpenAutoCheckType(changed)
+    const handleAutocheckTypeChange = (e, data = null) => {
+        let changed = data
+        if (e) {
+            changed = e.target.value
+        }
+
+        if (data && !e) {
+            changed = t(data)
+        }
+
+        setAutoCheckType(changed)
 
         if (changed === t("output_check_input")) {
             changeExercise("answerCheckType", "checkCodeOutput")
             return;
         }
-
 
         const autoCheckList = {
             [t("output_check")]: "checkCodeOutput",
@@ -165,20 +254,19 @@ const ExerciseSettings = ({ setOpenSettings }) => {
     }
 
     const saveExercise = () => {
+        if (!exercise?.name || exercise.name.trim() === "") {
+            notificationNoRequired(t("name"));
+            return;
+        }
+        if (!exercise?.description?.[exLngValue] || exercise.description[exLngValue].trim() === "") {
+            notificationNoRequired(t("description"));
+            return;
+        }
+
         if (exercise.type === "choose") {
-            console.log(options) // TODO : make logic for save. When save file add optionExercise as string, make block for exercise
+            setBlock(exerciseId, "choose", { options: { ...options }, description: exercise.description, name: exercise.name })
         }
         if (exercise.type === "code") {
-            if (!exercise?.name || exercise.name.trim() === "") {
-                notificationNoRequired(t("name"));
-                return;
-            }
-
-            if (!exercise?.description?.[exLngValue] || exercise.description[exLngValue].trim() === "") {
-                notificationNoRequired(t("description"));
-                return;
-            }
-
             if (exercise.answerCheckType === "checkCodeOutput") {
                 if (exercise.inputCount === 0) {
                     if (!exercise?.withoutInputAnswer || exercise.withoutInputAnswer.trim() === "") {
@@ -215,17 +303,23 @@ const ExerciseSettings = ({ setOpenSettings }) => {
             }
 
             if (!finalExercise.minimalPercent) {
-                finalExercise.minimalPercent = 70;
+                if (finalExercise.answerCheckType === "checkCodeOutput") {
+                    finalExercise.minimalPercent = 100;
+                } else {
+                    finalExercise.minimalPercent = 70;
+                }
             }
 
             if (exercise.answerCheckType === "checkFuncReturn") {
                 finalExercise.functionReturns = exercise.inputAnswers;
+                delete finalExercise.inputAnswers
+                delete finalExercise.inputCount
             }
 
             setExercise(finalExercise);
-
-            console.log("Exercise saved:", finalExercise);
+            setBlock(exerciseId, "exercise", { ...finalExercise })
         }
+        setOpenSettings(false)
     }
 
     const notificationNoRequired = (text) => {
@@ -236,7 +330,7 @@ const ExerciseSettings = ({ setOpenSettings }) => {
     return (<div className="exercise_settings-wrap">
         <div className="exercise_settings">
             <div className="line">
-                <SettingsInput label={t("name")} inputRef={exName} width={"55%"} onChange={(e) => changeExercise("name", e.target.value)} />
+                <SettingsInput label={t("name")} inputRef={exName} width={"55%"} onChange={(e) => changeExercise("name", e.target.value)} value={exercise?.name} />
                 <SettingsSelect label={t("text_language")} onChange={(e) => setExLngValue(e.target.value)} options={["Est", "Eng"]} noDefault={false} />
             </div>
             <div className="line centered-line">
@@ -253,7 +347,7 @@ const ExerciseSettings = ({ setOpenSettings }) => {
             </div>
             <div className="line">
                 <SettingsInput label={t("description")} inputRef={exDescription} width={"85%"} enterAllowed={true} onChange={(e) => changeExercise("description", {
-                    ...exercise?.description,
+                    ...exercise?.description, // Depending on choose or code change description to question
                     [exLngValue]: e.target.value
                 })} />
             </div>
@@ -266,23 +360,23 @@ const ExerciseSettings = ({ setOpenSettings }) => {
                 <div>
                     <div className="sepLine-wrap"><div className="sepLine" /></div>
                     <div className="line">
-                        <SettingsSelect label={t("autocheck_type")} options={[t("output_check"), t("output_check_input"), t("func_check")]} onChange={(e) => handleAutocheckTypeChange(e)} />
-                        {openAutoCheckType === t("output_check") ? (
-                            <SettingsInput label={t("output")} width={"18vw"} onChange={(e) => changeExercise("withoutInputAnswer", e.target.value)} />
-                        ) : (openAutoCheckType && (
-                            <SettingsRange label={t("complete_percent")} width={"15vw"} onChange={(e) => changeExercise("minimalPercent", e.target.value)} />)
+                        <SettingsSelect label={t("autocheck_type")} options={[t("output_check"), t("output_check_input"), t("func_check")]} onChange={(e) => handleAutocheckTypeChange(e)} value={t(autoCheckType)} />
+                        {autoCheckType === t("output_check") ? (
+                            <SettingsInput label={t("output")} width={"18vw"} onChange={(e) => changeExercise("withoutInputAnswer", e.target.value)} value={exercise.withoutInputAnswer} />
+                        ) : (autoCheckType && (
+                            <SettingsRange label={t("complete_percent")} width={"15vw"} onChange={(e) => changeExercise("minimalPercent", e.target.value)} defaultValue={exercise.minimalPercent} />)
                         )}
                     </div>
                 </div>
             )}
-            {openAutoCheckType === t("func_check") && (
+            {autoCheckType === t("func_check") && (
                 <div className="line">
-                    <SettingsInput label={t("function_name")} width={"20vw"} onChange={(e) => changeExercise("functionName", e.target.value)} />
+                    <SettingsInput label={t("function_name")} width={"20vw"} onChange={(e) => changeExercise("functionName", e.target.value)} value={exercise.functionName} />
                 </div>
             )}
-            {(openAutoCheckType === t("output_check_input") || openAutoCheckType === t("func_check")) && (openAutoCheckTypeOpen) && (
+            {(autoCheckType === t("output_check_input") || autoCheckType === t("func_check")) && (openAutoCheckTypeOpen) && (
                 <div className="line">
-                    <AutoCheckInput setList={(e) => handleInputsChange(e)} />
+                    <AutoCheckInput setList={(e) => handleInputsChange(e)} defaultTests={exercise.inputAnswers} />
                 </div>
             )}
             {openFileManager && (
