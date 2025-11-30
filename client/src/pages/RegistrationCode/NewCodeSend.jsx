@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react"
 import { useTranslation } from "react-i18next"
+import client_config from "../../client_config.json"
 
 const NewCodeSend = ({ endDate, onTimeout, setNewCodeSend, successMessage, errorMessage, newCodeSendDiv }) => {
     const { t } = useTranslation();
@@ -10,7 +11,7 @@ const NewCodeSend = ({ endDate, onTimeout, setNewCodeSend, successMessage, error
 
     const handleNewCodeSend = () => {
         if (codeBtn.current.classList.contains("active")) {
-            fetch("https://localhost:3001/api/auth/get-new-reg-code", {
+            fetch(`${client_config.SERVER_IP}/api/auth/get-new-reg-code`, {
                 method: "GET",
                 credentials: "include"
             }).then(async res => {

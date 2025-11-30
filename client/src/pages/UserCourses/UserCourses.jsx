@@ -6,7 +6,7 @@ import js from "../../pictures/js-icon.png"
 import py from "../../pictures/py-icon.png"
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import client_config from "../../client_config.json"
 
 const UserCourses = () => {
     const { t } = useTranslation();
@@ -15,7 +15,7 @@ const UserCourses = () => {
 
 
     useEffect(() => {
-        fetch("https://localhost:3001/api/user/courses", {
+        fetch(`${client_config.SERVER_IP}/api/user/courses`, {
             method: "GET",
             credentials: "include"
         }).then(async res => {
@@ -31,7 +31,7 @@ const UserCourses = () => {
     }, [])
 
     const redirectToCourse = (id) => {
-        navigate(`/course/${id}`, { replace: true });
+        navigate(`/ course / ${id}`, { replace: true });
     }
 
     return (<div className="courses_page">

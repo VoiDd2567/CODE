@@ -85,5 +85,6 @@
     "code_lng": "Programmeerimiskeel",
     "function_name": "Funktsiooni nimi",
     "error": "Viga",
-    "required": "on nõutav"
+    "required": "on nõutav",
+    "desc_language": "Kirjelduse keel"
 }

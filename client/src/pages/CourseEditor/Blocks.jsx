@@ -8,11 +8,23 @@ import correct from "../../pictures/complete-green.png";
 import incorrect from "../../pictures/incomplete.png";
 
 const TextBlock = ({ id, value, borders, setEditorValue }) => {
-    const block = useRef(null)
+    const block = useRef(null);
 
     useEffect(() => {
-        block.current.style.border = borders ? "1px solid black" : "none"
-    }, [borders])
+        block.current.style.border = borders ? "1px solid black" : "none";
+    }, [borders]);
+
+    const updateDynamicHeight = () => {
+        if (!block.current) return;
+
+        const lineCount = (block.current.value.match(/\n/g) || []).length + 1;
+        const lineHeight = 2;
+        const calculatedHeight = lineCount * lineHeight;
+        const minHeight = 3.7;
+        const finalHeight = Math.max(calculatedHeight, minHeight);
+
+        block.current.style.height = `${finalHeight}vh`;
+    };
 
     const handleInput = () => {
         const newValue = block.current.value;
@@ -31,13 +43,21 @@ const TextBlock = ({ id, value, borders, setEditorValue }) => {
                 return item;
             })
         );
+
+        updateDynamicHeight();
     };
 
+    useEffect(() => {
+        updateDynamicHeight();
+    }, [value]);
+
     return (
-        <textarea ref={block}
+        <textarea
+            ref={block}
             className="text_block block"
             onInput={handleInput}
-            defaultValue={value}></textarea>
+            defaultValue={value}
+        />
     );
 };
 
@@ -60,18 +80,31 @@ const EditorBlock = ({ borders, startValue }) => {
     )
 }
 
-const ExerciseBlock = ({ borders, setOpenSettings, data }) => {
+const ExerciseBlock = ({ borders, setOpenSettings, data, lng }) => {
     const block = useRef(null)
+    const [realLng, setRealLng] = useState(lng)
 
     useEffect(() => {
         block.current.style.border = borders ? "1px solid black" : "none"
     }, [borders])
 
+    useEffect(() => {
+        console.log(data.description)
+        console.log(lng)
+        if (!Object.keys(data.description).includes(lng)) {
+            let sLng = Object.keys(data.description)
+            setRealLng(sLng[0])
+            console.log("Lng changed")
+        } else {
+            setRealLng(lng)
+        }
+    }, [data, lng])
+
     return (<div ref={block} className="exercise_block-wrap block">
         <div className="exercise_block-settings">
             <img src={setting_icon} alt="Settings" onClick={() => setOpenSettings()} />
         </div>
-        <CompactCodeEditor h={20} />
+        <CompactCodeEditor h={20} description={data.description[realLng]} />
     </div>)
 }
 

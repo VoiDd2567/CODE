@@ -1,8 +1,21 @@
 .CCE-wrap {
-    height: 20vh;
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+    margin-bottom: 2vh;
+    background-color: #797a7c;
+    padding: 1vw;
+    border-radius: 2vh;
+}
+
+.editor-line {
     display: flex;
     align-items: end;
-    justify-content: start;
-    margin-left: 1vw;
-    margin-bottom: 2vh;
+}
+
+.ex_description {
+    min-height: 2vh;
+    padding: 1vh;
+    color: white;
+    font-family: "Electrolize";
 }

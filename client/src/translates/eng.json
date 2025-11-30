@@ -86,5 +86,6 @@
   "code_lng": "Programming language",
   "function_name": "Function name",
   "error": "Error",
-  "required": "required"
+  "required": "required",
+  "desc_language": "Description language"
 }

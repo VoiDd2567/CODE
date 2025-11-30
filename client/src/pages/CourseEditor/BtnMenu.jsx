@@ -35,8 +35,8 @@ const CourseEditorBtnMenu = ({ chooseMenu, coursorPos, isMenuVisible, addEditorI
                     <img src={plus_img} alt="" />
                     <div className="choose_menu-block_btn-insert_choise_wrap">
                         <div onClick={addTextBlock} className="choose_menu-block_btn-insert-choise"><img src={add_text_img} alt="Txt" title={t("add_text")} /></div>
-                        <div onClick={addCodeBlock} className="choose_menu-block_btn-insert-choise"><img src={add_exercise_img} alt="Exercise" title={t("add_exercise")} /></div>
-                        <div onClick={addExerciseBlock} className="choose_menu-block_btn-insert-choise"><img src={add_code_img} alt="Code" title={t("add_code")} /></div>
+                        <div onClick={addExerciseBlock} className="choose_menu-block_btn-insert-choise"><img src={add_exercise_img} alt="Exercise" title={t("add_exercise")} /></div>
+                        <div onClick={addCodeBlock} className="choose_menu-block_btn-insert-choise"><img src={add_code_img} alt="Code" title={t("add_code")} /></div>
                         <div onClick={addImageBlock} className="choose_menu-block_btn-insert-choise"><img src={add_image_img} alt="Img" title={t("add_img")} /></div>
                     </div>
                 </div>

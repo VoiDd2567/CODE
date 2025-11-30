@@ -18,6 +18,7 @@ html {
 
 .left_panel {
     min-width: 14vw;
+    max-width: 16vw;
     height: 80%;
     margin-left: 1vw;
     margin-top: 2vh;
@@ -59,4 +60,30 @@ html {
 
 .course_editor-block {
     min-height: 1vh;
+}
+
+.block-delete {
+    display: none;
+}
+
+.course_editor-block:hover .block-delete {
+    display: flex;
+}
+
+.block-delete {
+    height: 2.5vh;
+    align-items: center;
+    justify-content: end;
+    margin-left: 1vw;
+    margin-top: 1vh;
+    display: none;
+}
+
+.block-delete img {
+    height: 100%;
+    cursor: pointer;
+}
+
+.block-delete img:hover {
+    transform: scale(1.1);
 }

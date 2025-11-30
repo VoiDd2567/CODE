@@ -4,6 +4,7 @@ import run_image from "../../pictures/run-btn.png"
 import complete_image from "../../pictures/complete-btn.png"
 import open_exercise_image from "../../pictures/open-exercise-btn.png"
 import { useRef, useState, useEffect } from "react";
+import client_config from "../../client_config.json"
 
 const Console = ({
     setExerciseChoose = null,
@@ -15,7 +16,9 @@ const Console = ({
     editorValue = null,
     exercise = null,
     inserted = false,
-    h = "auto" }) => {
+    h = "auto",
+    w = "auto",
+    example = false }) => {
 
     const { t } = useTranslation();
     const webConsole = useRef(null);
@@ -38,13 +41,15 @@ const Console = ({
         if (inserted) {
             pageWrap.current.style.height = `${h}vh`
             consoleWrap.current.style.height = `${h - 5.5}vh`;
+            consoleWrap.current.style.width = `${w}vw`
+            pageWrap.current.style.width = `${w}vw`
         }
-    }, [inserted, h, exerciseOpened])
+    }, [inserted, h, exerciseOpened, w])
 
     const handleRunBtnClick = () => {
         const fileType = chosenFile.split(".")[1]
         startRunningCodeText();
-        fetch("https://localhost:3001/api/code/render-code", {
+        fetch(`${client_config.SERVER_IP}/api/code/render-code`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -70,7 +75,7 @@ const Console = ({
                 const data = await res.json();
                 if (data["output"]["status"] === "complete") {
                     textToConsole(data["output"]["output"], false);
-                    textToConsole("\n\n---------------------Code running completed-----------------------");
+                    textToConsole("\n\n<-Code running completed->");
                 }
                 if (data["output"]["status"] === "waiting_for_input") {
                     handleInput()
@@ -93,7 +98,7 @@ const Console = ({
         setWaitingForInput(false);
         setInputHistory([""])
 
-        fetch("https://localhost:3001/api/code/send-input", {
+        fetch(`${client_config.SERVER_IP}/api/code/send-input`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -110,7 +115,7 @@ const Console = ({
                 textToConsole("\n")
                 if (data["output"]["status"] === "complete") {
                     textToConsole(data["output"]["output"]);
-                    textToConsole("\n\n---------------------Code running completed-----------------------");
+                    textToConsole("\n\n<-Code running completed->");
                 }
                 if (data["output"]["status"] === "waiting_for_input") {
                     handleInput();
@@ -195,7 +200,7 @@ const Console = ({
         saveData(editorValue);
         setTimeout(() => {
             startRunningCodeText();
-            fetch("https://localhost:3001/api/exercise/check-exercise", {
+            fetch(`${client_config.SERVER_IP}/api/exercise/check-exercise`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -248,7 +253,7 @@ const Console = ({
             <div className="console__buttons-wrap">
                 <button className="console__btn run-btn" onClick={handleRunBtnClick} title="Run code"><p>{t("run")}</p><img src={run_image} alt="" /></button>
                 {(exerciseOpened || inserted) &&
-                    <button className="console__btn send-btn" onClick={handleSendBtnClick} title="Send exercise answer to be automaticly checked"><p>{t("send")}</p><img src={complete_image} alt="" /></button>
+                    <button className={`console__btn send-btn ${example ? "send-disabled" : ""}`} onClick={handleSendBtnClick} title="Send exercise answer to be automaticly checked"><p>{t("send")}</p><img src={complete_image} alt="" /></button>
                 }
                 {!inserted && (<button className="console__btn open-exercise-btn" onClick={handleExerciseOpenBtnClick}><p>{t("open-exercise")}</p><img src={open_exercise_image} alt="" /></button>)}
             </div>

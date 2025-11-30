@@ -17,6 +17,7 @@ import PasswordResetEmailGet from "./pages/PasswordResetEmailGet/PasswordResetEm
 import CoursePage from "./pages/CoursePage/CoursePage";
 //import ClassPage from "./pages/ClassPage/ClassPage";
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
+import client_config from "./client_config.json"
 
 const PrivateRoute = ({ children }) => {
     const { user } = useContext(UserContext);
@@ -34,7 +35,7 @@ const App = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('https://localhost:3001/api/user/user', {
+        fetch(`${client_config.SERVER_IP}/api/user/user`, {
             method: 'GET',
             credentials: 'include'
         })

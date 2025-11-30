@@ -7,6 +7,7 @@ import NewCodeSend from "./NewCodeSend";
 import "./registrationCode.css"
 import logo from "../../pictures/logo.png";
 import { useEffect } from "react";
+import client_config from "../../client_config.json"
 
 const RegistrationCode = () => {
     const { t } = useTranslation();
@@ -25,7 +26,7 @@ const RegistrationCode = () => {
     const newCodeSendDiv = useRef(null);
 
     const codeExpireTime = () => {
-        fetch("https://localhost:3001/api/auth/reg-code-time", {
+        fetch(`${client_config.SERVER_IP}/api/auth/reg-code-time`, {
             method: "GET",
             credentials: "include"
         }).then(async res => {
@@ -49,7 +50,7 @@ const RegistrationCode = () => {
 
     const checkCode = (event) => {
         event.preventDefault();
-        fetch("https://localhost:3001/api/auth/check-reg-code", {
+        fetch(`${client_config.SERVER_IP}/api/auth/check-reg-code`, {
             method: "POST",
             credentials: "include",
             headers: {

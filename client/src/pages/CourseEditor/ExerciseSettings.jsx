@@ -68,7 +68,6 @@ const ExerciseSettings = ({ setOpenSettings, setBlock, exerciseId, exerciseSetti
                             opt = typeMap["input"]
                         }
                     }
-                    console.log(opt)
                     setAutoCheckType(t(opt))
                     handleAutocheckTypeChange(null, opt)
                 }
@@ -104,7 +103,6 @@ const ExerciseSettings = ({ setOpenSettings, setBlock, exerciseId, exerciseSetti
                 }
                 if (exerciseSettings?.functionReturns) {
                     changeExercise("inputAnswers", exerciseSettings?.functionReturns)
-                    console.log(exerciseSettings?.functionReturns)
                 }
             }
         }
@@ -132,10 +130,8 @@ const ExerciseSettings = ({ setOpenSettings, setBlock, exerciseId, exerciseSetti
     useEffect(() => {
         const newFiles = {}
         Object.entries(files).forEach(([, file]) => {
-            console.log(file)
             newFiles[file.name] = file.content
         });
-        console.log(files)
         changeExercise("files", newFiles)
     }, [files])
 
@@ -327,11 +323,15 @@ const ExerciseSettings = ({ setOpenSettings, setBlock, exerciseId, exerciseSetti
         setErrorText(`${errText} ${text} ${t("required")}`)
     }
 
+    const changeLng = (e) => {
+        setExLngValue(e.target.value)
+    }
+
     return (<div className="exercise_settings-wrap">
         <div className="exercise_settings">
             <div className="line">
                 <SettingsInput label={t("name")} inputRef={exName} width={"55%"} onChange={(e) => changeExercise("name", e.target.value)} value={exercise?.name} />
-                <SettingsSelect label={t("text_language")} onChange={(e) => setExLngValue(e.target.value)} options={["Est", "Eng"]} noDefault={false} />
+                <SettingsSelect label={t("desc_language")} value={exLngValue} onChange={(e) => changeLng(e)} options={["est", "eng"]} noDefault={false} />
             </div>
             <div className="line centered-line">
                 <SettingsSelect label={t("exercise_type")} onChange={(e) => handleExTypeChange(e)} options={[t("select_type"), t("code_type")]} noDefault={false} />

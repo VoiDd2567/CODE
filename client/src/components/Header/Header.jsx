@@ -5,7 +5,7 @@ import { LanguageContext } from "../LanguageContext/LanguageContext"
 import { UserContext } from "../UserContext";
 import "./header.css";
 import logo from "../../pictures/logo.png";
-
+import client_config from "../../client_config.json"
 const developer_mode = true;
 
 function Header() {
@@ -47,7 +47,7 @@ function Header() {
     i18n.changeLanguage(newLng);
     setIsLngOpen(false);
 
-    fetch('https://localhost:3001/api/user/lng', {
+    fetch(`${client_config.SERVER_IP}/api/user/lng`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -59,7 +59,7 @@ function Header() {
   };
 
   const logout = () => {
-    fetch('https://localhost:3001/api/auth/logout', {
+    fetch(`${client_config.SERVER_IP}/api/auth/logout`, {
       method: 'GET',
       credentials: 'include',
     }).then(async res => {

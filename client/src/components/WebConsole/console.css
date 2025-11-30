@@ -51,8 +51,19 @@
     background-color: rgb(149, 149, 218);
 }
 
+.send-disabled {
+    pointer-events: none;
+    user-select: none;
+    filter: grayscale(1);
+}
+
+.send-disabled p {
+    color: gray;
+}
+
 .send-btn:active {
     background-color: rgb(109, 109, 159);
+    color: gray;
 }
 
 .open-exercise-btn {

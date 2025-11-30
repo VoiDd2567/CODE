@@ -20,6 +20,7 @@
     border: 1px solid black;
     resize: none;
     background-color: #a9aaad;
+    line-height: 2vh;
 }
 
 .text_block:focus {

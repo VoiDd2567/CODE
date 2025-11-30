@@ -9,6 +9,7 @@ import ExerciseSelector from "./ExerciseSelector"
 import { LanguageContext } from "../../components/LanguageContext/LanguageContext"
 import complete_image from "../../pictures/complete-white.png"
 import cross_image from "../../pictures/cross-white.png"
+import client_config from "../../client_config.json"
 
 const CodeEditor = () => {
     const { lng } = useContext(LanguageContext);
@@ -45,7 +46,7 @@ const CodeEditor = () => {
             exerciseId = exercise["_id"]
         }
 
-        fetch("https://localhost:3001/api/code/save-code", {
+        fetch(`${client_config.SERVER_IP}/api/code/save-code`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -55,7 +56,7 @@ const CodeEditor = () => {
         }).then(async res => {
             if (!res.ok) {
                 const errorData = await res.text();
-                throw new Error(`Error ${res.status} :\n ${errorData}`);
+                throw new Error(`Error ${res.status} : \n ${errorData}`);
             } else {
                 setFileSaved(true)
             }
@@ -65,7 +66,7 @@ const CodeEditor = () => {
     }
 
     const getExercises = () => {
-        fetch("https://localhost:3001/api/exercise/get-exercises", {
+        fetch(`${client_config.SERVER_IP}/api/exercise/get-exercises`, {
             method: "GET",
             credentials: "include",
         }).then(async res => {
@@ -83,7 +84,7 @@ const CodeEditor = () => {
     }
 
     const getExercise = (exerciseId) => {
-        fetch("https://localhost:3001/api/exercise/get-exercise", {
+        fetch(`${client_config.SERVER_IP}/api/exercise/get-exercise`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -112,7 +113,7 @@ const CodeEditor = () => {
     }
 
     useEffect(() => {
-        fetch("https://localhost:3001/api/user/user", {
+        fetch(`${client_config.SERVER_IP}/api/user/user`, {
             method: "GET",
             credentials: 'include',
         }).then(async res => {

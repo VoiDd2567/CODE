@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from "react"
 import CourseEditorBtnMenu from "./BtnMenu.jsx"
 import { EditorBlock, TextBlock, ExerciseBlock, ChooseBlock } from "./Blocks.jsx";
 import ExerciseSettings from "./ExerciseSettings.jsx";
+import trashcan from "../../pictures/bin.png"
 
-const CourseEditor = ({ borders }) => {
+const CourseEditor = ({ borders, lng }) => {
     const chooseMenu = useRef(null);
     const [coursorPos, setCoursorPos] = useState([])
     const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -22,10 +23,10 @@ const CourseEditor = ({ borders }) => {
                     name: "asdasd",
                     type: "code",
                     withoutInputAnswer: "Answer",
-                    functionName: "Ypur dick",
+                    functionName: "Placeholder",
                     functionReturns: [
-                        { input: "fUCK YOU", output: "fUCK YOU" },
-                        { input: "fUCK YOU", output: "fUCK YOU" }
+                        { input: "Placeholder", output: "Placeholder" },
+                        { input: "Placeholder", output: "Placeholder" }
                     ]
                 },
                 type: "exercise"
@@ -69,10 +70,11 @@ const CourseEditor = ({ borders }) => {
     const clickHandeler = (e) => {
         e.preventDefault()
         const block = e.target.closest('.block');
+        const delBlock = e.target.closest('.block-delete');
         const blockSettings = e.target.closest('.block-settings');
         const exerciseSettings = e.target.closest(".exercise_settings-wrap")
 
-        if (block || blockSettings || exerciseSettings) {
+        if (block || blockSettings || exerciseSettings || delBlock) {
             setIsMenuVisible(false);
             return;
         }
@@ -100,11 +102,6 @@ const CourseEditor = ({ borders }) => {
 
 
     const addExercise = (id, type, value) => {
-        console.log("----------------------------------------")
-        console.log(id)
-        console.log(type)
-        console.log(value)
-        console.log("----------------------------------------")
         addEditorItem(value, type, id)
     }
 
@@ -123,6 +120,10 @@ const CourseEditor = ({ borders }) => {
         id = parseInt(id)
         const item = editorValue.find(obj => obj[id]);
         return item[id].value;
+    }
+
+    const deleteBlock = (id) => {
+        setEditorValue(prev => prev.filter(item => Object.keys(item)[0] !== String(id)));
     }
 
     return (
@@ -164,6 +165,7 @@ const CourseEditor = ({ borders }) => {
                                     setExerciseSettingsVisible(true);
                                 }}
                                 data={data}
+                                lng={lng}
                             />
                         );
                     } else if (block.type === "choose") {
@@ -182,6 +184,7 @@ const CourseEditor = ({ borders }) => {
                             className={`course_editor-block ${index === chosenBlock ? "active" : ""}`}
                             data-block-id={id}
                         >
+                            <div className="block-delete"><img src={trashcan} alt="Delete" onClick={() => deleteBlock(id)} /></div>
                             {innerHtml}
                         </div>
                     );
