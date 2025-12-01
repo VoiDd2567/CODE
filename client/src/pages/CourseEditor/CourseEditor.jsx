@@ -2,13 +2,15 @@ import { useEffect, useState, useRef } from "react"
 import CourseEditorBtnMenu from "./BtnMenu.jsx"
 import { EditorBlock, TextBlock, ExerciseBlock, ChooseBlock } from "./Blocks.jsx";
 import ExerciseSettings from "./ExerciseSettings.jsx";
+import PageHandeler from "./components/PageHandeler.jsx";
 import trashcan from "../../pictures/bin.png"
 
 const CourseEditor = ({ borders, lng }) => {
     const chooseMenu = useRef(null);
     const [coursorPos, setCoursorPos] = useState([])
     const [isMenuVisible, setIsMenuVisible] = useState(false);
-    const [editorValue, setEditorValue] = useState([
+    const [page, setPage] = useState(0);
+    const [editorValue, setEditorValue] = useState([[
         { 1: { value: "Text aasdample", type: "text" } },
         { 2: { value: "text", type: "text" } },
         { 3: { value: "editor", type: "editor" } },
@@ -44,7 +46,7 @@ const CourseEditor = ({ borders, lng }) => {
                 }, type: "choose"
             }
         }
-    ]);
+    ], [], [], [], [], [], [], [], []]);
 
     const [chosenBlock, setChosenBlock] = useState(-1)
     const [exerciseSetttingsVisible, setExerciseSettingsVisible] = useState(false)
@@ -73,8 +75,9 @@ const CourseEditor = ({ borders, lng }) => {
         const delBlock = e.target.closest('.block-delete');
         const blockSettings = e.target.closest('.block-settings');
         const exerciseSettings = e.target.closest(".exercise_settings-wrap")
+        const pageHandeler = e.target.closest(".page_handeler")
 
-        if (block || blockSettings || exerciseSettings || delBlock) {
+        if (block || blockSettings || exerciseSettings || delBlock || pageHandeler) {
             setIsMenuVisible(false);
             return;
         }
@@ -86,29 +89,53 @@ const CourseEditor = ({ borders, lng }) => {
 
     const addEditorItem = (value, type, id = null) => {
         setEditorValue(prev => {
-            const nextId = id ?? (prev.length > 0 ? Math.max(...prev.map(obj => +Object.keys(obj)[0])) + 1 : 1);
+            const currentPageBlocks = prev[page] || [];
+            const allIds = prev.flat().map(obj => +Object.keys(obj)[0]);
+            const nextId = id ?? (allIds.length > 0 ? Math.max(...allIds) + 1 : 1);
 
-            const existingIndex = prev.findIndex(obj => Object.keys(obj)[0] == nextId);
+            const existingIndex = currentPageBlocks.findIndex(obj => Object.keys(obj)[0] == nextId);
 
+            const updatedPage = [...currentPageBlocks];
             if (existingIndex !== -1) {
-                const updated = [...prev];
-                updated[existingIndex] = { [nextId]: { value, type } };
-                return updated;
+                updatedPage[existingIndex] = { [nextId]: { value, type } };
             } else {
-                return [...prev, { [nextId]: { value, type } }];
+                updatedPage.push({ [nextId]: { value, type } });
             }
+
+            const newPages = [...prev];
+            newPages[page] = updatedPage;
+            return newPages;
         });
     };
+
+    const getNextIndex = () => {
+        if (!Array.isArray(editorValue) || editorValue.length === 0) return 1;
+        const allIds = editorValue.flat().map(obj => Number(Object.keys(obj)[0]));
+        return allIds.length > 0 ? Math.max(...allIds) + 1 : 1;
+    }
+
+    const getExerciseData = (id) => {
+        id = parseInt(id);
+        for (const pageBlocks of editorValue) {
+            const item = pageBlocks.find(obj => obj[id]);
+            if (item) {
+                return item[id].value;
+            }
+        }
+        return null;
+    }
+
+    const deleteBlock = (id, pageIndex) => {
+        setEditorValue(prev => {
+            const newPages = [...prev];
+            newPages[pageIndex] = newPages[pageIndex].filter(item => Object.keys(item)[0] !== String(id));
+            return newPages;
+        });
+    }
 
 
     const addExercise = (id, type, value) => {
         addEditorItem(value, type, id)
-    }
-
-    const getNextIndex = () => {
-        if (!Array.isArray(editorValue) || editorValue.length === 0) return 1;
-        const ids = editorValue.map(obj => Number(Object.keys(obj)[0]));
-        return Math.max(...ids) + 1;
     }
 
     const closeExerciseSettings = () => {
@@ -116,14 +143,8 @@ const CourseEditor = ({ borders, lng }) => {
         setCurrentExerciseId(-1);
     }
 
-    const getExerciseData = (id) => {
-        id = parseInt(id)
-        const item = editorValue.find(obj => obj[id]);
-        return item[id].value;
-    }
-
-    const deleteBlock = (id) => {
-        setEditorValue(prev => prev.filter(item => Object.keys(item)[0] !== String(id)));
+    const getPagesCount = () => {
+        return editorValue.length
     }
 
     return (
@@ -142,54 +163,77 @@ const CourseEditor = ({ borders, lng }) => {
                     />
                 );
             })()}
-            <div className="course_ediotor-blocks">
-                {editorValue.map((item, index) => {
-                    const [id, block] = Object.entries(item)[0];
+            <div className="course_editor-blocks">
+                {editorValue.map((p, pageIndex) => (
+                    pageIndex === page && (
+                        <div key={pageIndex} className="page-container">
+                            {p.map((item, blockIndex) => {
+                                const [id, block] = Object.entries(item)[0];
 
-                    let innerHtml = <div></div>;
-                    if (block.type === "text") {
-                        innerHtml = (
-                            <TextBlock id={id} value={block.value} borders={borders} setEditorValue={setEditorValue} />
-                        );
-                    } else if (block.type === "editor") {
-                        innerHtml = (
-                            <EditorBlock borders={borders} startValue={block.value} />
-                        );
-                    } else if (block.type === "exercise") {
-                        const data = getExerciseData(id);
-                        innerHtml = (
-                            <ExerciseBlock
-                                borders={borders}
-                                setOpenSettings={() => {
-                                    setCurrentExerciseId(id);
-                                    setExerciseSettingsVisible(true);
-                                }}
-                                data={data}
-                                lng={lng}
-                            />
-                        );
-                    } else if (block.type === "choose") {
-                        const data = getExerciseData(id);
-                        innerHtml = (<ChooseBlock borders={borders}
-                            setOpenSettings={() => {
-                                setCurrentExerciseId(id);
-                                setExerciseSettingsVisible(true);
-                            }}
-                            data={data} />)
-                    }
+                                let innerHtml = <div></div>;
+                                if (block.type === "text") {
+                                    innerHtml = (
+                                        <TextBlock
+                                            id={id}
+                                            value={block.value}
+                                            borders={borders}
+                                            setEditorValue={setEditorValue}
+                                        />
+                                    );
+                                } else if (block.type === "editor") {
+                                    innerHtml = (
+                                        <EditorBlock borders={borders} startValue={block.value} />
+                                    );
+                                } else if (block.type === "exercise") {
+                                    const data = getExerciseData(id);
+                                    innerHtml = (
+                                        <ExerciseBlock
+                                            borders={borders}
+                                            setOpenSettings={() => {
+                                                setCurrentExerciseId(id);
+                                                setExerciseSettingsVisible(true);
+                                            }}
+                                            data={data}
+                                            lng={lng}
+                                        />
+                                    );
+                                } else if (block.type === "choose") {
+                                    const data = getExerciseData(id);
+                                    innerHtml = (
+                                        <ChooseBlock
+                                            borders={borders}
+                                            setOpenSettings={() => {
+                                                setCurrentExerciseId(id);
+                                                setExerciseSettingsVisible(true);
+                                            }}
+                                            data={data}
+                                        />
+                                    );
+                                }
 
-                    return (
-                        <div
-                            key={id}
-                            className={`course_editor-block ${index === chosenBlock ? "active" : ""}`}
-                            data-block-id={id}
-                        >
-                            <div className="block-delete"><img src={trashcan} alt="Delete" onClick={() => deleteBlock(id)} /></div>
-                            {innerHtml}
+                                return (
+                                    <div
+                                        key={id}
+                                        className={`course_editor-block ${blockIndex === chosenBlock && pageIndex === page ? "active" : ""}`}
+                                        data-block-id={id}
+                                        data-page-index={pageIndex}
+                                    >
+                                        <div className="block-delete">
+                                            <img
+                                                src={trashcan}
+                                                alt="Delete"
+                                                onClick={() => deleteBlock(id, pageIndex)}
+                                            />
+                                        </div>
+                                        {innerHtml}
+                                    </div>
+                                );
+                            })}
                         </div>
-                    );
-                })}
+                    )
+                ))}
             </div>
+            <PageHandeler setPage={setPage} pageAmount={getPagesCount()} nowPage={page} />
             <CourseEditorBtnMenu
                 chooseMenu={chooseMenu}
                 coursorPos={coursorPos}

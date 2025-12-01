@@ -1,6 +1,7 @@
 import { useContext, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { UserContext } from "../../../components/UserContext";
+import client_config from "../../../client_config.json"
 
 const SecurityWindow = () => {
     const { t } = useTranslation();
@@ -11,7 +12,7 @@ const SecurityWindow = () => {
         resetMessage.current.textContent = "Waiting...";
         resetMessage.current.style.color = "black";
         resetMessage.current.hidden = false;
-        fetch('https://localhost:3001/api/auth/send-reset-link', {
+        fetch(`${client_config.SERVER_IP}/api/auth/send-reset-link`, {
             method: 'POST',
             credentials: 'include',
             headers: {

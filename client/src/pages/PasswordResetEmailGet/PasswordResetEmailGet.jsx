@@ -2,6 +2,7 @@ import LoginingPageLogo from "../../components/other/logginingPagesLogo";
 import "./passwordResetEmailGet.css"
 import { useTranslation } from "react-i18next";
 import { useState, useRef } from "react";
+import client_config from "../../client_config.json"
 
 const PasswordResetEmailGet = () => {
     const { t } = useTranslation();
@@ -19,7 +20,7 @@ const PasswordResetEmailGet = () => {
         event.preventDefault();
 
         setEmailValue(email.current.value)
-        fetch('https://localhost:3001/api/auth/send-reset-link', {
+        fetch(`${client_config.SERVER_IP}/api/auth/send-reset-link`, {
             method: 'POST',
             credentials: 'include',
             headers: {

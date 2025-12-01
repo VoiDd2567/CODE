@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require("fs-extra");
 const tmp = require('tmp');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const logger = require("../../scripts/Logging")
 const config = require("../../config.js")
 
@@ -15,7 +15,7 @@ class PythonRender {
     constructor(python_code, extraFiles = []) {
         this.PYTHON_VERSION = config["PYTHON_VERSION"];
         this.id = uuidv4();
-        this.tempDir = tmp.dirSync({ unsafeCleanup: true });
+        this.tempDir = tmp.dirSync({ unsafeCleanup: true, mode: 0o755 });
         this.python_code = this.addTemplate(python_code);
         this.extraFiles = extraFiles;
         this.containerName = `safe-python-${this.id}`;
@@ -61,51 +61,71 @@ ${code}
 
     /** Starts container for Python*/
     async #ensureContainer() {
-        const { exec } = require('child_process');
         const volumeHostPath = this.tempDir.name;
 
         return new Promise((resolve, reject) => {
-            exec(`docker ps -a --format '{{.Names}}'`, (err, stdout) => {
-                if (err) return reject(err);
+            // Get current user's UID and GID dynamically
+            exec('id -u', (err, uid) => {
+                if (err) {
+                    logger.error("Failed to get UID, using default 1000");
+                    uid = "1000";
+                } else {
+                    uid = uid.trim();
+                }
+                
+                exec('id -g', (err2, gid) => {
+                    if (err2) {
+                        logger.error("Failed to get GID, using default 1000");
+                        gid = "1000";
+                    } else {
+                        gid = gid.trim();
+                    }
+                    
+                    exec(`docker ps -a --format '{{.Names}}'`, (err3, stdout) => {
+                        if (err3) return reject(err3);
 
-                const createCmd = `docker run --user 1000:1000 -dit --rm --name ${this.containerName} \
-                    -v ${volumeHostPath}:/tmp:ro \
-                    --read-only \
-                    --network none \
-                    --memory 128m \
-                    --pids-limit 64 \
-                    --cpus="0.2" \
-                    --security-opt=no-new-privileges \
-                    --cap-drop=ALL \
-                    python:${this.PYTHON_VERSION}-slim bash`;
-                const containers = stdout.split('\n').filter(Boolean);
-                if (containers.includes(this.containerName)) {
-                    exec(`docker inspect -f '{{.State.Running}}' ${this.containerName}`, (err2, stdout2) => {
-                        if (err2) return reject(err2);
+                        const createCmd = `docker run --user ${uid}:${gid} -dit --rm --name ${this.containerName} \
+                            -v ${volumeHostPath}:/workspace:ro \
+                            --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+                            --read-only \
+                            --network none \
+                            --memory 128m \
+                            --pids-limit 64 \
+                            --cpus="0.2" \
+                            --security-opt=no-new-privileges \
+                            --cap-drop=ALL \
+                            python:${this.PYTHON_VERSION}-slim bash`;
+                        
+                        const containers = stdout.split('\n').filter(Boolean);
+                        if (containers.includes(this.containerName)) {
+                            exec(`docker inspect -f '{{.State.Running}}' ${this.containerName}`, (err4, stdout2) => {
+                                if (err4) return reject(err4);
 
-                        if (stdout2.trim() === "true") {
-                            resolve();
-                        } else {
-                            exec(`docker stop ${this.containerName}`, (stopErr) => {
-                                if (stopErr) return reject(stopErr);
+                                if (stdout2.trim() === "true") {
+                                    resolve();
+                                } else {
+                                    exec(`docker stop ${this.containerName}`, (stopErr) => {
+                                        if (stopErr) return reject(stopErr);
 
-                                exec(`docker rm -f ${this.containerName}`, (rmErr) => {
-                                    if (rmErr) return reject(rmErr);
+                                        exec(`docker rm -f ${this.containerName}`, (rmErr) => {
+                                            if (rmErr) return reject(rmErr);
 
-                                    exec(createCmd, (err3) => {
-                                        if (err3) return reject(err3);
-                                        resolve();
+                                            exec(createCmd, (err5) => {
+                                                if (err5) return reject(err5);
+                                                resolve();
+                                            });
+                                        });
                                     });
-                                });
+                                }
+                            });
+                        } else {
+                            exec(createCmd, (err6) => {
+                                if (err6) return reject(err6);
+                                resolve();
                             });
                         }
                     });
-                } else {
-                    exec(createCmd, (err4) => {
-                        if (err4) return reject(err4);
-                        resolve();
-                    });
-                }
+                });
             });
         });
     }
@@ -120,7 +140,7 @@ ${code}
         for (const filePath of filesToCopy) {
             const filenameInContainer = path.basename(filePath);
             const copyCmd = spawn('docker', [
-                'cp', filePath, `${this.containerName}:/tmp/${filenameInContainer}`
+                'cp', filePath, `${this.containerName}:/workspace/${filenameInContainer}`
             ]);
 
             await new Promise((res, rej) => {
@@ -132,7 +152,7 @@ ${code}
         return new Promise(async (resolve, reject) => {
             this.child = spawn('docker', [
                 'exec', '-i', this.containerName,
-                'bash', '-c', `cd /tmp && timeout 300 python3 ${this.id}.py`
+                'bash', '-c', `cd /workspace && timeout 300 python3 ${this.id}.py`
             ], {
                 stdio: ['pipe', 'pipe', 'pipe']
             });
@@ -157,6 +177,7 @@ ${code}
             this.child.stderr.on('data', (data) => {
                 errorOutput += data.toString(); // Collect errors from stderr
                 this.output += data.toString(); // Add to output for compatibility
+                logger.error("Python stderr:", data.toString()); // Debug logging
             });
 
             this.child.on('close', async (code) => {
@@ -221,6 +242,7 @@ ${code}
             const onErrorData = (chunk) => {
                 errorOutput += chunk.toString(); // Collect errors from stderr
                 buffer += chunk.toString(); // Add to output for compatibility
+                logger.error("Python stderr:", chunk.toString()); // Debug logging
             };
 
             this.child.stdout.on('data', onData);
@@ -252,13 +274,11 @@ ${code}
 
         this.tempDir.removeCallback();
 
-        const { exec } = require('child_process');
         exec(`docker rm -f ${this.containerName}`, (error, stdout, stderr) => {
             if (error && !stderr.includes("is already in progress")) {
                 logger.error(`Failed to remove container ${this.containerName}:`, error);
             }
         });
-
     }
 }
 

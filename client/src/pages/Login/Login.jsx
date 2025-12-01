@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/PasswordInput";
 import LoginingPageLogo from "../../components/other/logginingPagesLogo";
 import "./login.css";
+import client_config from "../../client_config.json"
 
 const Login = () => {
     const { t, i18n } = useTranslation();
@@ -18,7 +19,7 @@ const Login = () => {
     const fetchData = (event) => {
         event.preventDefault();
 
-        fetch('https://localhost:3001/api/auth/login', {
+        fetch(`${client_config.SERVER_IP}/api/auth/login`, {
             method: 'POST',
             credentials: 'include',
             headers: {

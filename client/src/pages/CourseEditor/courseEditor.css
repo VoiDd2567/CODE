@@ -56,6 +56,13 @@ html {
     background-color: #a9aaad;
     overflow-x: hidden;
     padding-bottom: 20vh;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.course_editor-blocks {
+    flex: 1
 }
 
 .course_editor-block {

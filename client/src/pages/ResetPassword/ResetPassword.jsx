@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 import LogginingPageLogo from "../../components/other/logginingPagesLogo";
 import PasswordInput from "../../components/PasswordInput/PasswordInput";
 import "./resetPassword.css"
+import client_config from "../../client_config.json"
 
 const ResetPassword = () => {
 
@@ -22,7 +23,7 @@ const ResetPassword = () => {
 
     useEffect(() => {
         errorMessage.current.hidden = true;
-        fetch('https://localhost:3001/api/auth/check-reset-token', {
+        fetch(`${client_config.SERVER_IP}/api/auth/check-reset-token`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -61,7 +62,7 @@ const ResetPassword = () => {
             return;
         }
 
-        fetch('https://localhost:3001/api/auth/reset-password', {
+        fetch(`${client_config.SERVER_IP}/api/auth/reset-password`, {
             method: 'POST',
             credentials: 'include',
             headers: {

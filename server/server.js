@@ -18,6 +18,7 @@ const limiter = rateLimit({
 })
 
 const app = express();
+//app.use(cors({ origin: 'https://80.77.25.86:3000', credentials: true }));
 app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());

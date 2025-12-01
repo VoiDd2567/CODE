@@ -89,12 +89,9 @@ const ExerciseBlock = ({ borders, setOpenSettings, data, lng }) => {
     }, [borders])
 
     useEffect(() => {
-        console.log(data.description)
-        console.log(lng)
         if (!Object.keys(data.description).includes(lng)) {
             let sLng = Object.keys(data.description)
             setRealLng(sLng[0])
-            console.log("Lng changed")
         } else {
             setRealLng(lng)
         }

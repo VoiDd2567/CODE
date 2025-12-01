@@ -5,6 +5,7 @@ import PasswordInput from "../../components/PasswordInput/PasswordInput";
 import TeacherStudentChoose from "./TeacherStudentChoose";
 import LoginingPageLogo from "../../components/other/logginingPagesLogo";
 import "./registration.css";
+import client_config from "../../client_config.json"
 
 const Registration = () => {
     const { t } = useTranslation();
@@ -23,7 +24,7 @@ const Registration = () => {
     const fetchData = (event) => {
         event.preventDefault();
 
-        fetch('https://localhost:3001/api/auth/registration', {
+        fetch(`${client_config.SERVER_IP}/api/auth/registration`, {
             method: 'POST',
             credentials: 'include',
             headers: {
