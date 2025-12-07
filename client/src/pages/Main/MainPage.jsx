@@ -14,7 +14,7 @@ const MainPage = () => {
             <p className="main_page-p">{t("main_page_text")}</p>
             <p className="main_page-p">Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta maiores et placeat a iusto libero consequatur ullam asperiores cumque corporis, minima deleniti, mollitia eligendi totam id quas dolorem maxime ea.</p>
             <div className="gh_link-wrap">
-                <a className="main_page-gh_link" href="https://github.com/VoiDd2567/CODE">{t("ling_for_github")}</a>
+                <a className="main_page-gh_link" href="https://github.com/VoiDd2567/CODE">{t("link_for_github")}</a>
                 <img src={github} alt="" />
             </div>
         </main>

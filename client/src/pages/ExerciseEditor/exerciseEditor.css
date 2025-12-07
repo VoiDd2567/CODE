@@ -1,0 +1,69 @@
+.exercise_editor_page-form {
+    margin-left: 10vw;
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: column;
+    font-family: "Electrolize";
+}
+
+.exercise_editor_page-form-item-label {
+    color: #ededf0;
+    font-size: 3vh;
+}
+
+.exercise_editor_page-form-item {
+    margin-bottom: 4vh;
+}
+
+.exercise_editor_page-form-item-textarea {
+    resize: none;
+    margin-top: 1vh;
+    height: 4vh;
+    padding-left: 1vw;
+    padding-top: 1vh;
+    text-justify: center;
+    font-size: 2vh;
+    min-width: 50vw;
+    background-color: #d8d9db;
+}
+
+.exercise_editor_page-form-section_name {
+    color: #FFD369;
+    font-size: 3vw;
+    margin-right: 3vw;
+    margin-top: 5vh;
+}
+
+.exercise_editor_page-form-select {
+    margin-top: 2vh;
+    display: flex;
+    margin-left: 2vw;
+    margin-bottom: 4vh;
+}
+
+.small-label {
+    font-size: 2.5vh;
+}
+
+.exercise_editor_page-form-item-checkbox {
+    margin-left: 1vw;
+    width: 1vw;
+}
+
+.small-textarea {
+    width: 20vw;
+    min-width: 20vw;
+}
+
+.exercise_editor_page-form-item-select {
+    margin-top: 1vh;
+    max-width: 25vw;
+    font-family: "Electrolize";
+    font-size: 2vh;
+    padding: 1vh;
+}
+
+.exercise_editor_page-form-items_line {
+    display: flex;
+    gap: 20vw;
+}

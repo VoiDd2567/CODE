@@ -5,7 +5,7 @@ const TeacherStudentChoose = ({ setRole }) => {
 
     return (
         <div className="registartion-page__radio-wrap">
-            <label className="registration-page__choise-question">{t("role_choise")}</label>
+            <label className="registration-page__choise-question">{t("role_choice")}</label>
             <div className="registration-page__radio-group">
                 <label className="registration-page__radio-label">
                     <input className="registration-page__radio-btn" type="radio" name="role" value="student" onChange={() => setRole("student")} required />

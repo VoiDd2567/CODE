@@ -1,0 +1,32 @@
+.label-line {
+    display: flex;
+}
+
+.add_code_block-btn {
+    background-color: #FFD369;
+    margin-left: 1.5vw;
+    min-width: 4vw;
+    padding-left: 0.5vw;
+    padding-right: 0.5vw;
+    border-radius: 1vh;
+    font-family: "Electrolize";
+}
+
+.add_code_block-btn:hover {
+    background-color: #e5b443;
+}
+
+.add_code_block-btn:active {
+    background-color: #8e6e26;
+}
+
+.exercise_editor_page-form-item-desciption {
+    margin-top: 1vh;
+    width: 60vw;
+    min-height: 20vh;
+    padding-left: 1vw;
+    padding-top: 1vh;
+    text-justify: center;
+    font-size: 2vh;
+    background-color: #d8d9db;
+}

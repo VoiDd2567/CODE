@@ -58,12 +58,25 @@ header {
 
 }
 
+.header__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header__item img {
+    width: 3vw;
+    margin-right: 0.5vw;
+}
+
 .header__item:hover,
 .header__lng-menu div:hover {
     color: #a48640;
     cursor: pointer;
     transform: scale(1.05);
 }
+
+
 
 .header__lng {
     margin-right: 1vw;

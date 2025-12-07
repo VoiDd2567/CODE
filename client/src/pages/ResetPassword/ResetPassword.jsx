@@ -57,7 +57,7 @@ const ResetPassword = () => {
         const pas_repeat = password_repeat.current.value;
 
         if (pas != pas_repeat) {
-            errorMessage.current.textContent = t("paswords_not_same");
+            errorMessage.current.textContent = t("passwords_not_same");
             errorMessage.current.hidden = false;
             return;
         }

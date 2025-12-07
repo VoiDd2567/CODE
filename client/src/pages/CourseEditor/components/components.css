@@ -300,8 +300,3 @@
     -webkit-appearance: none;
     margin: 0;
 }
-
-/* Убираем стрелочки в Firefox */
-.page_handeler-input[type=number] {
-    -moz-appearance: textfield;
-}

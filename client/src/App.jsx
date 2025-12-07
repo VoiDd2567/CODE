@@ -7,7 +7,6 @@ import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
 import RegistrationCode from "./pages/RegistrationCode/RegistrationCode";
 import CodeEditor from "./pages/CodeEditor/CodeEditor";
-import CourseEditor from "./pages/CourseEditor/CourseEditorPage";
 import UserCourses from "./pages/UserCourses/UserCourses";
 import ProfileSettings from "./pages/ProfileSettings/ProfileSettings";
 import Teapot from "./pages/Teapot/Teapot"
@@ -15,6 +14,8 @@ import LoadingScreen from "./components/Loading/LoadingScreem";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import PasswordResetEmailGet from "./pages/PasswordResetEmailGet/PasswordResetEmailGet";
 import CoursePage from "./pages/CoursePage/CoursePage";
+import ExerciseEditor from "./pages/ExerciseEditor/ExerciseEditor";
+//import CourseEditor from "./pages/CourseEditor/CourseEditorPage";
 //import ClassPage from "./pages/ClassPage/ClassPage";
 import { LanguageContext } from "./components/LanguageContext/LanguageContext"
 import client_config from "./client_config.json"
@@ -73,11 +74,6 @@ const App = () => {
                             <CodeEditor />
                         </PrivateRoute>
                     } />
-                    <Route path="/course-editor" element={
-                        <PrivateRoute>
-                            <CourseEditor />
-                        </PrivateRoute>
-                    } />
                     <Route path="/profile-settings" element={
                         <PrivateRoute>
                             <ProfileSettings />
@@ -88,6 +84,16 @@ const App = () => {
                             <UserCourses />
                         </PrivateRoute>
                     } />
+                    <Route path="/exercise-editor" element={
+                        <PrivateRoute>
+                            <ExerciseEditor />
+                        </PrivateRoute>
+                    } />
+                    {/* <Route path="/course-editor" element={
+                        <PrivateRoute>
+                            <CourseEditor />
+                        </PrivateRoute>
+                    } /> */}
                     {/* <Route path="/class/:id" element={
                         <PrivateRoute>
                             <ClassPage />

@@ -5,7 +5,10 @@ import { LanguageContext } from "../LanguageContext/LanguageContext"
 import { UserContext } from "../UserContext";
 import "./header.css";
 import logo from "../../pictures/logo.png";
+import code_yellow from "../../pictures/code_yellow.png"
+import exercise_yellow from "../../pictures/exercise_yellow.png"
 import client_config from "../../client_config.json"
+
 const developer_mode = true;
 
 function Header() {
@@ -14,8 +17,9 @@ function Header() {
   const { lng, setLng } = useContext(LanguageContext);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const [redirectToCodeEditor, setRedirectToCodeEditor] = useState(false);
-  const [redirectToCourseEditor, setRedirectToCourseEditor] = useState(false);
   const [redirectToCourses, setRedirectToCourses] = useState(false);
+  const [redirectToExerciseEditor, setRedirectToExerciseEditor] = useState(false);
+  //const [redirectToCourseEditor, setRedirectToCourseEditor] = useState(false);
   //const [redirectToClass, setRedirectToClass] = useState(false)
   const [redirectToProfile, setRedirectToProfile] = useState(false)
   const [isLngOpen, setIsLngOpen] = useState(false);
@@ -29,12 +33,13 @@ function Header() {
   useEffect(() => {
     if (loginLabel.current && account.current) {
       if (user) {
+        console.log(user)
         setLogged(true)
-        loginLabel.current.hidden = true;
+        loginLabel.current.style.display = "none";
         account.current.style.display = "flex";
       } else {
         setLogged(false)
-        loginLabel.current.hidden = false;
+        loginLabel.current.style.display = "flex";
         account.current.style.display = "none";
       }
     }
@@ -87,13 +92,17 @@ function Header() {
     return <Navigate to="/profile-settings" replace />;
   }
 
-  if (redirectToCourseEditor) {
-    return <Navigate to="/course-editor" replace />;
-  }
-
   if (redirectToCourses) {
     return <Navigate to="/courses" replace />;
   }
+
+  if (redirectToExerciseEditor) {
+    return <Navigate to="/exercise-editor" replace />;
+  }
+
+  // if (redirectToCourseEditor) {
+  //   return <Navigate to="/course-editor" replace />;
+  // }
 
   // if (redirectToClass) {
   //   return <Navigate to="/class/12312" replace />;
@@ -135,20 +144,20 @@ function Header() {
         </div>
         {logged && (
           <>
-            {pageMode === "student" && (
-              <div className="header__item" onClick={() => setRedirectToCodeEditor(true)}>
-                {t("editor")}
-              </div>
-            )}
+            <div className="header__item" onClick={() => setRedirectToCodeEditor(true)}>
+              <img src={code_yellow} title={t("code_editor")} />
+            </div>
             {pageMode === "teacher" && (
-              <div className="header__item" onClick={() => setRedirectToCourseEditor(true)}>
-                {t("course_editor")}
+              <div className="header__item" onClick={() => setRedirectToExerciseEditor(true)}>
+                <img src={exercise_yellow} title={t("exercise_editor")} />
               </div>
             )}
-            <div className="header__item" onClick={() => { setRedirectToCourses(true) }}>{t("courses")}</div>
+            <div className="header__item" onClick={() => { setRedirectToCourses(true) }}>
+              <p>{t("courses")}</p>
+            </div>
           </>
         )}
-        <div className="header__item" ref={loginLabel} onClick={() => { setRedirectToLogin(true) }}>{t("login")} </div>
+        <div className="header__item" ref={loginLabel} onClick={() => { setRedirectToLogin(true) }}><p>{t("login")}</p> </div>
         <div className="header__account-wrap" ref={account}>
           <div className="header_menu_draw" onClick={() => { setIsAccountOpen(!isAccountOpen) }}>
             {isAccountOpen ? (
