@@ -1,5 +1,5 @@
 .exercise_editor_page-form {
-    margin-left: 10vw;
+    margin-left: 9vw;
     margin-top: 5vh;
     display: flex;
     flex-direction: column;
@@ -13,6 +13,7 @@
 
 .exercise_editor_page-form-item {
     margin-bottom: 4vh;
+    margin-left: 2vw;
 }
 
 .exercise_editor_page-form-item-textarea {
@@ -31,14 +32,14 @@
     color: #FFD369;
     font-size: 3vw;
     margin-right: 3vw;
-    margin-top: 5vh;
 }
 
 .exercise_editor_page-form-select {
-    margin-top: 2vh;
+    margin-top: 5vh;
     display: flex;
-    margin-left: 2vw;
+    align-items: center;
     margin-bottom: 4vh;
+    height: 6vh;
 }
 
 .small-label {
@@ -46,8 +47,7 @@
 }
 
 .exercise_editor_page-form-item-checkbox {
-    margin-left: 1vw;
-    width: 1vw;
+    transform: scale(1.7);
 }
 
 .small-textarea {
@@ -65,5 +65,17 @@
 
 .exercise_editor_page-form-items_line {
     display: flex;
-    gap: 20vw;
+    gap: 5vw;
+}
+
+.exercise_editor_page_bottom {
+    height: 20vh;
+}
+
+.exercise_editor_page-form-item-counter {
+    margin-top: 1vh;
+    height: 3.5vh;
+    padding-left: 1vw;
+    font-size: 2vh;
+    background-color: #d8d9db;
 }

@@ -91,5 +91,7 @@
   "code_editor": "Code editor",
   "exercise_editor": "Exercise editor",
   "add_code_block": "Add code block",
-  "autocheck": "Autocheck"
+  "autocheck": "Autocheck",
+  "add_pair": "Add pair",
+  "check_amount": "Amount of checks"
 }

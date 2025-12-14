@@ -1,3 +1,7 @@
+img {
+    user-select: none;
+}
+
 .label-line {
     display: flex;
 }
@@ -29,4 +33,92 @@
     text-justify: center;
     font-size: 2vh;
     background-color: #d8d9db;
+}
+
+
+.autocheck_values-menu-add_btn {
+    font-family: "Electrolize";
+    margin-left: 2vw;
+    padding: 0.5vh;
+    font-size: 2vh;
+    background-color: #FFD369;
+}
+
+.autocheck_values-menu-add_btn:hover {
+    background-color: #e5b443;
+}
+
+.autocheck_values-menu-add_btn:active {
+    background-color: #8e6e26;
+}
+
+.autocheck_values-menu-pairs {
+    margin-top: 3vh;
+}
+
+.autocheck_values-menu-pair-wrap {
+    width: 80%;
+    background-color: #a9aaad;
+    padding: 1vh;
+    margin-top: 2vh;
+    border-radius: 2vh;
+}
+
+.autocheck_values-menu-pair {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 35% 20% 35% 5%;
+    align-items: center;
+    margin-top: 2vh;
+}
+
+.autocheck_values-menu-pair-input {
+    width: 100%;
+    background-color: #d8d9db;
+}
+
+.autocheck_values-menu-pair-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3vw;
+    min-height: 3vh;
+    background-size: cover;
+}
+
+.autocheck_values-menu-pair-del {
+    margin-top: 1vh;
+    width: 2vw;
+    height: 4vh;
+    background-size: cover;
+    margin-left: 2vw;
+}
+
+
+.autocheck_values-menu-pair-arrow img {
+    width: 3vw;
+}
+
+.autocheck_values-menu-pair-label {
+    font-size: 2vh;
+    color: white;
+    margin-bottom: 1vh;
+    margin-left: 0.5vw;
+    user-select: none;
+}
+
+.autocheck_values-menu-pair-textarea {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    resize: none;
+    font-family: "Electrolize";
+    padding: 0.5vh;
+    height: 2.5vh;
+    font-size: 2vh;
+}
+
+.autocheck_values-menu-pair-item-input {
+    margin-bottom: 1vh;
 }
