@@ -12,6 +12,7 @@ const ExerciseEditor = () => {
     const [autocheck, setAutocheck] = useState(true)
     const [autocheckType, setAutocheckType] = useState(t("output_check_input"))
     const [autocheckCheckAmount, setAutocheckCheckAmount] = useState(1)
+    const [files, setFiles] = useState(true)
 
     return <div className="exercise_editor_page">
         <MinimizedHeader />
@@ -43,7 +44,7 @@ const ExerciseEditor = () => {
                             </div>)}
                         {(autocheckType === t("func_check") || autocheckType === t("output_check_input")) && (
                             <div className="exercise_editor_page-form-item">
-                                <div className="exercise_editor_page-form-item-label">{t("check_amount")}</div>
+                                <div className="exercise_editor_page-form-item-label">{t("input_amount")}</div>
                                 <input type="number" min="1" className="exercise_editor_page-form-item-counter" value={autocheckCheckAmount} onChange={(e) => setAutocheckCheckAmount(e.target.value)}></input>
                             </div>)}
                     </div>
@@ -55,6 +56,11 @@ const ExerciseEditor = () => {
                     {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (<AutocheckValues inputAmount={autocheckCheckAmount} />)}
                 </>
             )}
+            <div className="exercise_editor_page-form-select">
+                <div className="exercise_editor_page-form-section_name">{t("Files")}</div>
+                <input type="checkbox" className="exercise_editor_page-form-item-checkbox" onChange={() => setFiles(!files)} checked={files} />
+            </div>
+            {files && (<div></div>)}
             <div className="exercise_editor_page_bottom"></div>
         </div>
     </div>

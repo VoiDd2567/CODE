@@ -79,7 +79,7 @@ const AutocheckValues = ({ inputAmount = 2 }) => {
                                 <div className="autocheck_values-menu-pair-item">
                                     {input.map((inputOne, idx) => (
                                         <div key={idx} className="autocheck_values-menu-pair-item-input">
-                                            <div className="autocheck_values-menu-pair-label">{t("Input")} {idx + 1}</div>
+                                            <div className="autocheck_values-menu-pair-label">{t("input")} {idx + 1}</div>
                                             <textarea
                                                 className="autocheck_values-menu-pair-textarea"
                                                 onChange={e => updatePairInput(index, idx, e.target.value)}
