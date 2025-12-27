@@ -69,7 +69,7 @@
 }
 
 .exercise_editor_page_bottom {
-    height: 20vh;
+    height: 10vh;
 }
 
 .exercise_editor_page-form-item-counter {
@@ -78,4 +78,75 @@
     padding-left: 1vw;
     font-size: 2vh;
     background-color: #d8d9db;
+}
+
+.exercise_editor_page-save_btn-wrap {
+    width: 95%;
+    display: flex;
+    justify-content: end;
+    margin-top: 10vh;
+}
+
+.exercise_editor_page-save_btn {
+    padding: 1vh;
+    padding-left: 2vh;
+    padding-right: 2vh;
+    margin-left: 3vw;
+    background-color: rgb(62, 192, 62);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.exercise_editor_page-save_btn:hover {
+    background-color: rgb(38, 136, 38);
+}
+
+.exercise_editor_page-save_btn:active {
+    background-color: rgb(22, 89, 22);
+}
+
+.exercise_editor_page-notifications {
+    position: fixed;
+    bottom: 15%;
+    right: 2%;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5vh;
+}
+
+.exercise_editor_page-notification {
+    background-color: rgba(76, 166, 76, 0.453);
+    padding: 1vh;
+    border-radius: 1vh;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 1vh;
+    transform: translateX(120%);
+    opacity: 0;
+    animation: slideIn 0.35s ease-out forwards;
+    font-family: "Electrolize";
+}
+
+
+.notification-delete {
+    width: 2vh;
+}
+
+.notification-delete img {
+    width: 100%;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }

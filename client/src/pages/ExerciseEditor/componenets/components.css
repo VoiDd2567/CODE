@@ -122,3 +122,32 @@ img {
 .autocheck_values-menu-pair-item-input {
     margin-bottom: 1vh;
 }
+
+.fileMenu {
+    margin-left: 2vw;
+}
+
+.fileMenu-add_btn {
+    font-family: "Electrolize";
+    margin-left: 2vw;
+    padding: 0.5vh;
+    font-size: 2vh;
+    width: 4vw;
+    background-color: #FFD369;
+    user-select: none;
+}
+
+.fileMenu-add_btn:hover {
+    background-color: #e5b443;
+}
+
+.fileMenu-add_btn:active {
+    background-color: #8e6e26;
+}
+
+.fileMenu-menu-area {
+    margin-top: 2vh;
+    width: 90%;
+    min-height: 20vh;
+    background-color: #a9aaad;
+}

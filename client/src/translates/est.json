@@ -92,5 +92,8 @@
   "add_code_block": "Lisada koodi plokki",
   "autocheck": "Autokontroll",
   "add_pair": "Lisa paar",
-  "input_amount": "Sisendite arv"
+  "input_amount": "Sisendite arv",
+  "param": "Parameeter",
+  "param_amount": "Parameetrite arv",
+  "add_file": "Lisa file"
 }

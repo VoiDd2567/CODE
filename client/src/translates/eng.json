@@ -93,5 +93,8 @@
   "add_code_block": "Add code block",
   "autocheck": "Autocheck",
   "add_pair": "Add pair",
-  "input_amount": "Amount of inputs"
+  "input_amount": "Amount of inputs",
+  "param": "Parameter",
+  "param_amount": "Amount of parameters",
+  "add_file": "Add file"
 }

@@ -4,7 +4,7 @@ import arrow_r from "../../../pictures/arrow-r.png"
 import deleteImg from "../../../pictures/delete.png";
 import deleteRedImg from "../../../pictures/delete-red.png";
 
-const AutocheckValues = ({ inputAmount = 2 }) => {
+const AutocheckValues = ({ inputAmount = 2, func = false }) => {
     const { t } = useTranslation()
 
     const [paires, setPairs] = useState([{ input: [], output: "" }])
@@ -33,9 +33,13 @@ const AutocheckValues = ({ inputAmount = 2 }) => {
     ];
 
     const handleAddClick = () => {
+        let newInput = []
+        for (let i = 0; i < inputAmount; i += 1) {
+            newInput.push("")
+        }
         setPairs(prev => [
             ...prev,
-            { input: Array(inputAmount).fill(""), output: "" }
+            { input: newInput, output: "" }
         ]);
     };
 
@@ -79,7 +83,7 @@ const AutocheckValues = ({ inputAmount = 2 }) => {
                                 <div className="autocheck_values-menu-pair-item">
                                     {input.map((inputOne, idx) => (
                                         <div key={idx} className="autocheck_values-menu-pair-item-input">
-                                            <div className="autocheck_values-menu-pair-label">{t("input")} {idx + 1}</div>
+                                            <div className="autocheck_values-menu-pair-label">{func ? t("param") : t("input")} {idx + 1}</div>
                                             <textarea
                                                 className="autocheck_values-menu-pair-textarea"
                                                 onChange={e => updatePairInput(index, idx, e.target.value)}
