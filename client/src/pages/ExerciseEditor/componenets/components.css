@@ -150,4 +150,89 @@ img {
     width: 90%;
     min-height: 20vh;
     background-color: #a9aaad;
+    padding-bottom: 1vh;
+}
+
+.fileMenu-file {
+    position: relative;
+    width: 100%;
+    max-height: 4vh;
+    display: flex;
+    align-items: center;
+}
+
+.fileMenu-file:hover {
+    background-color: #8d8e91;
+}
+
+.fileMenu-file-icons {
+    display: flex;
+    gap: 1vw;
+    height: 4vh;
+}
+
+.fileMenu-file-icon {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 0.5vh;
+    padding-bottom: 0.5vh;
+}
+
+.fileMenu-file-icon img {
+    height: 100%;
+    cursor: pointer;
+}
+
+.fileMenu-file-icon img:hover {
+    transform: scale(1.1);
+}
+
+.fileMenu-file-file_icon {
+    height: 4vh;
+}
+
+.fileMenu-file-file_icon img {
+    height: 100%;
+}
+
+.fileMenu-file-name {
+    margin-left: 1vw;
+    width: 100%;
+    margin-right: 1vw;
+}
+
+.fileMenu-file_editor {
+    margin-top: 2vh;
+}
+
+
+.fileMenu-file_editor_header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1vh;
+}
+
+.fileMenu-file_editor-fileName {
+    color: white;
+    margin-left: 1vw;
+    margin-right: 1vw;
+}
+
+.fileMenu-file_editor-closeIcon {
+    height: 2vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fileMenu-file_editor-closeIcon img {
+    height: 100%;
+    cursor: pointer;
+}
+
+.fileMenu-file_editor-closeIcon img:hover {
+    transform: scale(1.1);
 }
