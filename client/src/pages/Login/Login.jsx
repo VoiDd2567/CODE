@@ -36,12 +36,13 @@ const Login = () => {
                 errorMessage.current.hidden = false;
                 throw new Error(`Error ${res.status}`);
             } else {
-
                 const data = await res.json();
                 i18n.changeLanguage(data["user"].defaultLng);
                 setRedirectBack(true);
             }
-        }).catch(error => {
+        }).catch(async error => {
+            errorMessage.current.textContent = error || 'Error';
+            errorMessage.current.hidden = false;
             console.error('ERROR with sending data', error);
         });
     };
