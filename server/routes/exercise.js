@@ -3,6 +3,7 @@ const router = express.Router()
 
 const MongoGetData = require("../database/mongo_get_data");
 const { getUsersAllowedExercises, requireAuth } = require("../scripts/SecurityChecks")
+const { safeExercise } = require("../scripts/SafeTemplates")
 const ExerciseCheck = require("../codeProcessing/ExerciseCheck")
 const logger = require("../scripts/Logging");
 
@@ -61,6 +62,27 @@ router.post("/check-exercise", requireAuth, async (req, res) => {
             res.status(400).json({ error: "Unfortunately we still don't have automatic checking for this programming language" })
         }
 
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.post("/new-exercise", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const { data } = req.body;
+
+        const user = await MongoGetData.getUserBySession(sessionId)
+
+        if (user.weight != "teacher") {
+            return res.status(403).json({ error: "You are not allowed to use Exercise editor" })
+        }
+
+        if (!safeExercise(data)) {
+            return res.status(409).json({ error: "Data wasn't correct or includes forbidden keys" })
+        }
+        res.status(200).json({ correct: true, id: "blank" })
     } catch (err) {
         logger.error(err)
         res.status(500).json({ error: "Internal server error" })

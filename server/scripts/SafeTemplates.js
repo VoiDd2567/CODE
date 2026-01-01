@@ -48,4 +48,24 @@ function safeCourse(course) {
     }
 }
 
-module.exports = { safeUser, safeRegistrationCode, safeCourse };
+function safeExercise(ex) {
+    const allowedKeys = ["type", "name", "description", "files",
+        "programmingLng", "autoCheck", "answerCheckType", "inputAnswers",
+        "inputCount", "withoutInputAnswer", "functionName", "functionReturns",
+        "minimalPercent"]
+
+    const requiredKeys = ["name", "description", "programmingLng"]
+
+    const hasOnlyAllowedKeys = Object.keys(ex).every(element => allowedKeys.includes(element));
+    if (!hasOnlyAllowedKeys) {
+        return false;
+    }
+    const hasAllRequiredKeys = requiredKeys.every(key => key in ex);
+    if (!hasAllRequiredKeys) {
+        return false;
+    }
+
+    return true;
+}
+
+module.exports = { safeUser, safeRegistrationCode, safeCourse, safeExercise };

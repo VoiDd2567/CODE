@@ -1,10 +1,11 @@
 import MinimizedHeader from "../../components/other/minimizedHeader"
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DescriprionBlock from "./componenets/descriptionBlock";
 import AutocheckValues from "./componenets/autocheckValues";
 import FileMenu from "./componenets/fileMenu";
 import cross from "../../pictures/cross-b.png"
+import client_config from "../../client_config.json"
 
 import "./exerciseEditor.css"
 import "./componenets/components.css"
@@ -16,20 +17,51 @@ const ExerciseEditor = () => {
     const [autocheckCheckAmount, setAutocheckCheckAmount] = useState(1)
     const [files, setFiles] = useState(true)
     const [notifications, setNotifications] = useState([])
-    const [data, setData] = useState({})
+    const [data, setData] = useState({
+        "programmingLng": "py",
+        "inputCount": "1",
+        "answerCheckType": "checkCodeOutput",
+        "minimalPercent": "100"
+    })
 
-    useEffect(() => {
-        console.log(data)
-    }, [data])
+    const addNotification = (message, type = "green") => {
+        setNotifications(prev => [
+            ...prev,
+            { message, type }
+        ])
+    }
 
     const handleExerciseSave = () => {
 
+        if (!Object.keys(data).includes("name") || data?.name === "") {
+            addNotification(`${t("name")} ${t("required")}`, "red")
+            return;
+        }
+        if (!Object.keys(data).includes("description") || data?.description === "") {
+            addNotification(`${t("description")} ${t("required")}`, "red")
+            return;
+        }
 
+        addData("type", "code")
 
-        setNotifications(prev => [
-            ...prev,
-            "Nothing was added" //TODO
-        ])
+        fetch(`${client_config.SERVER_IP}/api/exercise/new-exercise`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ data: data })
+        }).then(async res => {
+            if (!res.ok) {
+                const errorData = await res.json();
+                addNotification(errorData, "red")
+            } else {
+                const ans = await res.json();
+                addNotification(`Exercise created with id - ${ans.id}`, "green")
+            }
+        }).catch(error => {
+            addNotification(error.message, "red")
+        });
     }
 
     const removeNotif = (id) => {
@@ -132,8 +164,8 @@ const ExerciseEditor = () => {
         </div>
         <div className="exercise_editor_page-notifications">
             {notifications.map((notif, id) => {
-                return (<div key={id} className="exercise_editor_page-notification" >
-                    <div className="notification-text">{notif}</div>
+                return (<div key={id} className={`exercise_editor_page-notification notification-${notif.type}`} >
+                    <div className="notification-text">{notif.message}</div>
                     <div className="notification-delete"><img src={cross} alt="Close" onClick={() => removeNotif(id)} /></div>
                 </div>)
             })}

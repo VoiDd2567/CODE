@@ -33,9 +33,9 @@ class MongoCreateData {
     }
   }
 
-  static async createExercise(type, description, answer = null) {
+  static async createExercise(exerciseData) {
     try {
-      const exercise = new Exercise({ type, description, answer });
+      const exercise = new Exercise(exerciseData);
       const savedExercise = await exercise.save();
       return savedExercise._id;
     } catch (err) {
