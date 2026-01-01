@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { createRoot } from "react-dom/client";
 import Editor from "../../../components/Editor/Editor";
 
-const DescriptionBlock = () => {
+const DescriptionBlock = ({ setDesc }) => {
     const { t } = useTranslation();
     const exDescription = useRef(null);
     const [descValue, setDescValue] = useState("")
@@ -17,7 +17,10 @@ const DescriptionBlock = () => {
         return cleanup;
     }, []);
 
-    useEffect(() => { console.log(descValue) }, [descValue])
+    useEffect(() => {
+        setDesc(descValue)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [descValue])
 
     // Update descValue whenever content changes
     useEffect(() => {

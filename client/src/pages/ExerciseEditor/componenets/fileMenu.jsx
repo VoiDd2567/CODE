@@ -10,7 +10,7 @@ import delRed from "../../../pictures/delete-red.png"
 import closeImg from "../../../pictures/cross-icon.png"
 
 
-const FileMenu = () => {
+const FileMenu = ({ addFiles }) => {
     const { t } = useTranslation()
     const [files, setFiles] = useState({
         1: { name: "main.py", value: "#Write your code here\n\n" }
@@ -19,6 +19,11 @@ const FileMenu = () => {
     const [openedFile, setOpenedFile] = useState(null)
     const [fileEditorValue, setFileEditorValue] = useState(null)
     const [fileEditorH, setFileEditorH] = useState(7.5)
+
+    useEffect(() => {
+        addFiles(files)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [files])
 
     useEffect(() => {
         if (fileEditorValue == null) return
@@ -119,7 +124,7 @@ const FileMenu = () => {
                     <div className="fileMenu-file_editor-fileName">{openedFile ? openedFile.name : ""}</div>
                     <div className="fileMenu-file_editor-closeIcon"><img src={closeImg} alt="Close" onClick={() => setOpenFile(false)} /></div>
                 </div>
-                <Editor fixedHeight={false} w={80} h={fileEditorH} editorValue={openedFile ? openedFile.value : ""} getValue={setFileEditorValue} />
+                <Editor fixedHeight={false} w={80} h={fileEditorH} editorValue={fileEditorValue ? fileEditorValue : ""} getValue={setFileEditorValue} />
             </div>)}
         </div>
     )

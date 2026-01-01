@@ -1,6 +1,6 @@
 import MinimizedHeader from "../../components/other/minimizedHeader"
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DescriprionBlock from "./componenets/descriptionBlock";
 import AutocheckValues from "./componenets/autocheckValues";
 import FileMenu from "./componenets/fileMenu";
@@ -16,8 +16,16 @@ const ExerciseEditor = () => {
     const [autocheckCheckAmount, setAutocheckCheckAmount] = useState(1)
     const [files, setFiles] = useState(true)
     const [notifications, setNotifications] = useState([])
+    const [data, setData] = useState({})
+
+    useEffect(() => {
+        console.log(data)
+    }, [data])
 
     const handleExerciseSave = () => {
+
+
+
         setNotifications(prev => [
             ...prev,
             "Nothing was added" //TODO
@@ -28,24 +36,60 @@ const ExerciseEditor = () => {
         setNotifications(prev => prev.filter((_, i) => i !== id))
     }
 
+    const addData = (key, value) => {
+        setData(prev => ({
+            ...prev,
+            [key]: value
+        }))
+    }
+
+    const handleAutocheckType = (e) => {
+        const v = e.target.value
+        setAutocheckType(v);
+
+        const typeMap = {
+            [t("func_check")]: "checkFuncReturn",
+            [t("output_check")]: "checkCodeOutput",
+            [t("output_check_input")]: "checkCodeOutput"
+        }
+
+        addData("autoCheckType", typeMap[v])
+
+        if (v === t("output_check_input")) {
+            addData("inputCount", 1)
+            setAutocheckCheckAmount(1)
+        } else {
+            addData("inputCount", 0)
+        }
+    }
+
     return <div className="exercise_editor_page">
         <MinimizedHeader />
         <div className="exercise_editor_page-form">
-            <div className="exercise_editor_page-form-item">
-                <div className="exercise_editor_page-form-item-label">{t("name")}</div>
-                <textarea className="exercise_editor_page-form-item-textarea" autoFocus></textarea>
+            <div className="exercise_editor_page-form-items_line">
+                <div className="exercise_editor_page-form-item">
+                    <div className="exercise_editor_page-form-item-label">{t("name")}</div>
+                    <textarea className="exercise_editor_page-form-item-textarea" onInput={(e) => addData("name", e.target.value)} autoFocus></textarea>
+                </div>
+                <div className="exercise_editor_page-form-item">
+                    <div className="exercise_editor_page-form-item-label">{t("code_lng")}</div>
+                    <select className="exercise_editor_page-form-item-select" onChange={(e) => addData("programmingLng", e.target.value)}>
+                        <option value={"py"}>Python</option>
+                        <option value={"js"}>JavaScript</option>
+                    </select>
+                </div>
             </div>
-            <DescriprionBlock />
+            <DescriprionBlock setDesc={(d) => addData("description", d)} />
             <div className="exercise_editor_page-form-select">
                 <div className="exercise_editor_page-form-section_name">{t("autocheck")}</div>
-                <input type="checkbox" className="exercise_editor_page-form-item-checkbox" onChange={() => setAutocheck(!autocheck)} checked={autocheck} />
+                <input type="checkbox" className="exercise_editor_page-form-item-checkbox" onChange={() => { setAutocheck(!autocheck); addData("autoCheck", !autocheck) }} checked={autocheck} />
             </div>
             {autocheck && (
                 <>
                     <div className="exercise_editor_page-form-items_line">
                         <div className="exercise_editor_page-form-item">
                             <div className="exercise_editor_page-form-item-label">{t("autocheck_type")}</div>
-                            <select className="exercise_editor_page-form-item-select" onChange={(e) => setAutocheckType(e.target.value)}>
+                            <select className="exercise_editor_page-form-item-select" onChange={(e) => handleAutocheckType(e)}>
                                 <option value={t("output_check_input")}>{t("output_check_input")}</option>
                                 <option value={t("func_check")}>{t("func_check")}</option>
                                 <option value={t("output_check")}>{t("output_check")}</option>
@@ -54,20 +98,24 @@ const ExerciseEditor = () => {
                         {autocheckType === t("func_check") && (
                             <div className="exercise_editor_page-form-item">
                                 <div className="exercise_editor_page-form-item-label">{t("function_name")}</div>
-                                <textarea className="exercise_editor_page-form-item-textarea small-textarea"></textarea>
+                                <textarea className="exercise_editor_page-form-item-textarea small-textarea" onInput={(e) => addData("functionName", e.target.value)}></textarea>
                             </div>)}
                         {(autocheckType === t("func_check") || autocheckType === t("output_check_input")) && (
                             <div className="exercise_editor_page-form-item">
                                 <div className="exercise_editor_page-form-item-label">{autocheckType === t("func_check") ? t("param_amount") : t("input_amount")}</div>
-                                <input type="number" min="1" className="exercise_editor_page-form-item-counter" value={autocheckCheckAmount} onChange={(e) => setAutocheckCheckAmount(e.target.value)}></input>
+                                <input type="number" min="1" className="exercise_editor_page-form-item-counter" value={autocheckCheckAmount} onChange={(e) => { setAutocheckCheckAmount(e.target.value); addData("inputCount", e.target.value) }}></input>
                             </div>)}
+                    </div>
+                    <div className="exercise_editor_page-form-item">
+                        <div className="exercise_editor_page-form-item-label">{t("complete_percent")}</div>
+                        <input type="number" min="1" max="100" defaultValue="100" className="exercise_editor_page-form-item-counter" onChange={(e) => { addData("minimalPercent", e.target.value) }}></input>
                     </div>
                     {autocheckType === t("output_check") && (
                         <div className="exercise_editor_page-form-item">
                             <div className="exercise_editor_page-form-item-label">{t("Output")}</div>
-                            <textarea className="exercise_editor_page-form-item-textarea"></textarea>
+                            <textarea className="exercise_editor_page-form-item-textarea" onInput={(e) => addData("withoutInputAnswer", e.target.value)}></textarea>
                         </div>)}
-                    {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (<AutocheckValues inputAmount={autocheckCheckAmount} func={autocheckType === t("func_check")} />)}
+                    {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (<AutocheckValues inputAmount={autocheckCheckAmount} setInputs={(p) => addData("inputAnswers", p)} func={autocheckType === t("func_check")} />)}
                 </>
             )}
             <div className="exercise_editor_page-form-select">
@@ -75,7 +123,7 @@ const ExerciseEditor = () => {
                 <input type="checkbox" className="exercise_editor_page-form-item-checkbox" onChange={() => setFiles(!files)} checked={files} />
             </div>
             {files && (<>
-                <FileMenu />
+                <FileMenu addFiles={(f) => addData("files", f)} />
             </>)}
             <div className="exercise_editor_page-save_btn-wrap">
                 <div className="exercise_editor_page-save_btn" onClick={handleExerciseSave}>{t("save")}</div>

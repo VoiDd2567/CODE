@@ -4,7 +4,7 @@ import arrow_r from "../../../pictures/arrow-r.png"
 import deleteImg from "../../../pictures/delete.png";
 import deleteRedImg from "../../../pictures/delete-red.png";
 
-const AutocheckValues = ({ inputAmount = 2, func = false }) => {
+const AutocheckValues = ({ inputAmount = 2, setInputs, func = false }) => {
     const { t } = useTranslation()
 
     const [paires, setPairs] = useState([{ input: [], output: "" }])
@@ -25,6 +25,8 @@ const AutocheckValues = ({ inputAmount = 2, func = false }) => {
             const inputArr = Array(inputAmount).fill("")
             setPairs([{ input: inputArr, output: "" }])
         }
+        setInputs(paires)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [paires, inputAmount])
 
     const normalizeInput = (arr) => [
