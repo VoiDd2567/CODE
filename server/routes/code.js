@@ -24,6 +24,7 @@ router.post("/save-code", requireAuth, async (req, res) => {
         }
 
         if (type === "user") {
+            console.log(user)
             if (fileName in user.userFiles) {
                 const userFiles = user.userFiles;
                 userFiles[fileName] = value;

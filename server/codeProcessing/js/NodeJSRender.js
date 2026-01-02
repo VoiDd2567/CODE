@@ -255,7 +255,6 @@ ${code.split('\n').map(line => '        ' + line).join('\n')}
             this.child.stderr.on('data', (data) => {
                 errorOutput += data.toString(); // Collect errors from stderr
                 this.output += data.toString(); // Add to output for compatibility
-                logger.error("Node.js stderr:", data.toString()); // Debug logging
             });
 
             this.child.on('close', async (code) => {
@@ -325,7 +324,6 @@ ${code.split('\n').map(line => '        ' + line).join('\n')}
             const onErrorData = (chunk) => {
                 errorOutput += chunk.toString(); // Collect errors from stderr
                 buffer += chunk.toString(); // Add to output for compatibility
-                logger.error("Node.js stderr:", chunk.toString()); // Debug logging
             };
 
             this.child.stdout.on('data', onData);

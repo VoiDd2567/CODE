@@ -42,7 +42,6 @@ class getCache {
 
     static async #checkKey(key) {
         const cached = await redis.get(key);
-        if (!cached) return null;
         const data = JSON.parse(cached)
         if (data && typeof data === "object" && !Array.isArray(data)) return data;
         return key
