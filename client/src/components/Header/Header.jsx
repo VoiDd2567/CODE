@@ -17,8 +17,9 @@ function Header() {
   const { lng, setLng } = useContext(LanguageContext);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const [redirectToCodeEditor, setRedirectToCodeEditor] = useState(false);
-  const [redirectToCourses, setRedirectToCourses] = useState(false);
+  const [redirectToExercises, setRedirectToExercises] = useState(false);
   const [redirectToExerciseEditor, setRedirectToExerciseEditor] = useState(false);
+  //const [redirectToCourses, setRedirectToCourses] = useState(false);
   //const [redirectToCourseEditor, setRedirectToCourseEditor] = useState(false);
   //const [redirectToClass, setRedirectToClass] = useState(false)
   const [redirectToProfile, setRedirectToProfile] = useState(false)
@@ -92,8 +93,8 @@ function Header() {
     return <Navigate to="/profile-settings" replace />;
   }
 
-  if (redirectToCourses) {
-    return <Navigate to="/courses" replace />;
+  if (redirectToExercises) {
+    return <Navigate to="/exercises" replace />;
   }
 
   if (redirectToExerciseEditor) {
@@ -152,8 +153,8 @@ function Header() {
                 <img src={exercise_yellow} title={t("exercise_editor")} />
               </div>
             )}
-            <div className="header__item" onClick={() => { setRedirectToCourses(true) }}>
-              <p>{t("courses")}</p>
+            <div className="header__item" onClick={() => { setRedirectToExercises(true) }}>
+              <p>{t("exercises")}</p>
             </div>
           </>
         )}

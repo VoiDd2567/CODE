@@ -96,5 +96,6 @@
   "input_amount": "Amount of inputs",
   "param": "Parameter",
   "param_amount": "Amount of parameters",
-  "add_file": "Add file"
+  "add_file": "Add file",
+  "exercises": "Exercises"
 }
