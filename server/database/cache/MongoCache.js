@@ -17,6 +17,8 @@ class getCache {
 
     static async getCourse(findBy) { return await this.#getByQuery("course", findBy, ["_id", "creator"]) }
 
+    static async getTaskAccess(findBy) { return await this.#getByQuery("taskAccess", findBy, ["_id", "userId", "taskId"]) }
+
     static async #getById(id, item) {
         this.#validateQuery(id, ["_id"]);
         const key = `${item}:${id}`;
@@ -40,6 +42,7 @@ class getCache {
 
     static async #checkKey(key) {
         const cached = await redis.get(key);
+        if (!cached) return null;
         const data = JSON.parse(cached)
         if (data && typeof data === "object" && !Array.isArray(data)) return data;
         return key
@@ -77,6 +80,10 @@ class deleteCache {
     }
     static async deleteCourse(course) {
         await deleteCache.deleteWithQuery(course, "course", ["_id", "creator"]);
+    }
+
+    static async deleteTaskAccess(taskAccess) {
+        await deleteCache.deleteWithQuery(taskAccess, "taskAccess", ["_id", "userId", "taskId"]);
     }
 
     static async deleteWithId(id, itemName) {

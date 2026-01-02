@@ -156,68 +156,53 @@ ${code.split('\n').map(line => '        ' + line).join('\n')}
         const volumeHostPath = this.tempDir.name;
 
         return new Promise((resolve, reject) => {
-            // Get current user's UID and GID dynamically
-            exec('id -u', (err, uid) => {
-                if (err) {
-                    logger.error("Failed to get UID, using default 1000");
-                    uid = "1000";
-                } else {
-                    uid = uid.trim();
-                }
-                
-                exec('id -g', (err2, gid) => {
-                    if (err2) {
-                        logger.error("Failed to get GID, using default 1000");
-                        gid = "1000";
-                    } else {
-                        gid = gid.trim();
-                    }
-                    
-                    exec(`docker ps -a --format '{{.Names}}'`, (err3, stdout) => {
-                        if (err3) return reject(err3);
+            // Get UID and GID directly from Node.js process (more reliable than shell commands)
+            const uid = process.getuid ? process.getuid().toString() : "1000";
+            const gid = process.getgid ? process.getgid().toString() : "1000";
 
-                        const createCmd = `docker run --user ${uid}:${gid} -dit --rm --name ${this.containerName} \
-                            -v ${volumeHostPath}:/workspace:ro \
-                            --tmpfs /tmp:rw,noexec,nosuid,size=64m \
-                            --read-only \
-                            --network none \
-                            --memory 128m \
-                            --pids-limit 64 \
-                            --cpus="0.2" \
-                            --security-opt=no-new-privileges \
-                            --cap-drop=ALL \
-                            node:${this.NODE_VERSION}-slim bash`;
+            exec(`docker ps -a --format '{{.Names}}'`, (err, stdout) => {
+                if (err) return reject(err);
 
-                        const containers = stdout.split('\n').filter(Boolean);
-                        if (containers.includes(this.containerName)) {
-                            exec(`docker inspect -f '{{.State.Running}}' ${this.containerName}`, (err4, stdout2) => {
-                                if (err4) return reject(err4);
+                const createCmd = `docker run --user ${uid}:${gid} -dit --rm --name ${this.containerName} \
+                -v ${volumeHostPath}:/workspace:ro \
+                --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+                --read-only \
+                --network none \
+                --memory 128m \
+                --pids-limit 64 \
+                --cpus="0.2" \
+                --security-opt=no-new-privileges \
+                --cap-drop=ALL \
+                node:${this.NODE_VERSION}-slim bash`;
 
-                                if (stdout2.trim() === "true") {
-                                    resolve();
-                                } else {
-                                    exec(`docker stop ${this.containerName}`, (stopErr) => {
-                                        if (stopErr) return reject(stopErr);
+                const containers = stdout.split('\n').filter(Boolean);
+                if (containers.includes(this.containerName)) {
+                    exec(`docker inspect -f '{{.State.Running}}' ${this.containerName}`, (err2, stdout2) => {
+                        if (err2) return reject(err2);
 
-                                        exec(`docker rm -f ${this.containerName}`, (rmErr) => {
-                                            if (rmErr) return reject(rmErr);
-
-                                            exec(createCmd, (err5) => {
-                                                if (err5) return reject(err5);
-                                                resolve();
-                                            });
-                                        });
-                                    });
-                                }
-                            });
+                        if (stdout2.trim() === "true") {
+                            resolve();
                         } else {
-                            exec(createCmd, (err6) => {
-                                if (err6) return reject(err6);
-                                resolve();
+                            exec(`docker stop ${this.containerName}`, (stopErr) => {
+                                if (stopErr) return reject(stopErr);
+
+                                exec(`docker rm -f ${this.containerName}`, (rmErr) => {
+                                    if (rmErr) return reject(rmErr);
+
+                                    exec(createCmd, (err3) => {
+                                        if (err3) return reject(err3);
+                                        resolve();
+                                    });
+                                });
                             });
                         }
                     });
-                });
+                } else {
+                    exec(createCmd, (err4) => {
+                        if (err4) return reject(err4);
+                        resolve();
+                    });
+                }
             });
         });
     }

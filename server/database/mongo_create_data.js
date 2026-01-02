@@ -6,6 +6,7 @@ const Session = require("./schemas/Session")
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
 const PasswordReset = require("./schemas/PasswordReset")
+const TaskAccess = require("./schemas/TaskAccess")
 const logger = require("../scripts/Logging")
 const MongoGetData = require("./mongo_get_data");
 const MongoDeleteData = require("./mongo_delete_data")
@@ -128,6 +129,17 @@ class MongoCreateData {
       return savedPasswordReset._id;
     } catch (err) {
       logger.error("Error creating savedPasswordReset: " + err.message)
+      throw err;
+    }
+  }
+
+  static async createTaskAccess(taskId, userId) {
+    try {
+      const taskAccess = new TaskAccess({ taskId, userId });
+      const savedTaskAccess = await taskAccess.save();
+      return savedTaskAccess._id;
+    } catch (err) {
+      logger.error("Error creating savedTaskAccess: " + err.message)
       throw err;
     }
   }

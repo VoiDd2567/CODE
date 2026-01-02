@@ -6,6 +6,7 @@ const Session = require("./schemas/Session");
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
 const PasswordReset = require("./schemas/PasswordReset")
+const TaskAccess = require("./schemas/TaskAccess")
 const logger = require("../scripts/Logging")
 const { getCache, setCache } = require("./cache/MongoCache")
 
@@ -20,27 +21,31 @@ class MongoGetData {
   }
 
   static async getExercise(findBy) {
-    return await this.#getData("exercise", findBy)
+    return await this.#getData("exercise", findBy);
   }
 
   static async getExerciseSolution(findBy) {
-    return await this.#getData("exerciseSolution", findBy)
+    return await this.#getData("exerciseSolution", findBy);
   }
 
   static async getSession(findBy) {
-    return await this.#getData("session", findBy)
+    return await this.#getData("session", findBy);
   }
 
   static async getRegistrationCode(findBy) {
-    return await this.#getData("registrationCode", findBy)
+    return await this.#getData("registrationCode", findBy);
   }
 
   static async getCourse(findBy) {
-    return await this.#getData("course", findBy)
+    return await this.#getData("course", findBy);
   }
 
   static async getPasswordReset(findBy) {
-    return await this.#getData("passwordReset", findBy)
+    return await this.#getData("passwordReset", findBy);
+  }
+
+  static async getTaskAccess(findBy) {
+    return await this.#getData("taskAccess", findBy);
   }
 
   static async getUserBySession(sessionId) {
@@ -58,7 +63,8 @@ class MongoGetData {
         session: [Session, getCache.getSession, 3600],
         registrationCode: [RegistrationCode, getCache.getRegistrationCode, 600],
         course: [Course, getCache.getCourse, 86400],
-        passwordReset: [PasswordReset, null, null]
+        passwordReset: [PasswordReset, null, null],
+        taskAccess: [TaskAccess, getCache.getTaskAccess, 43200]
       }[collectionType];
       let cache;
       if (collectionType != "passwordReset" && collectionType != "exercise") {

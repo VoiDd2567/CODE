@@ -7,34 +7,36 @@ const Session = require("./schemas/Session")
 const RegistrationCode = require("./schemas/RegistrationCode")
 const Course = require("./schemas/Course")
 const PasswordReset = require("./schemas/PasswordReset")
+const TaskAccess = require("./schemas/TaskAccess")
 const logger = require("../scripts/Logging")
 const { deleteCache } = require("./cache/MongoCache")
 
 class MongoDeleteData {
     static async deleteUser(userId) {
         try {
-            const user = await User.findOne({ _id: userId });
-            deleteCache().deleteUser(user);
-            await User.deleteOne({ _id: userId });
+            const user = await User.findOneAndDelete({ _id: userId });
+            if (user) {
+                deleteCache().deleteUser(user);
+            }
         } catch (err) {
             logger.error("Error deleting data : " + err)
         }
     }
     static async deleteSchoolClass(schoolClassId) {
         try {
-            const schoolClass = await SchoolClass.findOne({ _id: schoolClassId });
-            deleteCache().deleteSchoolClass(schoolClass);
-            await SchoolClass.deleteOne({ _id: schoolClassId });
+            const schoolClass = await SchoolClass.findOneAndDelete({ _id: schoolClassId });
+            if (schoolClass) {
+                deleteCache().deleteSchoolClass(schoolClass);
+            }
         } catch (err) {
             logger.error("Error deleting data : " + err)
         }
     }
     static async deleteExercise(exerciseId) {
         try {
-            const exercise = await Exercise.findOne({ _id: exerciseId });
+            const exercise = await Exercise.findOneAndDelete({ _id: exerciseId });
             if (exercise) {
                 deleteCache.deleteExercise(exerciseId);
-                await Exercise.deleteOne({ _id: exerciseId });
             }
         } catch (err) {
             logger.error("Error deleting exercise: " + err);
@@ -42,10 +44,9 @@ class MongoDeleteData {
     }
     static async deleteExerciseSolution(exerciseSolutionId) {
         try {
-            const solution = await ExerciseSolution.findOne({ _id: exerciseSolutionId });
+            const solution = await ExerciseSolution.findOneAndDelete({ _id: exerciseSolutionId });
             if (solution) {
                 deleteCache.deleteExerciseSolution(solution);
-                await ExerciseSolution.deleteOne({ _id: exerciseSolutionId });
             }
         } catch (err) {
             logger.error("Error deleting exercise solution: " + err);
@@ -53,10 +54,9 @@ class MongoDeleteData {
     }
     static async deleteSession(sessionId) {
         try {
-            const session = await Session.findOne({ _id: sessionId });
+            const session = await Session.findOneAndDelete({ _id: sessionId });
             if (session) {
                 deleteCache.deleteSession(session);
-                await Session.deleteOne({ _id: sessionId });
             }
         } catch (err) {
             logger.error("Error deleting session: " + err);
@@ -64,10 +64,9 @@ class MongoDeleteData {
     }
     static async deleteRegistrationCode(registrationCodeId) {
         try {
-            const code = await RegistrationCode.findOne({ _id: registrationCodeId });
+            const code = await RegistrationCode.findOneAndDelete({ _id: registrationCodeId });
             if (code) {
                 deleteCache.deleteRegistrationCode(code);
-                await RegistrationCode.deleteOne({ _id: registrationCodeId });
             }
         } catch (err) {
             logger.error("Error deleting registration code: " + err);
@@ -75,10 +74,9 @@ class MongoDeleteData {
     }
     static async deleteCourse(courseId) {
         try {
-            const course = await Course.findOne({ _id: courseId });
+            const course = await Course.findOneAndDelete({ _id: courseId });
             if (course) {
                 deleteCache.deleteCourse(course);
-                await Course.deleteOne({ _id: courseId });
             }
         } catch (err) {
             logger.error("Error deleting course: " + err);
@@ -86,12 +84,24 @@ class MongoDeleteData {
     }
     static async deletePasswordReset(passwordResetId) {
         try {
-            const course = await PasswordReset.findOne({ _id: passwordResetId });
-            if (course) {
-                await PasswordReset.deleteOne({ _id: passwordResetId });
-            }
+            await PasswordReset.findOneAndDelete({ _id: passwordResetId });
         } catch (err) {
             logger.error("Error deleting PasswordReset: " + err);
+        }
+    }
+
+    static async deleteTaskAccess(userId, taskId, _id = null) {
+        try {
+            const query = _id
+                ? { _id }
+                : { userId, taskId };
+
+            const deleted = await TaskAccess.findOneAndDelete(query);
+            if (deleted) {
+                deleteCache.deleteTaskAccess({ _id: deleted._id });
+            }
+        } catch (err) {
+            logger.error("Error deleting TaskAccess: " + err);
         }
     }
 }
