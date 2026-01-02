@@ -149,13 +149,15 @@ function Header() {
               <img src={code_yellow} title={t("code_editor")} />
             </div>
             {pageMode === "teacher" && (
-              <div className="header__item" onClick={() => setRedirectToExerciseEditor(true)}>
-                <img src={exercise_yellow} title={t("exercise_editor")} />
-              </div>
+              <>
+                <div className="header__item" onClick={() => setRedirectToExerciseEditor(true)}>
+                  <img src={exercise_yellow} title={t("exercise_editor")} />
+                </div>
+                <div className="header__item" onClick={() => { setRedirectToExercises(true) }}>
+                  <p>{t("exercises")}</p>
+                </div>
+              </>
             )}
-            <div className="header__item" onClick={() => { setRedirectToExercises(true) }}>
-              <p>{t("exercises")}</p>
-            </div>
           </>
         )}
         <div className="header__item" ref={loginLabel} onClick={() => { setRedirectToLogin(true) }}><p>{t("login")}</p> </div>
