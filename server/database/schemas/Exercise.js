@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
-const config = require("../../config")
 
 const exerciseSchema = new mongoose.Schema({
   type: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: Map, of: String, required: true },
-  creator: { type: String, default: config["DEFAULT_CREATOR"] },
+  creatorId: { type: String, default: "no-creator" },
   files: { type: Object, required: true },
   programmingLng: { type: String, default: "python" },
   autoCheck: { type: Boolean, default: false },

@@ -8,6 +8,7 @@ const DescriptionBlock = ({ setDesc }) => {
     const exDescription = useRef(null);
     const [descValue, setDescValue] = useState("")
     const [editorsValue, setEditorsValue] = useState({});
+    const [lng, setLng] = useState("eng")
 
     useEffect(() => {
         const el = exDescription.current;
@@ -230,6 +231,11 @@ const DescriptionBlock = ({ setDesc }) => {
                 >
                     {t("add_code_block")}
                 </button>
+                <div className="exercise_editor_page-form-item-label label-break">{t("desc_language")}</div>
+                <select className="exercise_editor_page-form-item-select desc-select">
+                    <option value="eng">Eng</option>
+                    <option value="est">Est</option>
+                </select>
             </div>
             <div
                 ref={exDescription}

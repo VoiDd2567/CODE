@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router()
 
 const MongoGetData = require("../database/mongo_get_data");
+const MongoCreateData = require("../database/mongo_create_data")
 const { getUsersAllowedExercises, requireAuth } = require("../scripts/SecurityChecks")
 const { safeExercise } = require("../scripts/SafeTemplates")
 const ExerciseCheck = require("../codeProcessing/ExerciseCheck")
@@ -78,11 +79,15 @@ router.post("/new-exercise", requireAuth, async (req, res) => {
         if (user.weight != "teacher") {
             return res.status(403).json({ error: "You are not allowed to use Exercise editor" })
         }
-
         if (!safeExercise(data)) {
             return res.status(409).json({ error: "Data wasn't correct or includes forbidden keys" })
         }
-        res.status(200).json({ correct: true, id: "blank" })
+
+        data["creatorId"] = user._id;
+
+        const exerciseID = await MongoCreateData.createExercise(data)
+
+        res.status(200).json({ correct: true, id: exerciseID }) //TODO : add privacy. That means getting it from user, changing safe template and giving user his private exercises
     } catch (err) {
         logger.error(err)
         res.status(500).json({ error: "Internal server error" })
