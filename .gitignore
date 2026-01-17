@@ -22,6 +22,7 @@ lerna-debug.log*
 server_copy.js
 test.js*
 lineCount.py*
+README.txt*
 
 node_modules
 dist
