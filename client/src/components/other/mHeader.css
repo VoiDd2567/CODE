@@ -28,7 +28,7 @@
     font-family: "Electrolize";
     font-weight: bold;
     font-size: 3vh;
-    margin-right: 2vw;
+    margin-right: 1.5vw;
 }
 
 .lng_switch-switch {
@@ -78,12 +78,13 @@
 }
 
 .m_header-account-img {
-    height: 5vh;
+    height: 5.5vh;
 }
 
 .m_header-account-img img {
     height: 100%;
-    margin-right: 1vw;
+    margin-right: 2vw;
+    margin-left: 2vw;
     cursor: pointer;
 }
 
@@ -92,8 +93,8 @@
 }
 
 .m_header-exercise_editor {
-    height: 4vh;
-    margin-right: 2vw;
+    margin-top: 1vh;
+    height: 3vh;
     cursor: pointer;
 }
 
@@ -109,18 +110,17 @@
     position: absolute;
     background-color: #32373f;
     right: 0;
-    margin-right: 1vw;
+    margin-right: 2vw;
     border-radius: 1vh;
     border: 1px solid rgb(132, 131, 131);
     padding: 1vh;
-}
-
-.account-menu {
     font-family: "Electrolize";
     color: #FFD369;
     font-size: 3vh;
     cursor: pointer;
+    margin-top: 1vh;
 }
+
 
 .account-menu div:hover {
     transform: scale(1.1);
