@@ -85,6 +85,30 @@ router.post("/new-exercise", requireAuth, async (req, res) => {
 
         data["creatorId"] = user._id;
 
+        if (data.files && typeof data.files === 'object') {
+            const converted = {};
+            const filesArray = Array.isArray(data.files) ? data.files : Object.values(data.files);
+
+            filesArray.forEach(file => {
+                if (file && file.name && file.value !== undefined) {
+                    converted[file.name] = file.value;
+                }
+            });
+            data.files = converted;
+        }
+
+        if (data.description && typeof data.description === 'object') {
+            const convertedDescription = {};
+
+            Object.keys(data.description).forEach(lang => {
+                let desc = data.description[lang];
+                desc = desc.replace(/<<<code-block>>>([\s\S]*?)<<<\/code-block>>>/g, '<<editor>>$1<</editor>>');
+                desc = desc.replace(/\n/g, '\\n');
+                convertedDescription[lang] = desc;
+            });
+
+            data.description = convertedDescription;
+        }
         const exerciseID = await MongoCreateData.createExercise(data)
 
         res.status(200).json({ correct: true, id: exerciseID }) //TODO : add privacy. That means getting it from user, changing safe template and giving user his private exercises

@@ -96,5 +96,7 @@
   "param": "Parameeter",
   "param_amount": "Parameetrite arv",
   "add_file": "Lisa file",
-  "exercises": "Ülesanded"
+  "exercises": "Ülesanded",
+  "saved": "Salvestatud",
+  "not_saved": "Pole salvestatud"
 }

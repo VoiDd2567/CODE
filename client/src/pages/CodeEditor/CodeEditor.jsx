@@ -1,5 +1,6 @@
 import "./codeEditor.css"
 import { useState, useEffect, useContext } from "react"
+import { useTranslation } from "react-i18next"
 import Editor from "../../components/Editor/Editor"
 import MinimizedHeader from "../../components/other/minimizedHeader"
 import Console from "../../components/WebConsole/Console"
@@ -12,6 +13,7 @@ import cross_image from "../../pictures/cross-white.png"
 import client_config from "../../client_config.json"
 
 const CodeEditor = () => {
+    const { t } = useTranslation();
     const { lng } = useContext(LanguageContext);
     const [files, setFiles] = useState({})
     const [chosenFile, setChosenFile] = useState(Object.keys(files)[0]);
@@ -145,7 +147,7 @@ const CodeEditor = () => {
     return (
         <div>
             {openedExerciseChoose && <ExerciseSelector exercises={exercises} setExerciseChoose={setExerciseChoose} getExercise={getExercise} />}
-            <MinimizedHeader />
+            <MinimizedHeader showExercise={true} />
             <div className="code-editor-page__workspace-wrap">
                 <div className="code-editor-page__left-part">
                     {isExerciseOpen &&
@@ -155,8 +157,8 @@ const CodeEditor = () => {
                         <Editor w={60} h={editorH} setFileSaved={setFileSaved} saveData={saveData} editorValue={editorValue} setEditorValue={handleEditorValueChange} main={true} />
                     </div>
                     <div className="code-editor-page__file-saved-label">
-                        {fileSaved ? (<div><img src={complete_image} />Saved </div>
-                        ) : (<div><img src={cross_image} />Not saved</div>)}
+                        {fileSaved ? (<div><img src={complete_image} />{t("saved")}</div>
+                        ) : (<div><img src={cross_image} />{t("not_saved")}</div>)}
                     </div>
                 </div>
                 <div className="code-editor-page__right-part">

@@ -188,7 +188,6 @@ router.get("/logout", async (req, res) => {
 router.post("/send-reset-link", RegLimiter, async (req, res) => {
     try {
         const { email } = req.body;
-        console.log
         if (typeof email != "string") {
             return res.status(401).json({ error: "Wrong data type" })
         }

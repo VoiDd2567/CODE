@@ -21,7 +21,10 @@ const ExerciseEditor = () => {
         "programmingLng": "py",
         "inputCount": "1",
         "answerCheckType": "checkCodeOutput",
-        "minimalPercent": "100"
+        "minimalPercent": "100",
+        "type": "code",
+        "autoCheck": true,
+        "files": true
     })
 
     const addNotification = (message, type = "green") => {
@@ -42,7 +45,6 @@ const ExerciseEditor = () => {
             return;
         }
 
-        addData("type", "code")
 
         fetch(`${client_config.SERVER_IP}/api/exercise/new-exercise`, {
             method: "POST",
@@ -54,7 +56,8 @@ const ExerciseEditor = () => {
         }).then(async res => {
             if (!res.ok) {
                 const errorData = await res.json();
-                addNotification(errorData, "red")
+                const errorMessage = errorData.error || errorData.message || JSON.stringify(errorData);
+                addNotification(errorMessage, "red")
             } else {
                 const ans = await res.json();
                 addNotification(`Exercise created with id - ${ans.id}`, "green")
@@ -96,7 +99,7 @@ const ExerciseEditor = () => {
     }
 
     return <div className="exercise_editor_page">
-        <MinimizedHeader />
+        <MinimizedHeader showCode={true} />
         <div className="exercise_editor_page-form">
             <div className="exercise_editor_page-form-items_line">
                 <div className="exercise_editor_page-form-item">

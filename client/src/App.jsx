@@ -29,6 +29,11 @@ const PrivateRoute = ({ children }) => {
     return children;
 };
 
+const RootRedirect = () => {
+    const { user } = useContext(UserContext);
+    return <Navigate to={user ? "/code-editor" : "/login"} replace />;
+};
+
 const App = () => {
 
     const { i18n } = useTranslation();
@@ -63,7 +68,7 @@ const App = () => {
         <UserContext.Provider value={{ user, setUser }}>
             <Router>
                 <Routes>
-                    <Route path="/" element={<MainPage />} />
+                    <Route path="/" element={<RootRedirect />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/registration" element={<Registration />} />
                     <Route path="/registration-code" element={<RegistrationCode />} />

@@ -97,5 +97,7 @@
   "param": "Parameter",
   "param_amount": "Amount of parameters",
   "add_file": "Add file",
-  "exercises": "Exercises"
+  "exercises": "Exercises",
+  "saved": "Saved",
+  "not_saved": "Not saved"
 }

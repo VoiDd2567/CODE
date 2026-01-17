@@ -6,9 +6,9 @@ import Editor from "../../../components/Editor/Editor";
 const DescriptionBlock = ({ setDesc }) => {
     const { t } = useTranslation();
     const exDescription = useRef(null);
-    const [descValue, setDescValue] = useState("")
+    const [descValue, setDescValue] = useState({ eng: "", est: "" });
     const [editorsValue, setEditorsValue] = useState({});
-    const [lng, setLng] = useState("eng")
+    const [lng, setLng] = useState("eng");
 
     useEffect(() => {
         const el = exDescription.current;
@@ -19,9 +19,27 @@ const DescriptionBlock = ({ setDesc }) => {
     }, []);
 
     useEffect(() => {
-        setDesc(descValue)
+        setDesc(descValue);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [descValue])
+    }, [descValue]);
+
+    // Load content when language changes
+    useEffect(() => {
+        const el = exDescription.current;
+        if (!el) return;
+
+        // Clear current content
+        el.innerHTML = '';
+
+        // Load content for selected language
+        const currentContent = descValue[lng] || '';
+
+        if (currentContent) {
+            loadContentFromString(currentContent);
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lng]);
 
     // Update descValue whenever content changes
     useEffect(() => {
@@ -38,7 +56,56 @@ const DescriptionBlock = ({ setDesc }) => {
             el.removeEventListener("input", updateDescValue);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [editorsValue]);
+    }, [editorsValue, lng]);
+
+    const loadContentFromString = (content) => {
+        const el = exDescription.current;
+        if (!el) return;
+
+        const lines = content.split('\n');
+        const codeBlockRegex = /<<<code-block>>>(.+?)<<<\/code-block>>>/s;
+
+        lines.forEach(line => {
+            const match = line.match(codeBlockRegex);
+
+            if (match) {
+                const codeContent = match[1];
+                const blockId = `code-block-${Date.now()}-${Math.random()}`;
+
+                setEditorsValue(prev => ({
+                    ...prev,
+                    [blockId]: codeContent
+                }));
+
+                const codeBlockWrapper = document.createElement('div');
+                codeBlockWrapper.className = 'inserted-code-block';
+                codeBlockWrapper.contentEditable = 'false';
+                codeBlockWrapper.setAttribute('data-block-id', blockId);
+
+                const reactContainer = document.createElement('div');
+                codeBlockWrapper.appendChild(reactContainer);
+                el.appendChild(codeBlockWrapper);
+
+                const root = createRoot(reactContainer);
+                root.render(
+                    <Editor
+                        h={calculateEditorHeight(codeContent)}
+                        w={50}
+                        fixedHeight={false}
+                        getValue={(value) => updateEditorValue(blockId, value)}
+                        initialValue={codeContent}
+                    />
+                );
+            } else {
+                const div = document.createElement('div');
+                div.textContent = line || '';
+                if (!line) {
+                    div.innerHTML = '<br>';
+                }
+                el.appendChild(div);
+            }
+        });
+    };
 
     const saveDescriptionValue = () => {
         const editor = exDescription.current;
@@ -91,7 +158,11 @@ const DescriptionBlock = ({ setDesc }) => {
         // Clean up extra newlines at the end
         combinedValue = combinedValue.replace(/\n+$/, '');
 
-        setDescValue(combinedValue);
+        // Update the description value for the current language
+        setDescValue(prev => ({
+            ...prev,
+            [lng]: combinedValue
+        }));
     };
 
     const resizeInput = (el) => {
@@ -220,6 +291,11 @@ const DescriptionBlock = ({ setDesc }) => {
         setTimeout(() => saveDescriptionValue(), 0);
     }
 
+    const handleLanguageChange = (e) => {
+        const newLng = e.target.value;
+        setLng(newLng);
+    };
+
     return (
         <div className="exercise_editor_page-form-item">
             <div className="label-line">
@@ -232,7 +308,11 @@ const DescriptionBlock = ({ setDesc }) => {
                     {t("add_code_block")}
                 </button>
                 <div className="exercise_editor_page-form-item-label label-break">{t("desc_language")}</div>
-                <select className="exercise_editor_page-form-item-select desc-select">
+                <select
+                    className="exercise_editor_page-form-item-select desc-select"
+                    value={lng}
+                    onChange={handleLanguageChange}
+                >
                     <option value="eng">Eng</option>
                     <option value="est">Est</option>
                 </select>

@@ -2,6 +2,7 @@ function safeUser(user) {
     try {
         const passwordLastChanged = new Date(user.passwordChangedAt);
         return {
+            weight: user.weight,
             username: user.username,
             email: user.email,
             name: user.name,
@@ -52,7 +53,7 @@ function safeExercise(ex) {
     const allowedKeys = ["type", "name", "description", "files",
         "programmingLng", "autoCheck", "answerCheckType", "inputAnswers",
         "inputCount", "withoutInputAnswer", "functionName", "functionReturns",
-        "minimalPercent"]
+        "minimalPercent", "autoCheckType"]
 
     const requiredKeys = ["name", "description", "programmingLng"]
 

@@ -1,0 +1,127 @@
+.m_header {
+    height: 9vh;
+    background-color: #222831;
+    display: flex;
+    align-items: center;
+}
+
+.m_header-logo {
+    width: 10vw;
+    margin-left: 2vw;
+    cursor: pointer;
+}
+
+.m_header-inside {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.m_header-lng_switch {
+    margin-top: 1.5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
+    color: #FFD369;
+    font-family: "Electrolize";
+    font-weight: bold;
+    font-size: 3vh;
+    margin-right: 2vw;
+}
+
+.lng_switch-switch {
+    position: relative;
+    display: inline-block;
+    width: 3vw;
+    height: 2.7vh;
+}
+
+.lng_switch-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.lng_switch-switch span {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #FFD369;
+    transition: 0.3s;
+    border-radius: 1.4vh;
+}
+
+.lng_switch-switch span::before {
+    position: absolute;
+    content: "";
+    height: 2vh;
+    width: 2vh;
+    left: 3px;
+    bottom: 3px;
+    background-color: #a48640;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.lng_switch-switch input:checked+span::before {
+    transform: translateX(1.5vw);
+}
+
+.lng_switch-txt {
+    transition: 0.3s ease;
+}
+
+.small-lng {
+    font-size: 2vh;
+}
+
+.m_header-account-img {
+    height: 5vh;
+}
+
+.m_header-account-img img {
+    height: 100%;
+    margin-right: 1vw;
+    cursor: pointer;
+}
+
+.m_header-account-img img:hover {
+    transform: scale(1.1);
+}
+
+.m_header-exercise_editor {
+    height: 4vh;
+    margin-right: 2vw;
+    cursor: pointer;
+}
+
+.m_header-exercise_editor img {
+    height: 100%;
+}
+
+.m_header-exercise_editor img:hover {
+    transform: scale(1.1);
+}
+
+.account-menu {
+    position: absolute;
+    background-color: #32373f;
+    right: 0;
+    margin-right: 1vw;
+    border-radius: 1vh;
+    border: 1px solid rgb(132, 131, 131);
+    padding: 1vh;
+}
+
+.account-menu {
+    font-family: "Electrolize";
+    color: #FFD369;
+    font-size: 3vh;
+    cursor: pointer;
+}
+
+.account-menu div:hover {
+    transform: scale(1.1);
+}
