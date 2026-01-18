@@ -102,5 +102,8 @@
   "not_saved": "Not saved",
   "add_course": "Add course",
   "add": "Add",
-  "course_id": "Course id:"
+  "course_id": "Course id:",
+  "no_course_found": "No course found",
+  "course_added": "Course added",
+  "course_already_added": "Course is already added"
 }

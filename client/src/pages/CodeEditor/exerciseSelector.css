@@ -215,3 +215,13 @@
 .course_add-add_btn:active {
     background-color: #15191f;
 }
+
+.course_add-bottom {
+    display: flex;
+    align-items: center;
+    gap: 0.5vw;
+}
+
+.course_add-success {
+    font-family: "Electrolize";
+}

@@ -101,5 +101,8 @@
   "not_saved": "Pole salvestatud",
   "add_course": "Lisada kursust",
   "add": "Lisada",
-  "course_id": "Kursuse id:"
+  "course_id": "Kursuse id:",
+  "no_course_found": "Kursust ei leitud",
+  "course_added": "Kursus lisatud",
+  "course_already_added": "Kursus on juba lisatud"
 }

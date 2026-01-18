@@ -146,7 +146,7 @@ const CodeEditor = () => {
 
     return (
         <div>
-            {openedExerciseChoose && <ExerciseSelector exercises={exercises} setExerciseChoose={setExerciseChoose} getExercise={getExercise} />}
+            {openedExerciseChoose && <ExerciseSelector exercises={exercises} setExerciseChoose={setExerciseChoose} getExercise={getExercise} updateExercises={getExercises} />}
             <MinimizedHeader showExercise={true} />
             <div className="code-editor-page__workspace-wrap">
                 <div className="code-editor-page__left-part">

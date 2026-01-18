@@ -2,6 +2,7 @@ const config = require("../config")
 const nodemailer = require("nodemailer")
 const fs = require("fs")
 const path = require("path");
+const logger = require("./Logging");
 
 const GMAIL_APP_PASSWORD = config["GMAIL_APP_PASSWORD"]
 const GMAIL = config["GMAIL"]
@@ -34,7 +35,7 @@ class EmailSend {
 
             return true;
         } catch (err) {
-            console.error("Error while sending Email:", err);
+            logger.error("Error while sending Email:", err);
             return false;
         }
     }
@@ -46,7 +47,7 @@ class EmailSend {
             let html = file.replace("{{username}}", name).replace("{{code}}", code);
             return html;
         } catch (err) {
-            console.error("Error generating email HTML:", err);
+            logger.error("Error generating email HTML:", err);
             return "";
         }
     }
@@ -70,7 +71,7 @@ class EmailSend {
 
             return true;
         } catch (err) {
-            console.error("Error while sending Email:", err);
+            logger.error("Error while sending Email:", err);
             return false;
         }
     }
@@ -82,7 +83,7 @@ class EmailSend {
             let html = file.replace("{{link}}", link);
             return html;
         } catch (err) {
-            console.error("Error generating email HTML:", err);
+            logger.error("Error generating email HTML:", err);
             return "";
         }
     }

@@ -4,12 +4,14 @@ import { useTranslation } from "react-i18next";
 import complete from "../../pictures/complete-green.png"
 import question from "../../pictures/question.png"
 import incomplete from "../../pictures/incomplete.png"
+import client_config from "../../client_config.json"
 
-const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise }) => {
+const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExercises }) => {
     const { t } = useTranslation();
 
     const exercisesList = useRef(null)
     const courseRef = useRef(null)
+    const successRef = useRef(null)
     const [selectedExerciseId, setSelectedExerciseId] = useState(null)
     const [expandedCourses, setExpandedCourses] = useState(
         Object.fromEntries(Object.keys(exercises).map(courseName => [courseName, true]))
@@ -43,7 +45,39 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise }) => {
     }
 
     const handleCourseAdd = () => {
-        alert("You forgot to do that")
+        const courseId = courseRef.current.value;
+
+        fetch(`${client_config.SERVER_IP}/api/exercise/access-course`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ courseId: courseId })
+        }).then(async res => {
+            if (!res.ok) {
+                const errorData = await res.json();
+                if (errorData.error === "No course found") {
+                    successRef.current.textContent = t("no_course_found")
+                } else if (errorData.error === "Course is already added") {
+                    successRef.current.textContent = t("course_already_added")
+                }
+                successRef.current.style.color = "red"
+                setTimeout(() => {
+                    successRef.current.textContent = ""
+                }, 3000)
+                throw new Error(`Error ${res.status} : \n ${errorData}`);
+            } else {
+                updateExercises()
+                successRef.current.textContent = t("course_added")
+                successRef.current.style.color = "green"
+                setTimeout(() => {
+                    successRef.current.textContent = ""
+                }, 3000)
+            }
+        }).catch(error => {
+            console.error('ERROR with getting data', error);
+        });
     }
 
     const toggleCourse = (courseName) => {
@@ -89,7 +123,10 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise }) => {
                     <div className="course_add-main">
                         <div className="course_add-input-wrap">
                             <input ref={courseRef} type="text" className="course_add-input" placeholder={t("course_id")} />
-                            <div className="course_add-add_btn" onClick={handleCourseAdd}>{t("add")}</div>
+                            <div className="course_add-bottom">
+                                <div ref={successRef} className="course_add-success"></div>
+                                <div className="course_add-add_btn" onClick={handleCourseAdd}>{t("add")}</div>
+                            </div>
                         </div>
                     </div>
                 </div>

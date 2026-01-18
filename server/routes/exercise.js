@@ -7,6 +7,7 @@ const { getUsersAllowedExercises, requireAuth } = require("../scripts/SecurityCh
 const { safeExercise } = require("../scripts/SafeTemplates")
 const ExerciseCheck = require("../codeProcessing/ExerciseCheck")
 const logger = require("../scripts/Logging");
+const MongoUpdateData = require("../database/mongo_update_data");
 
 router.get("/get-exercises", requireAuth, async (req, res) => {
     try {
@@ -112,6 +113,37 @@ router.post("/new-exercise", requireAuth, async (req, res) => {
         const exerciseID = await MongoCreateData.createExercise(data)
 
         res.status(200).json({ correct: true, id: exerciseID }) //TODO : add privacy. That means getting it from user, changing safe template and giving user his private exercises
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.post("/access-course", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const { courseId } = req.body;
+
+        const user = await MongoGetData.getUserBySession(sessionId)
+        if (!user) {
+            return res.status(401).json({ error: "Unauthorized user" })
+        }
+
+        const course = await MongoGetData.getCourse({ courseAccessId: courseId })
+        if (!course) {
+            return res.status(404).json({ error: "No course found" })
+        }
+
+        let courseAllowedUsers = [...course.accessedUsers];
+        console.log(course);
+        const userIdStr = user._id.toString();
+        if (courseAllowedUsers.includes(userIdStr)) {
+            return res.status(409).json({ error: "Course is already added" })
+        }
+        courseAllowedUsers.push(userIdStr)
+        await MongoUpdateData.update("course", { courseAccessId: courseId }, { accessedUsers: courseAllowedUsers })
+
+        res.status(200).json({ success: true })
     } catch (err) {
         logger.error(err)
         res.status(500).json({ error: "Internal server error" })

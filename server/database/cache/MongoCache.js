@@ -15,7 +15,7 @@ class getCache {
 
     static async getRegistrationCode(findBy) { return await this.#getByQuery("regCode", findBy, ["_id", "sessionId", "email"]) }
 
-    static async getCourse(findBy) { return await this.#getByQuery("course", findBy, ["_id", "creator"]) }
+    static async getCourse(findBy) { return await this.#getByQuery("course", findBy, ["_id", "creator", "courseAccessId"]) }
 
     static async getTaskAccess(findBy) { return await this.#getByQuery("taskAccess", findBy, ["_id", "userId", "taskId"]) }
 
@@ -78,7 +78,7 @@ class deleteCache {
         await deleteCache.deleteWithQuery(code, "regCode", ["_id", "sessionId", "email"]);
     }
     static async deleteCourse(course) {
-        await deleteCache.deleteWithQuery(course, "course", ["_id", "creator"]);
+        await deleteCache.deleteWithQuery(course, "course", ["_id"]);
     }
 
     static async deleteTaskAccess(taskAccess) {

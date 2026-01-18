@@ -53,6 +53,11 @@ class MongoGetData {
     return await this.#getData("user", { _id: session.userId });
   }
 
+  static async getAllCourses() {
+    const courses = await Course.find();
+    return courses
+  }
+
   static async #getData(collectionType, findBy) {
     try {
       const [model, getFn, ttl] = {
