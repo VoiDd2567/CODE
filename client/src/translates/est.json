@@ -98,5 +98,8 @@
   "add_file": "Lisa file",
   "exercises": "Ülesanded",
   "saved": "Salvestatud",
-  "not_saved": "Pole salvestatud"
+  "not_saved": "Pole salvestatud",
+  "add_course": "Lisada kursust",
+  "add": "Lisada",
+  "course_id": "Kursuse id:"
 }

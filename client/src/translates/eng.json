@@ -99,5 +99,8 @@
   "add_file": "Add file",
   "exercises": "Exercises",
   "saved": "Saved",
-  "not_saved": "Not saved"
+  "not_saved": "Not saved",
+  "add_course": "Add course",
+  "add": "Add",
+  "course_id": "Course id:"
 }
