@@ -80,7 +80,6 @@ class deleteCache {
     static async deleteCourse(course) {
         await deleteCache.deleteWithQuery(course, "course", ["_id"]);
     }
-
     static async deleteTaskAccess(taskAccess) {
         await deleteCache.deleteWithQuery(taskAccess, "taskAccess", ["_id", "userId", "taskId"]);
     }
