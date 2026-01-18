@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
 import { LanguageContext } from "../LanguageContext/LanguageContext"
@@ -22,10 +22,6 @@ const MinimizedHeader = ({ showExercise, showCode }) => {
 
     const { user } = useContext(UserContext);
     const { lng, setLng } = useContext(LanguageContext);
-
-    useEffect(() => {
-        console.log(user)
-    }, [user])
 
     const changeLng = () => {
         let newLng = "est"

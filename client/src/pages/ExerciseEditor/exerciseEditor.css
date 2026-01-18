@@ -1,5 +1,16 @@
+.exercise_editor_page {
+    display: flex;
+}
+
+.exercise_editor-form-wrap {
+    width: 60vw;
+    height: 100%;
+    background-color: #565c64;
+    overflow: hidden;
+}
+
 .exercise_editor_page-form {
-    margin-left: 9vw;
+    margin-left: 2vw;
     margin-top: 5vh;
     display: flex;
     flex-direction: column;
@@ -24,7 +35,7 @@
     padding-top: 1vh;
     text-justify: center;
     font-size: 2vh;
-    min-width: 50vw;
+    min-width: 25vw;
     background-color: #d8d9db;
 }
 
@@ -156,4 +167,9 @@
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+.exercise_editor-course_menu-wrap {
+    width: 40vw;
+    height: 100%;
 }

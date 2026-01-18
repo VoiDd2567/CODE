@@ -1,14 +1,10 @@
-import MinimizedHeader from "../../components/other/minimizedHeader"
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import DescriprionBlock from "./componenets/descriptionBlock";
 import AutocheckValues from "./componenets/autocheckValues";
 import FileMenu from "./componenets/fileMenu";
-import cross from "../../pictures/cross-b.png"
+import cross from "../../../pictures/cross-b.png"
 import client_config from "../../client_config.json"
-
-import "./exerciseEditor.css"
-import "./componenets/components.css"
 
 const ExerciseEditor = () => {
     const { t } = useTranslation();
@@ -98,8 +94,7 @@ const ExerciseEditor = () => {
         }
     }
 
-    return <div className="exercise_editor_page">
-        <MinimizedHeader showCode={true} />
+    return (<div className="exercise_editor-form-wrap">
         <div className="exercise_editor_page-form">
             <div className="exercise_editor_page-form-items_line">
                 <div className="exercise_editor_page-form-item">
@@ -173,7 +168,8 @@ const ExerciseEditor = () => {
                 </div>)
             })}
         </div>
-    </div>
+    </div>)
+
 }
 
 export default ExerciseEditor

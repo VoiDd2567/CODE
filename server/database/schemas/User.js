@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
   solutions: { type: [String], default: [] },
   madeCourses: { type: [String], default: [] },
   solvedExercises: { type: String, default: 0 },
-  nameIsMutable: { type: Boolean, default: true },
+  nameIsMutable: { type: Boolean, default: true }, // Wtf is this and what is it for. It is just here and is never used again. WTF
   userFiles: { type: Object, default: { "python.py": "#Write you python code here", "javascript.js": "#Write you JavaScript code here", "text.txt": "Write your text here" } },
   passwordChangedAt: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now }

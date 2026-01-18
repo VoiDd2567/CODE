@@ -7,12 +7,6 @@ function safeUser(user) {
             email: user.email,
             name: user.name,
             defaultLng: user.defaultLng,
-            schoolClass: user.schoolClass,
-            accessedCourses: user.accessedCourses,
-            allowedExercises: user.allowedExercises,
-            solutions: user.solutions,
-            madeCourses: user.madeCourses,
-            solvedExercises: user.solvedExercises,
             nameIsMutable: user.nameIsMutable,
             files: user.userFiles,
             passwordLastChanged: passwordLastChanged.toLocaleString()

@@ -135,7 +135,7 @@ router.post("/access-course", requireAuth, async (req, res) => {
         }
 
         let courseAllowedUsers = [...course.accessedUsers];
-        console.log(course);
+
         const userIdStr = user._id.toString();
         if (courseAllowedUsers.includes(userIdStr)) {
             return res.status(409).json({ error: "Course is already added" })

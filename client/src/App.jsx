@@ -12,7 +12,7 @@ import Teapot from "./pages/Teapot/Teapot"
 import LoadingScreen from "./components/Loading/LoadingScreem";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import PasswordResetEmailGet from "./pages/PasswordResetEmailGet/PasswordResetEmailGet";
-import ExerciseEditor from "./pages/ExerciseEditor/ExerciseEditor";
+import ExerciseEditorPage from "./pages/ExerciseEditor/ExerciseEditorPage";
 import UserExercises from "./pages/UserExercises/UserExercises";
 //import UserCourses from "./pages/UserCourses/UserCourses";
 //import CoursePage from "./pages/CoursePage/CoursePage";
@@ -87,7 +87,7 @@ const App = () => {
                     } />
                     <Route path="/exercise-editor" element={
                         <PrivateRoute>
-                            <ExerciseEditor />
+                            <ExerciseEditorPage />
                         </PrivateRoute>
                     } />
                     <Route path="/exercises" element={

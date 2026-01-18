@@ -28,8 +28,7 @@ class MongoUpdateData {
 
       this.#checkKeys(updateData, model, model.blockedFields || []);
       const item = await model.findOne(updateParameter);
-      console.log(updateParameter)
-      console.log(item)
+
       if (item) delCache(item);
       await model.updateOne(updateParameter, { $set: updateData });
 
