@@ -82,7 +82,7 @@ class deleteCache {
     }
     static async deleteTaskAccess(taskAccess) {
         await deleteCache.deleteWithQuery(taskAccess, "taskAccess", ["_id", "userId", "taskId"]);
-    }
+    } // I probably dont need this anymore. And halfd of other code. Let it just stay here as a memory of my brain damage
 
     static async deleteWithId(id, itemName) {
         try {
