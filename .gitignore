@@ -23,6 +23,7 @@ server_copy.js
 test.js*
 lineCount.py*
 README.txt*
+delDockers.js*
 
 node_modules
 dist
