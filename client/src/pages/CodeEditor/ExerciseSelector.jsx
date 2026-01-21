@@ -102,11 +102,20 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExe
                             </div>
                             {expandedCourses[courseName] && (
                                 <div className="exercise-selector__course-exercises">
-                                    {Object.entries(courseExercises).map(([exerciseId, exerciseName]) => (
-                                        <div key={exerciseId} id={exerciseId} onClick={handleExerciseClick} className="exercise-selector__exercise" >
-                                            {exerciseName}
-                                        </div>
-                                    ))}
+                                    {Object.entries(courseExercises).map(([exerciseId, [exerciseName, completeType]]) => {
+                                        const img = completeType === "r" ? incomplete : completeType === "y" ? question : complete;
+                                        console.log(completeType)
+                                        return (
+                                            <div className="exercise-selector__exercise-wrap">
+                                                <div key={exerciseId} id={exerciseId} onClick={handleExerciseClick} className="exercise-selector__exercise" >
+                                                    {exerciseName}
+                                                </div>
+                                                <div id={exerciseId} onClick={handleExerciseClick} className="exercise-selector__exercise-correct-status" >
+                                                    <img src={img} alt="" />
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             )}
                         </div>

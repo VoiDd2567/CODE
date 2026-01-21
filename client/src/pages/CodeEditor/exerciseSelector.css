@@ -104,9 +104,13 @@
     user-select: none;
 }
 
+.exercise-selector__exercise-wrap {
+    display: flex;
+    align-items: center;
+}
+
 .exercise-selector__exercise {
-    width: 100%;
-    min-width: 100%;
+    width: 90%;
     height: 5vh;
     display: flex;
     align-items: center;
@@ -224,4 +228,19 @@
 
 .course_add-success {
     font-family: "Electrolize";
+}
+
+.exercise-selector__exercise-correct-status {
+    width: 1.5vw;
+    height: 1.5vw;
+    background-color: #575b63;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5vh;
+    border-radius: 1vh;
+}
+
+.exercise-selector__exercise-correct-status img {
+    height: 100%;
 }

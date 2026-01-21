@@ -14,13 +14,28 @@ const getUsersAllowedExercises = async (user, byClass = false) => {
 
             allowedExercises.push(...course.courseExercises)
 
-            const exerciseList = {}
+            if (byClass) {
+                const exerciseList = {}
 
-            for (const exerciseId of course.courseExercises) {
-                const exercise = await MongoGetData.getExercise({ _id: exerciseId });
-                exerciseList[exerciseId] = exercise.name;
+                for (const exerciseId of course.courseExercises) {
+                    const exercise = await MongoGetData.getExercise({ _id: exerciseId.toString() });
+                    const solution = await MongoGetData.getExerciseSolution({ userId: userId, exerciseId: exercise._id })
+
+                    let completeType = "r"
+                    if (solution) {
+                        const intSolPercent = parseInt(solution.answerCorrectPercent)
+                        if (intSolPercent >= parseInt(exercise.minimalPercent)) {
+                            completeType = "g"
+                        } else {
+                            if (intSolPercent > 0) {
+                                completeType = "y"
+                            }
+                        }
+                    }
+                    exerciseList[exerciseId.toString()] = [exercise.name, completeType];
+                }
+                structuredAllowedExercises[course.name] = exerciseList;
             }
-            structuredAllowedExercises[course.name] = exerciseList;
         }
 
         return byClass ? structuredAllowedExercises : allowedExercises;

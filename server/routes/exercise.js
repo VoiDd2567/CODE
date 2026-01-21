@@ -35,7 +35,7 @@ router.post("/get-exercise", requireAuth, async (req, res) => {
 
         const solution = await MongoGetData.getExerciseSolution({ exerciseId: exerciseId, userId: user._id })
         const files = solution ? solution.solutionFiles : null;
-        if (exerciseId in allowedExercises) {
+        if (allowedExercises.includes(exerciseId)) {
             res.status(200).json({ exercise: exercise, userSolution: files })
         } else {
             res.status(403).json({ error: "You don't have access to this exercise" })

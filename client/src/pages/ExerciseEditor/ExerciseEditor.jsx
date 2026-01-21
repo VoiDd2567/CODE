@@ -3,7 +3,7 @@ import { useState } from "react";
 import DescriprionBlock from "./componenets/descriptionBlock";
 import AutocheckValues from "./componenets/autocheckValues";
 import FileMenu from "./componenets/fileMenu";
-import cross from "../../../pictures/cross-b.png"
+import cross from "../../pictures/cross-b.png"
 import client_config from "../../client_config.json"
 
 const ExerciseEditor = () => {

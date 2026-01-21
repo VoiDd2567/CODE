@@ -16,16 +16,28 @@ const { response } = require("express");
 
 //NB! It checks by USER SOLUTION. It takes it from db so before checking there has to be user solution writen in db
 
-/** Before using need to init(). Class takes exerciseId and userId, finds user solution and checks if its correct.
- * Needs to already have an exercise solution in db
-*/
+/**
+ * Class for checking user's exercise solutions
+ * Requires initialization with exercise ID and user ID
+ * Provides methods for checking solution correctness
+ */
 class ExerciseCheck {
+    /**
+     * Constructor for ExerciseCheck class
+     * @param {string} exerciseId - The ID of the exercise to check
+     * @param {string} userId - The ID of the user whose solution is being checked
+     */
     constructor(exerciseId, userId) {
         this.exerciseId = exerciseId;
         this.userId = userId;
         this.maxTests = 5;
     }
 
+    /**
+     * Initializes the ExerciseCheck instance by loading exercise data from database
+     * Sets up exercise type, answer checking method, and required parameters
+     * @throws {Error} If initialization fails
+     */
     async init() {
         try {
             const exercise = await MongoGetData.getExercise({ _id: this.exerciseId });
@@ -57,7 +69,12 @@ class ExerciseCheck {
         }
     }
 
-    /**Gets solution by user and exercise ids and checks it depending on exercise type */
+    /**
+     * Main method to check user's solution against exercise requirements
+     * Routes to appropriate checking method based on exercise type
+     * @returns {Object} Result object with correctness percentage and output details
+     * @throws {Error} If no solution found or exercise auto-check is disabled
+     */
     async checkSolution() {
         try {
             const solution = await MongoGetData.getExerciseSolution({ exerciseId: this.exerciseId, userId: this.userId });
@@ -92,6 +109,11 @@ class ExerciseCheck {
         }
     }
 
+    /**
+     * Checks multiple choice exercises by comparing user's answer with correct answer
+     * @returns {boolean} True if answer is correct, false otherwise
+     * @private
+     */
     async #processListCheck() {
         try {
             if (this.exerciseChoiceAnswer === this.userSolution.solution) {
@@ -103,7 +125,13 @@ class ExerciseCheck {
             throw err;
         }
     }
-    /**Auto check fore exercises with type codeOutputCheck */
+
+    /**
+     * Auto check for exercises with type checkCodeOutput
+     * Runs user's code with test inputs and compares outputs with expected results
+     * @returns {Object} Result with correctness percentage and detailed output
+     * @private
+     */
     async #processCodeOutputCheck() {
         try {
             if (this.exerciseInputCount > 0) {
@@ -132,7 +160,12 @@ class ExerciseCheck {
         }
     }
 
-    /**Auto check fore exercises with type FuncOutputCheck */
+    /**
+     * Auto check for exercises with type checkFuncReturn
+     * Tests user's function with various inputs and checks return values
+     * @returns {Object} Result with correctness percentage and detailed output
+     * @private
+     */
     async #processFuncOutputCheck() {
         try {
             if (this.#detectInput(this.userSolution.solution, this.programmingLng)) {
@@ -167,7 +200,16 @@ class ExerciseCheck {
         }
     }
 
-    /**Runs code one time*/
+    /**
+     * Runs code in isolated container environment for single test case
+     * Handles both Python and JavaScript code execution
+     * @param {string} code - The code to execute
+     * @param {*} waitedOutput - Expected output for comparison (null for function checks)
+     * @param {Array} inputs - Input values to provide to the code
+     * @param {boolean} func - True if checking function return, false for output check
+     * @returns {Object} Result object with execution details and correctness
+     * @private
+     */
     async #runOneInstanceCode(code, waitedOutput = null, inputs = null, func = false) {
         let container;
         try {
@@ -234,7 +276,17 @@ class ExerciseCheck {
         }
     }
 
-    /**Template for data that's being returned after checking code or function output*/
+    /**
+     * Creates standardized response template for code checking results
+     * @param {boolean} correct - Whether the code execution was correct
+     * @param {string} output - The actual output from code execution
+     * @param {string} error - Error type if any (null if no error)
+     * @param {*} waitedOutput - Expected output for comparison
+     * @param {string} time - Execution time in seconds
+     * @param {*} funcReturn - Function return value for function checks
+     * @returns {Object} Formatted result object
+     * @private
+     */
     #outputCheckReturnTemplate(correct, output, error = null, waitedOutput = null, time = null, funcReturn = null) {
         return {
             correct: correct,
@@ -246,6 +298,14 @@ class ExerciseCheck {
         }
     }
 
+    /**
+     * Formats output string with appropriate success/failure messages
+     * Handles different error types and formats display text
+     * @param {Object} output - Result object from code execution
+     * @param {boolean} func - True if checking function return, false for output check
+     * @returns {string} Formatted output string for display
+     * @private
+     */
     #rightInscription(output, func = false) {
         const needPBWaited = output.waitedOutput[0].includes("\n") ? "\n" : ""
         const needPBGot = output.output.includes("\n") ? "\n" : ""
@@ -261,6 +321,12 @@ class ExerciseCheck {
         return `> UNKNOWN STATE\n${output.output ? "Output: " + JSON.stringify(output.output) : ""}\n\n`;
     }
 
+    /**
+     * Limits the number of test cases to maxTests by randomly selecting subset
+     * Prevents excessive execution time for exercises with many test cases
+     * @param {boolean} func - True to limit function tests, false for input/output tests
+     * @private
+     */
     #cutToMaxKeys(func = false) {
         const key = func ? "exerciseFunctionReturns" : "exerciseInputAnswers";
         if (this[key].length > this.maxTests) {
@@ -268,7 +334,16 @@ class ExerciseCheck {
         }
     }
 
-    /**Adds code into users code that checks if code output or function is correct */
+    /**
+     * Injects function call and result checking code into user's solution
+     * Adds print statements to capture function return value and comparison result
+     * @param {string} funcName - Name of the function to test
+     * @param {string} code - User's original code
+     * @param {Array} funcParameters - Parameters to pass to the function
+     * @param {*} funcReturn - Expected return value
+     * @returns {string} Modified code with function call and checking logic
+     * @private
+     */
     #addFuncRunIntoCode(funcName, code, funcParameters, funcReturn) {
         if (this.programmingLng === "py") {
             return code + `\n\nFuncReturnCheckFuncByCODE = ${funcName}(${funcParameters.toString()})\n`
@@ -284,12 +359,27 @@ class ExerciseCheck {
         }
     }
 
+    /**
+     * Compares actual output with expected output for code output exercises
+     * Removes newlines for comparison to handle formatting differences
+     * @param {*} output - Actual output from code execution
+     * @param {*} waitedOutput - Expected output
+     * @returns {boolean} True if outputs match, false otherwise
+     * @private
+     */
     #checkOutputReturn(output, waitedOutput) {
         const outputStr = String(output).replace(/\n/g, "");
         const waitedStr = String(waitedOutput).replace(/\n/g, "");
         return outputStr === waitedStr;
     }
 
+    /**
+     * Parses function execution output to extract comparison result and return value
+     * Splits output by special marker to separate user output from test results
+     * @param {string} output - Combined output from function execution
+     * @returns {Object} Object with correctness status, function return value, and user output
+     * @private
+     */
     #checkFuncReturn(output) {
         const outputSeparated = output.split("---RESULT@@#:\n")
         const userOutput = outputSeparated[0];
@@ -299,6 +389,14 @@ class ExerciseCheck {
         return { correct: correct, funcOutput: funcOutput, userOutput: userOutput };
     }
 
+    /**
+     * Detects if code contains input statements that would interfere with auto-checking
+     * Supports both Python (input()) and JavaScript (prompt(), question())
+     * @param {string} code - The code to analyze
+     * @param {string} language - Programming language ('py', 'js', etc.)
+     * @returns {boolean} True if input statements are detected, false otherwise
+     * @private
+     */
     #detectInput(code, language) {
         if (!code || typeof code !== 'string') return false;
 
