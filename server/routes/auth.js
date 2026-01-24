@@ -11,6 +11,7 @@ const { safeUser, safeRegistrationCode } = require("../scripts/SafeTemplates");
 const RegistartionDataChecks = require("../scripts/RegistrationDataChecks");
 const EmailSend = require("../scripts/EmailSend");
 const Hash = require("../scripts/Hash");
+const UserLogout = require("../scripts/Logout")
 const logger = require("../scripts/Logging");
 const config = require("../config");
 const crypto = require('crypto');
@@ -253,6 +254,9 @@ router.post("/reset-password", RegLimiter, async (req, res) => {
             const hashedPassword = await Hash.hash(password);
             await MongoUpdateData.update("user", { _id: userId }, { password: hashedPassword, passwordChangedAt: new Date() })
             await MongoDeleteData.deletePasswordReset(reset._id);
+
+            await UserLogout(userId);
+
             return res.status(200).json({ message: "Password changed" })
         }
 
