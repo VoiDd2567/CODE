@@ -56,4 +56,35 @@ const requireAuth = async (req, res, next) => {
     next();
 }
 
-module.exports = { getUsersAllowedExercises, requireAuth };
+async function getUserMadeCourses(userId) { // Returns courses in format courseName : [courseId, [exerciseId: exerciseName]]
+    const user = await MongoGetData.getUser({ _id: userId })
+    if (!user) {
+        throw Error("No user found")
+    }
+
+    try {
+        let data = {}
+        const userMadeCourses = user.madeCourses;
+
+        for (const courseId of userMadeCourses) {
+            const course = await MongoGetData.getCourse({ _id: courseId });
+
+            let exercises = {}
+
+            for (const exerciseId of course.courseExercises) {
+                const exercise = await MongoGetData.getExercise({ _id: exerciseId });
+                exercises[exerciseId] = exercise.name;
+            }
+
+            data[course.name] = [courseId, exercises]
+            console.log(exercises)
+        }
+
+        return data
+    } catch (err) {
+        logger.error("Problem with getting user made courses: " + err)
+        throw Error("Problem with getting user made courses")
+    }
+}
+
+module.exports = { getUsersAllowedExercises, requireAuth, getUserMadeCourses };

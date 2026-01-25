@@ -111,11 +111,11 @@ class MongoCreateData {
     }
   }
 
-  static async createCourse(courseId, creator) {
+  static async createCourse(name, creator) {
     try {
       const courseAccessId = String(Math.floor(10000000 + Math.random() * 90000000));
 
-      const course = new Course({ courseId, creator, courseAccessId });
+      const course = new Course({ name, creator, courseAccessId });
 
       const savedCourse = await course.save();
       return savedCourse._id;

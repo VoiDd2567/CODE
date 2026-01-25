@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
 import { LanguageContext } from "../LanguageContext/LanguageContext"
@@ -11,9 +11,10 @@ import code_yellow from "../../pictures/code_yellow.png"
 import client_config from "../../client_config.json"
 import "./mHeader.css"
 
-const MinimizedHeader = ({ showExercise, showCode }) => {
+const MinimizedHeader = ({ showExercise, showCode, fixed }) => {
     const { t, i18n } = useTranslation()
 
+    const header = useRef(null)
     const [redirectHome, setRedirectHome] = useState(false);
     const [redirectExerciseEditor, setRedirectExerciseEditor] = useState(false);
     const [redirectCodeEditor, setRedirectCodeEditor] = useState(false);
@@ -22,6 +23,14 @@ const MinimizedHeader = ({ showExercise, showCode }) => {
 
     const { user } = useContext(UserContext);
     const { lng, setLng } = useContext(LanguageContext);
+
+    useEffect(() => {
+        if (fixed) {
+            header.current.style.position = "fixed";
+        } else {
+            header.current.style.position = "inherit";
+        }
+    }, [fixed])
 
     const changeLng = () => {
         let newLng = "est"
@@ -81,7 +90,7 @@ const MinimizedHeader = ({ showExercise, showCode }) => {
     }
 
     return (
-        <div className="m_header">
+        <div className="m_header" ref={header}>
             <img className="m_header-logo" onClick={returnHome} src={logo} alt="Logo" />
             <div className="m_header-inside">
                 <div className="m_header-lng_switch">

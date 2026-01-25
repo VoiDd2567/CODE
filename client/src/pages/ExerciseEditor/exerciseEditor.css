@@ -1,8 +1,16 @@
+.exercise_editor_page-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
 .exercise_editor_page {
     display: flex;
+    height: 100%;
+    margin-top: 9vh;
 }
 
 .exercise_editor-form-wrap {
+    margin-left: 40vw;
     width: 60vw;
     height: 100%;
     background-color: #565c64;
@@ -172,4 +180,139 @@
 .exercise_editor-course_menu-wrap {
     width: 40vw;
     height: 100%;
+}
+
+.exercise_editor-course_menu-wrap {
+    position: fixed;
+    background-color: #a9aaad;
+    height: 100%;
+    min-height: 100vh;
+    width: 40vw;
+    font-family: "Electrolize";
+}
+
+.course_menu {
+    margin-left: 4vw;
+    margin-top: 5vh;
+    margin-right: 4vw;
+}
+
+.course_menu-line {
+    display: flex;
+    align-items: center;
+}
+
+.course_menu-header {
+    font-size: 4.5vh;
+    font-weight: 500;
+}
+
+.course_menu-btn {
+    font-size: 1.5vh;
+    height: 4vh;
+    background-color: rgb(45, 141, 45);
+    border: 1px solid rgb(35, 121, 35);
+    border-radius: 1vh;
+    display: flex;
+    align-items: center;
+    gap: 0.3vw;
+    padding-left: 1vh;
+    padding-right: 1vh;
+    cursor: pointer;
+    margin-left: 2vw;
+}
+
+.course_menu-btn img {
+    height: 50%;
+}
+
+.course_menu-btn:hover {
+    transform: scale(1.1);
+}
+
+.course_menu-btn:active {
+    background-color: rgb(28, 101, 28);
+}
+
+.course_menu-course_list {
+    width: 100%;
+}
+
+.course_menu-course {
+    margin-left: 1.5vw;
+    margin-top: 2vh;
+}
+
+.course_menu-course-name {
+    font-size: 3vh;
+    width: 25vw;
+}
+
+.small_btn {
+    height: 3.2vh;
+    background-color: rgb(70, 212, 70);
+    border: 1px solid rgb(48, 177, 48);
+}
+
+.course_menu-course-exercises {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5vh;
+    background-color: #929396;
+    border-radius: 1vh;
+    overflow: hidden;
+}
+
+.course_menu-exercise {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vh;
+    border-bottom: 1px solid black;
+}
+
+.course_menu-exercise:last-of-type {
+    padding-bottom: 1vh;
+    border-bottom: 0;
+}
+
+.course_menu-exercise-name {
+    height: 3vh;
+    display: flex;
+    align-items: center;
+}
+
+.course_menu-exercise-change {
+    display: flex;
+    height: 2.7vh;
+    gap: 0.7vw;
+}
+
+.course_menu-exercise-change img {
+    height: 100%;
+    cursor: pointer;
+}
+
+.course_menu-exercise-change img:hover {
+    transform: scale(1.1);
+}
+
+.course_menu-error {
+    color: rgb(202, 25, 25);
+    font-size: 2.5vh;
+    margin-bottom: 1vh;
+}
+
+.course_menu-course-del {
+    height: 3vh;
+    margin-left: 0.5vw;
+}
+
+.course_menu-course-del img {
+    height: 100%;
+    cursor: pointer;
+}
+
+.course_menu-course-del img:hover {
+    transform: scale(1.1);
 }

@@ -6,7 +6,7 @@ import FileMenu from "./componenets/fileMenu";
 import cross from "../../pictures/cross-b.png"
 import client_config from "../../client_config.json"
 
-const ExerciseEditor = () => {
+const ExerciseEditor = ({ exerciseId }) => {
     const { t } = useTranslation();
     const [autocheck, setAutocheck] = useState(true)
     const [autocheckType, setAutocheckType] = useState(t("output_check_input"))
@@ -28,6 +28,18 @@ const ExerciseEditor = () => {
             ...prev,
             { message, type }
         ])
+    }
+
+    const handleExerciseSaveBtn = () => {
+        if (exerciseId) {
+            handleExerciseUpdate();
+        } else {
+            handleExerciseSave();
+        }
+    }
+
+    const handleExerciseUpdate = () => {
+        //TODO
     }
 
     const handleExerciseSave = () => {
@@ -156,7 +168,7 @@ const ExerciseEditor = () => {
                 <FileMenu addFiles={(f) => addData("files", f)} />
             </>)}
             <div className="exercise_editor_page-save_btn-wrap">
-                <div className="exercise_editor_page-save_btn" onClick={handleExerciseSave}>{t("save")}</div>
+                <div className="exercise_editor_page-save_btn" onClick={handleExerciseSaveBtn}>{t("save")}</div>
             </div>
             <div className="exercise_editor_page_bottom"></div>
         </div>

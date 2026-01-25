@@ -9,12 +9,13 @@ import { useState } from "react"
 
 const ExerciseEditorPage = () => {
     const [openExerciseEditor, setOpenExerciseEditor] = useState(true)
+    const [openedExerciseId, setOpenedExerciseId] = useState(true)
 
     return <div className="exercise_editor_page-wrap">
-        <MinimizedHeader showCode={true} />
+        <MinimizedHeader showCode={true} fixed={true} />
         <div className="exercise_editor_page">
-            <CourseEditor />
-            {openExerciseEditor && <ExerciseEditor />}
+            <CourseEditor setOpenedExerciseId={setOpenedExerciseId} setOpenExerciseEditor={setOpenExerciseEditor} />
+            {openExerciseEditor && <ExerciseEditor exerciseId={openedExerciseId} />}
         </div>
     </div>
 }

@@ -1,3 +1,5 @@
+const MongoGetData = require("../database/mongo_get_data");
+
 function safeUser(user) {
     try {
         const passwordLastChanged = new Date(user.passwordChangedAt);
@@ -62,5 +64,6 @@ function safeExercise(ex) {
 
     return true;
 }
+
 
 module.exports = { safeUser, safeRegistrationCode, safeCourse, safeExercise };

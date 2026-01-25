@@ -4,7 +4,7 @@ const MongoGetData = require("../database/mongo_get_data");
 const MongoDeleteData = require("../database/mongo_delete_data");
 const MongoUpdateData = require("../database/mongo_update_data");
 const { safeUser, safeCourse } = require("../scripts/SafeTemplates");
-const { requireAuth } = require("../scripts/SecurityChecks");
+const { requireAuth, getUserMadeCourses } = require("../scripts/SecurityChecks");
 const logger = require("../scripts/Logging");
 
 
@@ -71,5 +71,24 @@ router.get("/courses", requireAuth, async (req, res) => {
         res.status(500).json({ error: "Internal server error" })
     }
 })
+
+router.get("/my-courses", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const user = await MongoGetData.getUserBySession(sessionId)
+
+        if (!user.weight === "teacher") {
+            return res.status(401).json({ error: "You are not authorized for this action" })
+        }
+
+        const userMadeCourses = await getUserMadeCourses(user._id);
+        res.status(200).json({ courses: userMadeCourses })
+
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
 
 module.exports = router;

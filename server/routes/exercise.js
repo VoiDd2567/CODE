@@ -150,4 +150,26 @@ router.post("/access-course", requireAuth, async (req, res) => {
     }
 })
 
+router.post("/create-course", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const { courseName } = req.body;
+        const user = await MongoGetData.getUserBySession(sessionId)
+
+        if (user.weight != "teacher") {
+            return res.status(401).json({ error: "You don't have permission for this action" })
+        }
+
+        const courseId = await MongoCreateData.createCourse(courseName, user._id)
+        if (!courseId) {
+            res.status(500).json({ error: "Internal server error : Couldn't create course" })
+        }
+
+        res.status(200).json({ courseId: courseId })
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
 module.exports = router;

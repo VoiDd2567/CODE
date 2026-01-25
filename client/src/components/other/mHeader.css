@@ -3,6 +3,7 @@
     background-color: #222831;
     display: flex;
     align-items: center;
+    min-width: 100vw;
 }
 
 .m_header-logo {
