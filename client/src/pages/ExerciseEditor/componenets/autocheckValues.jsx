@@ -4,10 +4,22 @@ import arrow_r from "../../../pictures/arrow-r.png"
 import deleteImg from "../../../pictures/delete.png";
 import deleteRedImg from "../../../pictures/delete-red.png";
 
-const AutocheckValues = ({ inputAmount = 2, setInputs, func = false }) => {
+const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) => {
     const { t } = useTranslation()
 
-    const [paires, setPairs] = useState([{ input: [], output: "" }])
+    const [paires, setPairs] = useState(startInput)
+    const [isInitialized, setIsInitialized] = useState(false)
+
+    useEffect(() => {
+        console.log(startInput)
+    }, [startInput])
+
+    useEffect(() => {
+        if (!isInitialized && startInput && startInput.length > 0) {
+            setPairs(startInput);
+            setIsInitialized(true);
+        }
+    }, [startInput, isInitialized])
 
     useEffect(() => {
         setPairs(prev =>
@@ -16,8 +28,6 @@ const AutocheckValues = ({ inputAmount = 2, setInputs, func = false }) => {
                 input: normalizeInput(pair.input)
             }))
         );
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inputAmount])
 
     useEffect(() => {
@@ -25,53 +35,49 @@ const AutocheckValues = ({ inputAmount = 2, setInputs, func = false }) => {
             const inputArr = Array(inputAmount).fill("")
             setPairs([{ input: inputArr, output: "" }])
         }
-        setInputs(paires)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paires, inputAmount])
+    }, [inputAmount])
 
     const normalizeInput = (arr) => [
         ...arr.slice(0, inputAmount),
         ...Array(Math.max(0, inputAmount - arr.length)).fill("")
     ];
 
-    const handleAddClick = () => {
-        let newInput = []
-        for (let i = 0; i < inputAmount; i += 1) {
-            newInput.push("")
-        }
-        setPairs(prev => [
-            ...prev,
-            { input: newInput, output: "" }
-        ]);
-    };
-
-    const deleteItem = (idx) => {
-        setPairs(prev => prev.filter((_, index) => index !== idx));
-    };
-
     const updatePairInput = (pairIdx, inputIdx, value) => {
-        setPairs(prev =>
-            prev.map((pair, index) =>
-                index === pairIdx
-                    ? {
-                        ...pair,
-                        input: pair.input.map((inp, idx) =>
-                            idx === inputIdx ? value : inp
-                        )
-                    }
-                    : pair
-            )
+        const newPairs = paires.map((pair, index) =>
+            index === pairIdx
+                ? {
+                    ...pair,
+                    input: pair.input.map((inp, idx) =>
+                        idx === inputIdx ? value : inp
+                    )
+                }
+                : pair
         );
+        setPairs(newPairs);
+        setInputs(newPairs);
     };
 
     const updatePairOutput = (pairIdx, value) => {
-        setPairs(prev =>
-            prev.map((pair, index) =>
-                index === pairIdx
-                    ? { ...pair, output: value }
-                    : pair
-            )
+        const newPairs = paires.map((pair, index) =>
+            index === pairIdx
+                ? { ...pair, output: value }
+                : pair
         );
+        setPairs(newPairs);
+        setInputs(newPairs);
+    };
+
+    const handleAddClick = () => {
+        const newInput = Array(inputAmount).fill("");
+        const newPairs = [...paires, { input: newInput, output: "" }];
+        setPairs(newPairs);
+        setInputs(newPairs);
+    };
+
+    const deleteItem = (idx) => {
+        const newPairs = paires.filter((_, index) => index !== idx);
+        setPairs(newPairs);
+        setInputs(newPairs);
     };
 
     return (

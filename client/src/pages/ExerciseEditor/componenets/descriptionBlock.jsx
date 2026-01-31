@@ -36,15 +36,27 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
 
         container.innerHTML = "";
 
+        if (!content) {
+            const p = document.createElement("p");
+            p.innerHTML = "<br>";
+            container.appendChild(p);
+            return;
+        }
+
         const parts = content.split(/(\[CODE_BLOCK\].*?\[\/CODE_BLOCK\])/s);
 
-        parts.forEach(part => {
+        parts.forEach((part, partIndex) => {
             if (part.startsWith("[CODE_BLOCK]") && part.endsWith("[/CODE_BLOCK]")) {
                 const code = part.replace("[CODE_BLOCK]", "").replace("[/CODE_BLOCK]", "");
                 insertCodeBlockElement(code, container);
-            } else if (part.trim() || part === "") {
+            } else if (part) {
                 const lines = part.split("\n");
-                lines.forEach(line => {
+                lines.forEach((line, lineIndex) => {
+                    // Skip empty lines at the start of a part that comes after a code block
+                    if (partIndex > 0 && lineIndex === 0 && !line && parts[partIndex - 1].startsWith("[CODE_BLOCK]")) {
+                        return;
+                    }
+
                     const p = document.createElement("p");
                     p.textContent = line;
                     if (!line) {
@@ -54,6 +66,13 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
                 });
             }
         });
+
+        // Ensure there's at least one paragraph
+        if (container.childNodes.length === 0) {
+            const p = document.createElement("p");
+            p.innerHTML = "<br>";
+            container.appendChild(p);
+        }
     };
 
     const insertCodeBlockElement = (code = "", container = null) => {
@@ -132,8 +151,9 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
         if (!container) return;
 
         let result = "";
+        const nodes = Array.from(container.childNodes);
 
-        Array.from(container.childNodes).forEach((node, index) => {
+        nodes.forEach((node, index) => {
             if (node.classList && node.classList.contains("code-block-wrapper")) {
                 const textarea = node.querySelector(".code-block-content");
                 if (textarea) {
@@ -141,9 +161,25 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
                 }
             } else if (node.tagName === "P") {
                 const text = node.textContent;
-                result += text;
-                // Add newline if not the last element
-                if (index < container.childNodes.length - 1) {
+
+                // Don't add content from empty paragraphs right after code blocks
+                const prevNode = index > 0 ? nodes[index - 1] : null;
+                const isEmptyAfterCodeBlock = prevNode &&
+                    prevNode.classList &&
+                    prevNode.classList.contains("code-block-wrapper") &&
+                    !text;
+
+                if (!isEmptyAfterCodeBlock) {
+                    result += text;
+                }
+
+                // Add newline if not the last element and not before a code block
+                const nextNode = index < nodes.length - 1 ? nodes[index + 1] : null;
+                const isBeforeCodeBlock = nextNode &&
+                    nextNode.classList &&
+                    nextNode.classList.contains("code-block-wrapper");
+
+                if (index < nodes.length - 1 && !isBeforeCodeBlock && !isEmptyAfterCodeBlock) {
                     result += "\n";
                 }
             }

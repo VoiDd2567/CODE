@@ -8,7 +8,7 @@ import client_config from "../../client_config.json"
 
 const deafultData = {
     "programmingLng": "py",
-    "inputCount": "1",
+    "inputCount": 1,
     "answerCheckType": "checkCodeOutput",
     "minimalPercent": "100",
     "type": "code",
@@ -24,11 +24,12 @@ const deafultData = {
 
 const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor }) => {
     const { t } = useTranslation();
+
     const [autocheckType, setAutocheckType] = useState(t("output_check_input"))
-    const [autocheckCheckAmount, setAutocheckCheckAmount] = useState(1)
+    const [data, setData] = useState({ ...deafultData })
     const [files, setFiles] = useState(true)
     const [notifications, setNotifications] = useState([])
-    const [data, setData] = useState({ ...deafultData })
+    const [editorKey, setEditorKey] = useState(0);
 
     useEffect(() => {
         if (exerciseId) {
@@ -49,6 +50,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor }) => {
     const getExercise = (exerciseId) => {
         setData({ ...deafultData });
         setAutocheckType(t("output_check_input"))
+
         fetch(`${client_config.SERVER_IP}/api/exercise/get-exercise-data`, {
             method: "POST",
             credentials: 'include',
@@ -92,6 +94,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor }) => {
                 }
 
                 setData(dataG)
+                setEditorKey(prev => prev + 1);
             }
         }).catch(error => {
             addNotification(error.message, "red")
@@ -154,7 +157,6 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor }) => {
 
         if (v === t("output_check_input")) {
             addData("inputCount", 1)
-            setAutocheckCheckAmount(1)
         } else {
             addData("inputCount", 0)
         }
@@ -179,7 +181,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor }) => {
                 </div>
                 <div className="exercise_editor_page-form-item">
                     <div className="exercise_editor_page-form-item-label">{t("code_lng")}</div>
-                    <select value={data.programmingLng} className="exercise_editor_page-form-item-select" onChange={(e) => addData("programmingLng", e.target.value)}>
+                    <select defaultValue={data.programmingLng} className="exercise_editor_page-form-item-select" onChange={(e) => addData("programmingLng", e.target.value)}>
                         <option value={"py"}>Python</option>
                         <option value={"js"}>JavaScript</option>
                     </select>
@@ -195,10 +197,14 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor }) => {
                     <div className="exercise_editor_page-form-items_line">
                         <div className="exercise_editor_page-form-item">
                             <div className="exercise_editor_page-form-item-label">{t("autocheck_type")}</div>
-                            <select className="exercise_editor_page-form-item-select" defaultValue={data.answerCheckType} onChange={(e) => handleAutocheckType(e)}>
-                                <option value={t("output_check_input")}>{t("output_check_input")}</option>
-                                <option value={t("func_check")}>{t("func_check")}</option>
-                                <option value={t("output_check")}>{t("output_check")}</option>
+                            <select
+                                className="exercise_editor_page-form-item-select"
+                                value={autocheckType}
+                                onChange={(e) => handleAutocheckType(e)}
+                            >
+                                <option>{t("output_check_input")}</option>
+                                <option>{t("func_check")}</option>
+                                <option>{t("output_check")}</option>
                             </select>
                         </div>
                         {autocheckType === t("func_check") && (
@@ -209,19 +215,19 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor }) => {
                         {(autocheckType === t("func_check") || autocheckType === t("output_check_input")) && (
                             <div className="exercise_editor_page-form-item">
                                 <div className="exercise_editor_page-form-item-label">{autocheckType === t("func_check") ? t("param_amount") : t("input_amount")}</div>
-                                <input type="number" min="1" className="exercise_editor_page-form-item-counter" value={autocheckCheckAmount} onChange={(e) => { setAutocheckCheckAmount(e.target.value); addData("inputCount", e.target.value) }}></input>
+                                <input type="number" min="1" className="exercise_editor_page-form-item-counter" value={data.inputCount} onChange={(e) => { addData("inputCount", e.target.value) }}></input>
                             </div>)}
                     </div>
                     <div className="exercise_editor_page-form-item">
                         <div className="exercise_editor_page-form-item-label">{t("complete_percent")}</div>
-                        <input type="number" min="1" max="100" defaultValue="100" className="exercise_editor_page-form-item-counter" onChange={(e) => { addData("minimalPercent", e.target.value) }}></input>
+                        <input type="number" min="1" max="100" defaultValue="100" className="exercise_editor_page-form-item-counter" value={data.minimalPercent} onChange={(e) => { addData("minimalPercent", e.target.value) }}></input>
                     </div>
                     {autocheckType === t("output_check") && (
                         <div className="exercise_editor_page-form-item">
                             <div className="exercise_editor_page-form-item-label">{t("Output")}</div>
                             <textarea className="exercise_editor_page-form-item-textarea" onInput={(e) => addData("withoutInputAnswer", e.target.value)}></textarea>
                         </div>)}
-                    {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (<AutocheckValues inputAmount={autocheckCheckAmount} setInputs={(p) => addData("inputAnswers", p)} func={autocheckType === t("func_check")} />)}
+                    {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (<AutocheckValues key={editorKey} inputAmount={data.inputCount} setInputs={(p) => addData("inputAnswers", p)} func={autocheckType === t("func_check")} startInput={data.inputAnswers} />)}
                 </>
             )}
             <div className="exercise_editor_page-form-select">

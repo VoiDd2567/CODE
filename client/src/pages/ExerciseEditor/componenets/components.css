@@ -260,8 +260,9 @@
     background-color: #a9aaad;
     border-radius: 1vh;
     margin: 1vh 0;
+    width: 90%;
     overflow: hidden;
-    font-family: "Courier New", Courier, monospace;
+    font-family: "Electrolize", Courier, monospace;
 }
 
 /* Line numbers */
@@ -273,7 +274,7 @@
     font-size: 1.5vh;
     line-height: 2.5vh;
     user-select: none;
-    min-width: 3vw;
+    min-width: 0.8vw;
     overflow: hidden;
     white-space: pre;
 }
@@ -283,17 +284,18 @@
     flex: 1;
     background-color: #a9aaad;
     color: #ffffff;
-    padding: 1vh 0.5vw;
+    margin-top: 1vh;
+    padding: 0 0.5vw;
     border: none;
     outline: none;
-    font-family: "Courier New", Courier, monospace;
+    font-family: "Electrolize";
     font-size: 1.5vh;
     line-height: 2.5vh;
     resize: none;
     overflow-y: auto;
     overflow-x: auto;
     white-space: pre;
-    min-height: 10vh;
+    min-height: 2.5vh;
     max-height: 40vh;
 }
 
