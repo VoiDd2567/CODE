@@ -1,299 +1,220 @@
 import { useRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { createRoot } from "react-dom/client";
-import Editor from "../../../components/Editor/Editor";
 
-const DescriptionBlock = ({ setDesc }) => {
+const DescriptionBlock = ({ setDesc, startValue }) => {
     const { t } = useTranslation();
-    const exDescription = useRef(null);
-    const [descValue, setDescValue] = useState({ eng: "", est: "" });
-    const [editorsValue, setEditorsValue] = useState({});
+
     const [lng, setLng] = useState("eng");
+    const descriptionRef = useRef(null);
+    const [descValue, setDescValue] = useState(startValue || { eng: "", est: "" });
 
+    // Update descValue when startValue changes from parent
     useEffect(() => {
-        const el = exDescription.current;
-        if (!el) return;
-
-        const cleanup = resizeInput(el);
-        return cleanup;
-    }, []);
-
-    useEffect(() => {
-        setDesc(descValue);
+        if (startValue && (startValue.eng !== descValue.eng || startValue.est !== descValue.est)) {
+            setDescValue(startValue);
+            // Load content immediately when new data arrives
+            if (descriptionRef.current) {
+                const content = startValue[lng] || "";
+                loadContent(content);
+            }
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [descValue]);
+    }, [startValue]);
 
     // Load content when language changes
     useEffect(() => {
-        const el = exDescription.current;
-        if (!el) return;
-
-        // Clear current content
-        el.innerHTML = '';
-
-        // Load content for selected language
-        const currentContent = descValue[lng] || '';
-
-        if (currentContent) {
-            loadContentFromString(currentContent);
+        if (descriptionRef.current) {
+            const content = descValue[lng] || "";
+            loadContent(content);
         }
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lng]);
 
-    // Update descValue whenever content changes
-    useEffect(() => {
-        const el = exDescription.current;
-        if (!el) return;
+    const loadContent = (content) => {
+        const container = descriptionRef.current;
+        if (!container) return;
 
-        const updateDescValue = () => {
-            saveDescriptionValue();
-        };
+        container.innerHTML = "";
 
-        el.addEventListener("input", updateDescValue);
+        const parts = content.split(/(\[CODE_BLOCK\].*?\[\/CODE_BLOCK\])/s);
 
-        return () => {
-            el.removeEventListener("input", updateDescValue);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [editorsValue, lng]);
-
-    const loadContentFromString = (content) => {
-        const el = exDescription.current;
-        if (!el) return;
-
-        const lines = content.split('\n');
-        const codeBlockRegex = /<<<code-block>>>(.+?)<<<\/code-block>>>/s;
-
-        lines.forEach(line => {
-            const match = line.match(codeBlockRegex);
-
-            if (match) {
-                const codeContent = match[1];
-                const blockId = `code-block-${Date.now()}-${Math.random()}`;
-
-                setEditorsValue(prev => ({
-                    ...prev,
-                    [blockId]: codeContent
-                }));
-
-                const codeBlockWrapper = document.createElement('div');
-                codeBlockWrapper.className = 'inserted-code-block';
-                codeBlockWrapper.contentEditable = 'false';
-                codeBlockWrapper.setAttribute('data-block-id', blockId);
-
-                const reactContainer = document.createElement('div');
-                codeBlockWrapper.appendChild(reactContainer);
-                el.appendChild(codeBlockWrapper);
-
-                const root = createRoot(reactContainer);
-                root.render(
-                    <Editor
-                        h={calculateEditorHeight(codeContent)}
-                        w={50}
-                        fixedHeight={false}
-                        getValue={(value) => updateEditorValue(blockId, value)}
-                        initialValue={codeContent}
-                    />
-                );
-            } else {
-                const div = document.createElement('div');
-                div.textContent = line || '';
-                if (!line) {
-                    div.innerHTML = '<br>';
-                }
-                el.appendChild(div);
-            }
-        });
-    };
-
-    const saveDescriptionValue = () => {
-        const editor = exDescription.current;
-        if (!editor) return;
-
-        let combinedValue = '';
-
-        const processNode = (node) => {
-            if (node.nodeType === Node.TEXT_NODE) {
-                return node.textContent;
-            }
-
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                if (node.classList && node.classList.contains('inserted-code-block')) {
-                    const blockId = node.getAttribute('data-block-id');
-                    if (blockId && editorsValue[blockId] !== undefined) {
-                        return `<<<code-block>>>${editorsValue[blockId]}<<</code-block>>>`;
+        parts.forEach(part => {
+            if (part.startsWith("[CODE_BLOCK]") && part.endsWith("[/CODE_BLOCK]")) {
+                const code = part.replace("[CODE_BLOCK]", "").replace("[/CODE_BLOCK]", "");
+                insertCodeBlockElement(code, container);
+            } else if (part.trim() || part === "") {
+                const lines = part.split("\n");
+                lines.forEach(line => {
+                    const p = document.createElement("p");
+                    p.textContent = line;
+                    if (!line) {
+                        p.innerHTML = "<br>";
                     }
-                    return '';
-                }
-
-                if (node.tagName === 'BR') {
-                    return '\n';
-                }
-
-                if (node.tagName === 'DIV') {
-                    let content = '';
-                    for (let child of node.childNodes) {
-                        content += processNode(child);
-                    }
-                    // Add newline after div if it has content
-                    return content + (content ? '\n' : '');
-                }
-
-                // Process other elements recursively
-                let content = '';
-                for (let child of node.childNodes) {
-                    content += processNode(child);
-                }
-                return content;
+                    container.appendChild(p);
+                });
             }
-
-            return '';
-        };
-
-        for (let child of editor.childNodes) {
-            combinedValue += processNode(child);
-        }
-
-        // Clean up extra newlines at the end
-        combinedValue = combinedValue.replace(/\n+$/, '');
-
-        // Update the description value for the current language
-        setDescValue(prev => ({
-            ...prev,
-            [lng]: combinedValue
-        }));
-    };
-
-    const resizeInput = (el) => {
-        if (!el) return () => { };
-
-        const resize = () => {
-            el.style.height = "auto";
-            el.style.height = `${el.scrollHeight}px`;
-        };
-
-        const observer = new MutationObserver(() => {
-            resize();
-        });
-
-        observer.observe(el, {
-            childList: true,
-            subtree: true,
-            characterData: true
-        });
-
-        el.addEventListener("input", resize);
-        resize();
-
-        return () => {
-            el.removeEventListener("input", resize);
-            observer.disconnect();
-        };
-    }
-
-    const addNewEditor = (blockId) => {
-        setEditorsValue(prev => ({
-            ...prev,
-            [blockId]: ''
-        }));
-    };
-
-    const updateEditorValue = (blockId, value) => {
-        setEditorsValue(prev => {
-            const updated = {
-                ...prev,
-                [blockId]: value
-            };
-            // Trigger save after editor value updates
-            setTimeout(() => saveDescriptionValue(), 0);
-            return updated;
         });
     };
 
-    const calculateEditorHeight = (value = '') => {
-        const lineCount = (value.match(/\n/g) || []).length + 1;
-        const lineHeight = 2.5;
-        return lineCount * lineHeight;
-    };
-
-    const insertCodeBlock = () => {
-        const editor = exDescription.current;
-        if (!editor) return;
+    const insertCodeBlockElement = (code = "", container = null) => {
+        const targetContainer = container || descriptionRef.current;
+        if (!targetContainer) return;
 
         const blockId = `code-block-${Date.now()}-${Math.random()}`;
 
-        addNewEditor(blockId);
+        // Create code block wrapper
+        const wrapper = document.createElement("div");
+        wrapper.className = "code-block-wrapper";
+        wrapper.contentEditable = "false";
+        wrapper.setAttribute("data-block-id", blockId);
 
-        const codeBlockWrapper = document.createElement('div');
-        codeBlockWrapper.className = 'inserted-code-block';
-        codeBlockWrapper.contentEditable = 'false';
-        codeBlockWrapper.setAttribute('data-block-id', blockId);
+        // Create line numbers container
+        const lineNumbers = document.createElement("div");
+        lineNumbers.className = "code-block-line-numbers";
 
-        const reactContainer = document.createElement('div');
-        codeBlockWrapper.appendChild(reactContainer);
+        // Create code content container
+        const codeContent = document.createElement("textarea");
+        codeContent.className = "code-block-content";
+        codeContent.value = code;
+        codeContent.spellcheck = false;
+
+        // Update line numbers
+        const updateLineNumbers = () => {
+            const lines = codeContent.value.split("\n").length;
+            lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join("\n");
+            syncScroll();
+        };
+
+        // Sync scroll between line numbers and content
+        const syncScroll = () => {
+            lineNumbers.scrollTop = codeContent.scrollTop;
+        };
+
+        // Handle Tab key
+        const handleTab = (e) => {
+            if (e.key === "Tab") {
+                e.preventDefault();
+                const start = codeContent.selectionStart;
+                const end = codeContent.selectionEnd;
+                const value = codeContent.value;
+                codeContent.value = value.substring(0, start) + "    " + value.substring(end);
+                codeContent.selectionStart = codeContent.selectionEnd = start + 4;
+                updateLineNumbers();
+                saveContent();
+            }
+        };
+
+        codeContent.addEventListener("input", () => {
+            updateLineNumbers();
+            saveContent();
+        });
+        codeContent.addEventListener("scroll", syncScroll);
+        codeContent.addEventListener("keydown", handleTab);
+
+        updateLineNumbers();
+
+        wrapper.appendChild(lineNumbers);
+        wrapper.appendChild(codeContent);
+        targetContainer.appendChild(wrapper);
+
+        // Add a paragraph after code block for continued editing
+        if (!container) {
+            const p = document.createElement("p");
+            p.innerHTML = "<br>";
+            targetContainer.appendChild(p);
+        }
+
+        return wrapper;
+    };
+
+    const saveContent = () => {
+        const container = descriptionRef.current;
+        if (!container) return;
+
+        let result = "";
+
+        Array.from(container.childNodes).forEach((node, index) => {
+            if (node.classList && node.classList.contains("code-block-wrapper")) {
+                const textarea = node.querySelector(".code-block-content");
+                if (textarea) {
+                    result += `[CODE_BLOCK]${textarea.value}[/CODE_BLOCK]`;
+                }
+            } else if (node.tagName === "P") {
+                const text = node.textContent;
+                result += text;
+                // Add newline if not the last element
+                if (index < container.childNodes.length - 1) {
+                    result += "\n";
+                }
+            }
+        });
+
+        const updatedDescValue = {
+            ...descValue,
+            [lng]: result
+        };
+
+        setDescValue(updatedDescValue);
+        setDesc(updatedDescValue);
+    };
+
+    const handleInput = () => {
+        saveContent();
+    };
+
+    const handleKeyDown = (e) => {
+        // Prevent editing inside code blocks
+        if (e.target.closest(".code-block-wrapper")) {
+            return;
+        }
+        saveContent();
+    };
+
+    const addCodeBlock = () => {
+        const container = descriptionRef.current;
+        if (!container) return;
 
         const selection = window.getSelection();
-        let insertAtCursor = false;
+        let insertPoint = null;
 
+        // Try to insert at cursor position
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            const commonAncestor = range.commonAncestorContainer;
+            if (container.contains(range.commonAncestorContainer)) {
+                insertPoint = range.commonAncestorContainer;
 
-            const isInsideCodeBlock = (node) => {
-                let current = node;
-                while (current && current !== editor) {
-                    if (current.classList && current.classList.contains('inserted-code-block')) {
-                        return true;
-                    }
-                    current = current.parentNode;
+                // Find the paragraph element
+                while (insertPoint && insertPoint.tagName !== "P" && insertPoint !== container) {
+                    insertPoint = insertPoint.parentNode;
                 }
-                return false;
-            };
-
-            if (editor.contains(commonAncestor) && !isInsideCodeBlock(commonAncestor)) {
-                insertAtCursor = true;
-                range.deleteContents();
-                range.insertNode(codeBlockWrapper);
-
-                const br = document.createElement('div');
-                br.innerHTML = '<br>';
-                range.collapse(false);
-                range.insertNode(br);
-
-                range.setStartAfter(br);
-                range.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(range);
             }
         }
 
-        if (!insertAtCursor) {
-            editor.appendChild(codeBlockWrapper);
-            const br = document.createElement('div');
-            br.innerHTML = '<br>';
-            editor.appendChild(br);
+        // Create the code block
+        const wrapper = insertCodeBlockElement();
+
+        // Insert at the right position
+        if (insertPoint && insertPoint.tagName === "P") {
+            insertPoint.parentNode.insertBefore(wrapper, insertPoint.nextSibling);
         }
 
-        const root = createRoot(reactContainer);
-        root.render(
-            <Editor
-                h={calculateEditorHeight()}
-                w={50}
-                fixedHeight={false}
-                getValue={(value) => updateEditorValue(blockId, value)}
-            />
-        );
+        // Focus the code block
+        const textarea = wrapper.querySelector(".code-block-content");
+        if (textarea) {
+            textarea.focus();
+        }
 
-        editor.focus();
-
-        // Save after inserting code block
-        setTimeout(() => saveDescriptionValue(), 0);
-    }
+        saveContent();
+    };
 
     const handleLanguageChange = (e) => {
         const newLng = e.target.value;
-        setLng(newLng);
+        // Save current language content before switching
+        saveContent();
+        // Small delay to ensure save completes before switching
+        setTimeout(() => {
+            setLng(newLng);
+        }, 10);
     };
 
     return (
@@ -302,12 +223,14 @@ const DescriptionBlock = ({ setDesc }) => {
                 <div className="exercise_editor_page-form-item-label">{t("description")}</div>
                 <button
                     className="add_code_block-btn"
-                    onClick={insertCodeBlock}
+                    onClick={addCodeBlock}
                     type="button"
                 >
                     {t("add_code_block")}
                 </button>
-                <div className="exercise_editor_page-form-item-label label-break">{t("desc_language")}</div>
+                <div className="exercise_editor_page-form-item-label label-break">
+                    {t("desc_language")}
+                </div>
                 <select
                     className="exercise_editor_page-form-item-select desc-select"
                     value={lng}
@@ -318,13 +241,15 @@ const DescriptionBlock = ({ setDesc }) => {
                 </select>
             </div>
             <div
-                ref={exDescription}
-                className="exercise_editor_page-form-item-desciption"
+                ref={descriptionRef}
+                className="exercise_editor_page-form-item-description"
                 contentEditable
                 suppressContentEditableWarning
+                onInput={handleInput}
+                onKeyUp={handleKeyDown}
             />
         </div>
-    )
-}
+    );
+};
 
 export default DescriptionBlock;

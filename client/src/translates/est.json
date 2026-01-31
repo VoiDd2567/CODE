@@ -104,5 +104,10 @@
   "course_id": "Kursuse id:",
   "no_course_found": "Kursust ei leitud",
   "course_added": "Kursus lisatud",
-  "course_already_added": "Kursus on juba lisatud"
+  "course_already_added": "Kursus on juba lisatud",
+  "yes": "Jah",
+  "no": "Ei",
+  "no_courses": "Teil pole kursusi",
+  "delete_confirm": "Kas soovite kustutada",
+  "exercise_saved": "Ülesanne salvestatud"
 }

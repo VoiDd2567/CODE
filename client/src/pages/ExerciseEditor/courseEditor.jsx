@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 import { useState, useEffect, useRef } from "react";
 import client_config from "../../client_config.json"
 
+import AskWindow from "../../components/AskWindow/AskWindow";
 import plus from "../../pictures/plus.png"
 import openImg from "../../pictures/open-exercise-btn.png"
 import deleteImg from "../../pictures/delete-red.png"
@@ -14,6 +15,10 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
     const [exerciseIdxs, setExerciseIdxs] = useState({})
     const [order, setOrder] = useState({})
     const [draggedItem, setDraggedItem] = useState(null)
+
+    const [askWindowOpen, setAskWindowOpen] = useState(false)
+    const [askWindowQuestion, setAskWindowQuestion] = useState("No question")
+    const [askWindowFunc, setAskWindowFunc] = useState(() => { })
 
     useEffect(() => {
         getCourses()
@@ -44,31 +49,25 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
     }
 
     const courseInit = () => {
-        if (courses.length <= 0) return;
+        if (Object.keys(courses).length <= 0) return;
 
         let i = 0;
-        let breaks = []
         let newExerciseIdxs = {};
-        Object.values(courses).forEach((exercises) => {
-            Object.keys(exercises[1]).forEach((exerciseId) => {
-                newExerciseIdxs[i] = exerciseId
+        let newOrder = {};
+
+        Object.entries(courses).forEach(([courseId, courseData]) => {
+            const exercises = courseData[1]; // exercises object
+            const exerciseIndices = [];
+
+            Object.keys(exercises).forEach((exerciseId) => {
+                newExerciseIdxs[i] = exerciseId;
+                exerciseIndices.push(i);
                 i++;
             })
-            breaks.push(i)
+
+            newOrder[courseId] = exerciseIndices;
         })
 
-        let newOrder = {}
-        let part = []
-        let c = 0;
-        for (let x = 0; x < i; x++) {
-            if (breaks.includes(x)) {
-                newOrder[Object.keys(courses)[c++]] = part;
-                part = [x]
-                continue;
-            }
-            part.push(x)
-        }
-        newOrder[Object.keys(courses)[c]] = part;
         setExerciseIdxs(newExerciseIdxs);
         setOrder(newOrder)
     }
@@ -77,17 +76,16 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
         setDraggedItem(index);
     };
 
-    const handleDragOver = (e, id, courseName) => {
+    const handleDragOver = (e, id, courseId) => {
         e.preventDefault();
 
-        const idIdx = order[courseName].indexOf(id)
-        const dIdx = order[courseName].indexOf(draggedItem)
+        const idIdx = order[courseId].indexOf(id)
+        const dIdx = order[courseId].indexOf(draggedItem)
         if (draggedItem === null || dIdx === idIdx) return;
-        console.log(`${dIdx} - ${idIdx}`)
 
         let newOrder = { ...order }
-        newOrder[courseName][idIdx] = draggedItem;
-        newOrder[courseName][dIdx] = id;
+        newOrder[courseId][idIdx] = draggedItem;
+        newOrder[courseId][dIdx] = id;
 
         setOrder(newOrder)
     };
@@ -99,7 +97,10 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
     const handleAddCourse = () => {
         let i = 0
         let courseName = `${t("course")} ${i}`;
-        while (courses[courseName]) {
+
+        // Check if courseName already exists in any course
+        const courseNames = Object.values(courses).map(courseData => courseData[0]);
+        while (courseNames.includes(courseName)) {
             i++;
             courseName = `${t("course")} ${i}`;
         }
@@ -113,20 +114,106 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
             body: JSON.stringify({ courseName: courseName }),
         }).then(async res => {
             if (!res.ok) {
-                const errorData = await res.json();
-                errorMsg.current.textContent = errorData.error || 'Error';
-                errorMsg.current.hidden = false;
-                setTimeout(() => {
-                    errorMsg.current.hidden = true;
-                }, 4000)
+                setError(res)
             } else {
-                console.log("huihuihuiSahurrr")
+                getCourses() // Refresh courses after adding
             }
         })
     }
 
-    const handleAddExercise = () => {
+    const handleAddExercise = (courseId) => {
+        let i = 0;
+        let exerciseName = `${t("exercise")} ${i}`;
+        const exercises = courses[courseId][1];
+        const exerciseNames = Object.values(exercises);
 
+        while (exerciseNames.includes(exerciseName)) {
+            i++;
+            exerciseName = `${t("exercise")} ${i}`;
+        }
+
+        fetch(`${client_config.SERVER_IP}/api/exercise/create-exercise`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ courseId: courseId, exerciseName: exerciseName }),
+        }).then(async res => {
+            if (!res.ok) {
+                setError(res)
+            } else {
+                const data = await res.json();
+                openExercise(data.exId)
+                getCourses() // Refresh courses after adding
+            }
+        })
+    }
+
+    const handleDeletePress = (type, id, name, courseId = null) => {
+        if (type === "course") {
+            makeAskWindow(`${t("delete_confirm")} ${name}?`, () => deleteCourse(id))
+        }
+        if (type === "exercise") {
+            makeAskWindow(`${t("delete_confirm")} ${name}?`, () => deleteExercise(id, courseId))
+        }
+    }
+
+    const deleteCourse = (id) => {
+        fetch(`${client_config.SERVER_IP}/api/exercise/delete-course`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ courseId: id }),
+        }).then(async res => {
+            if (!res.ok) {
+                setError(res)
+            } else {
+                getCourses() // Refresh courses after deleteing
+
+            }
+        })
+    }
+
+    const deleteExercise = (id, courseId) => {
+        fetch(`${client_config.SERVER_IP}/api/exercise/delete-exercise`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ courseId: courseId, exerciseId: id }),
+        }).then(async res => {
+            if (!res.ok) {
+                setError(res)
+            } else {
+                getCourses() // Refresh courses after deleteing
+                setOpenExerciseEditor(false)
+                setOpenedExerciseId(null)
+            }
+        })
+    }
+
+    const makeAskWindow = (question, func) => {
+        setAskWindowQuestion(question);
+        setAskWindowFunc(() => func);
+        setAskWindowOpen(true);
+    }
+
+    const openExercise = (id) => {
+        setOpenExerciseEditor(true)
+        setOpenedExerciseId(id)
+    }
+
+    const setError = async (res) => {
+        const errorData = await res.json();
+        errorMsg.current.textContent = errorData.error || 'Error';
+        errorMsg.current.hidden = false;
+        setTimeout(() => {
+            errorMsg.current.hidden = true;
+        }, 4000)
     }
 
     return (
@@ -138,40 +225,49 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
                     <button className="course_menu-btn" onClick={handleAddCourse}><img src={plus} />{t("add_course")}</button>
                 </div>
                 <div className="course_menu-course_list">
-                    {Object.entries(order).map(([courseName, data]) => {
-                        if (!courses[courseName] || !courses[courseName][1]) {
-                            return null;
-                        }
-                        const [courseId] = courses[courseName][0]; // add exercise, del course/exercise, change names, open exercise, chnage exercise 
-                        return (
-                            <div className="course_menu-course">
-                                <div className="course_menu-line">
-                                    <div className="course_menu-course-name">{courseName}</div>
-                                    <div className="course_menu-course-del"><img src={deleteImg} alt="Delete" /></div>
-                                    <button className="course_menu-btn small_btn"><img src={plus} />{t("add_exercise")}</button>
-                                </div>
-                                <div className="course_menu-course-exercises">
-                                    {data.map((idx) => (
-                                        <div className="course_menu-exercise" draggable="true"
-                                            onDragStart={() => handleDragStart(idx)}
-                                            onDragOver={(e) => handleDragOver(e, idx, courseName)}
-                                            onDragEnd={handleDragEnd}
-                                        >
-                                            <div className="course_menu-exercise-name">{courses[courseName][1][exerciseIdxs[idx]]}</div>
-                                            <div className="course_menu-exercise-change">
-                                                <img src={openImg} alt="Open" />
-                                                <img src={deleteImg} alt="Delete" />
+
+                    {(Object.keys(courses).length) ? (
+                        Object.entries(order).map(([courseId, data]) => {
+                            if (!courses[courseId] || !courses[courseId][1]) {
+                                return null;
+                            }
+                            const [courseName, exercises] = courses[courseId];
+
+                            return (
+                                <div className="course_menu-course" key={courseId}>
+                                    <div className="course_menu-line">
+                                        <div className="course_menu-course-name">{courseName}</div>
+                                        <div className="course_menu-course-del"><img src={deleteImg} alt="Delete" onClick={() => handleDeletePress("course", courseId, courseName)} /></div>
+                                        <button className="course_menu-btn small_btn" onClick={() => handleAddExercise(courseId)}><img src={plus} />{t("add_exercise")}</button>
+                                    </div>
+                                    <div className="course_menu-course-exercises">
+                                        {data.map((idx) => (
+                                            <div className="course_menu-exercise"
+                                                key={idx}
+                                                draggable="true"
+                                                onDragStart={() => handleDragStart(idx)}
+                                                onDragOver={(e) => handleDragOver(e, idx, courseId)}
+                                                onDragEnd={handleDragEnd}
+                                            >
+                                                <div className="course_menu-exercise-name">{exercises[exerciseIdxs[idx]]}</div>
+                                                <div className="course_menu-exercise-change">
+                                                    <img src={openImg} alt="Open" onClick={() => openExercise(exerciseIdxs[idx])} />
+                                                    <img src={deleteImg} alt="Delete" onClick={() => handleDeletePress("exercise", exerciseIdxs[idx], exercises[exerciseIdxs[idx]], courseId)} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    })}
+                            )
+                        })
+                    ) : (
+                        <div className="no_course">{t("no_courses")}</div>
+                    )}
                 </div>
             </div>
+            <AskWindow open={askWindowOpen} setOpen={setAskWindowOpen} question={askWindowQuestion} func={askWindowFunc} />
         </div>
     )
 }
 
-export default CourseEditor 
+export default CourseEditor

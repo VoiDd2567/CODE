@@ -46,6 +46,29 @@ function safeCourse(course) {
 }
 
 function safeExercise(ex) {
+    try {
+        return {
+            type: ex.type,
+            name: ex.name,
+            description: ex.description,
+            files: ex.files,
+            programmingLng: ex.programmingLng,
+            autoCheck: ex.autoCheck,
+            answerCheckType: ex.answerCheckType,
+            inputAnswers: ex.inputAnswers,
+            inputCount: ex.inputCount,
+            withoutInputAnswer: ex.withoutInputAnswer,
+            functionName: ex.functionName,
+            functionReturns: ex.functionReturns,
+            minimalPercent: ex.minimalPercent,
+            autoCheckType: ex.autoCheckType
+        }
+    } catch (err) {
+        return "Unvailable to read exercise inforamtion"
+    }
+}
+
+function isSafeExercise(ex) {
     const allowedKeys = ["type", "name", "description", "files",
         "programmingLng", "autoCheck", "answerCheckType", "inputAnswers",
         "inputCount", "withoutInputAnswer", "functionName", "functionReturns",
@@ -66,4 +89,4 @@ function safeExercise(ex) {
 }
 
 
-module.exports = { safeUser, safeRegistrationCode, safeCourse, safeExercise };
+module.exports = { safeUser, safeRegistrationCode, safeCourse, isSafeExercise, safeExercise };

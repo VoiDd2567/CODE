@@ -10,7 +10,7 @@ import delRed from "../../../pictures/delete-red.png"
 import closeImg from "../../../pictures/cross-icon.png"
 
 
-const FileMenu = ({ addFiles }) => {
+const FileMenu = ({ addFiles, startFiles }) => {
     const { t } = useTranslation()
     const [files, setFiles] = useState({
         1: { name: "main.py", value: "#Write your code here\n\n" }
@@ -20,10 +20,12 @@ const FileMenu = ({ addFiles }) => {
     const [fileEditorValue, setFileEditorValue] = useState(null)
     const [fileEditorH, setFileEditorH] = useState(7.5)
 
+    // Only update files when startFiles changes (new exercise loaded)
     useEffect(() => {
-        addFiles(files)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [files])
+        setFiles(startFiles)
+    }, [startFiles])
+
+    // Remove the problematic useEffect that was calling addFiles(files)
 
     useEffect(() => {
         if (fileEditorValue == null) return
@@ -40,32 +42,44 @@ const FileMenu = ({ addFiles }) => {
             const keys = Object.keys(prevFiles).map(Number)
             const newId = keys.length === 0 ? 1 : Math.max(...keys) + 1
 
-            return {
+            const newFiles = {
                 ...prevFiles,
                 [newId]: {
                     name: `Untitled-${newId}.txt`,
                     value: " "
                 }
             }
+
+            addFiles(newFiles)
+            return newFiles
         })
     }
 
     const handleFileDelete = (idx) => {
-        let newD = { ...files }
-        delete newD[idx]
-        setFiles(newD)
+        setFiles(prevFiles => {
+            const newFiles = { ...prevFiles }
+            delete newFiles[idx]
+
+            addFiles(newFiles)
+            return newFiles
+        })
     }
 
     const handleNameChange = (e, idx) => {
         const newName = e.currentTarget.textContent
 
-        setFiles(prevFiles => ({
-            ...prevFiles,
-            [idx]: {
-                ...prevFiles[idx],
-                name: newName
+        setFiles(prevFiles => {
+            const newFiles = {
+                ...prevFiles,
+                [idx]: {
+                    ...prevFiles[idx],
+                    name: newName
+                }
             }
-        }))
+
+            addFiles(newFiles)
+            return newFiles
+        })
     }
 
     const handleOpenFileEditor = (idx) => {
@@ -75,11 +89,15 @@ const FileMenu = ({ addFiles }) => {
     }
 
     const handleOpenFileEditorValueChange = () => {
-        if (!(openedFile.id in files)) return;
+        if (!openedFile || !(openedFile.id in files)) return;
 
-        let newFiles = { ...files }
-        newFiles[openedFile.id].value = fileEditorValue;
-        setFiles(newFiles)
+        setFiles(prevFiles => {
+            const newFiles = { ...prevFiles }
+            newFiles[openedFile.id].value = fileEditorValue
+
+            addFiles(newFiles)
+            return newFiles
+        })
     }
 
     return (
@@ -95,8 +113,8 @@ const FileMenu = ({ addFiles }) => {
                         icon = jsIcon
                     }
                     return (
-                        <div className="fileMenu-file">
-                            <div className="fileMenu-file-file_icon"><img src={icon} /></div>
+                        <div className="fileMenu-file" key={idx}>
+                            <div className="fileMenu-file-file_icon"><img src={icon} alt="" /></div>
                             <div className="fileMenu-file-name" onBlur={(e) => handleNameChange(e, idx)} suppressContentEditableWarning contentEditable>{file.name}</div>
                             <div className="fileMenu-file-icons">
                                 <div className="fileMenu-file-icon">

@@ -8,14 +8,14 @@ import "./componenets/components.css"
 import { useState } from "react"
 
 const ExerciseEditorPage = () => {
-    const [openExerciseEditor, setOpenExerciseEditor] = useState(true)
-    const [openedExerciseId, setOpenedExerciseId] = useState(true)
+    const [openExerciseEditor, setOpenExerciseEditor] = useState(false)
+    const [openedExerciseId, setOpenedExerciseId] = useState(null)
 
     return <div className="exercise_editor_page-wrap">
         <MinimizedHeader showCode={true} fixed={true} />
         <div className="exercise_editor_page">
             <CourseEditor setOpenedExerciseId={setOpenedExerciseId} setOpenExerciseEditor={setOpenExerciseEditor} />
-            {openExerciseEditor && <ExerciseEditor exerciseId={openedExerciseId} />}
+            {openExerciseEditor && <ExerciseEditor exerciseId={openedExerciseId} setOpenExerciseEditor={setOpenExerciseEditor} />}
         </div>
     </div>
 }

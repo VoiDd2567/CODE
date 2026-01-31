@@ -105,5 +105,10 @@
   "course_id": "Course id:",
   "no_course_found": "No course found",
   "course_added": "Course added",
-  "course_already_added": "Course is already added"
+  "course_already_added": "Course is already added",
+  "yes": "Yes",
+  "no": "No",
+  "no_courses": "You have no courses",
+  "delete_confirm": "Do you want to delete",
+  "exercise_saved": "Exercise saved"
 }

@@ -64,7 +64,14 @@ async function getUserMadeCourses(userId) { // Returns courses in format courseN
 
     try {
         let data = {}
-        const userMadeCourses = user.madeCourses;
+        const courses = await MongoGetData.getAllCourses();
+        const userMadeCourses = [];
+
+        courses.forEach(course => {
+            if (course.creator == userId) {
+                userMadeCourses.push(course._id.toString())
+            }
+        })
 
         for (const courseId of userMadeCourses) {
             const course = await MongoGetData.getCourse({ _id: courseId });
@@ -76,10 +83,8 @@ async function getUserMadeCourses(userId) { // Returns courses in format courseN
                 exercises[exerciseId] = exercise.name;
             }
 
-            data[course.name] = [courseId, exercises]
-            console.log(exercises)
+            data[courseId] = [course.name, exercises]
         }
-
         return data
     } catch (err) {
         logger.error("Problem with getting user made courses: " + err)
