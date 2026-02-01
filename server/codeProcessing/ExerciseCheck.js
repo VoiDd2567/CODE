@@ -140,7 +140,7 @@ class ExerciseCheck {
                 let correctSolution = 100;
                 for (let test of this.exerciseInputAnswers) {
                     const { input, output: answer } = test;
-                    totalOutput += `---- Inputs : ${JSON.stringify(input)} ----\n`;
+                    totalOutput += `---- Inputs : ${JSON.stringify(input).replace(/"/g, "")} ----\n`;
                     let output = await this.#runOneInstanceCode(this.userSolution.solution, answer, input);
                     totalOutput += this.#rightInscription(output);
                     if (!output.correct) {
@@ -178,7 +178,7 @@ class ExerciseCheck {
                 let correctSolution = 100;
                 for (let test of this.exerciseFunctionReturns) {
                     const { input, output: funcReturn } = test;
-                    totalOutput += `---- Inputs : ${JSON.stringify(input)} ----\n`;
+                    totalOutput += `---- Inputs : ${JSON.stringify(input).replace(/"/g, "")} ----\n`;
                     let codeToRun = this.#addFuncRunIntoCode(
                         this.exerciseFunctionName,
                         this.userSolution.solution,
@@ -348,13 +348,15 @@ class ExerciseCheck {
         if (this.programmingLng === "py") {
             return code + `\n\nFuncReturnCheckFuncByCODE = ${funcName}(${funcParameters.toString()})\n`
                 + `print("---RESULT@@#:")\n`
-                + `print(FuncReturnCheckFuncByCODE == ${funcReturn})\n`
+                + `FuncReturnCheckFuncByCODE = str(FuncReturnCheckFuncByCODE).replace(" ","")\n`
+                + `print(FuncReturnCheckFuncByCODE == "${funcReturn}")\n`
                 + `print(FuncReturnCheckFuncByCODE)`;
         }
         if (this.programmingLng === "js") {
             return code + `\n\nconst FuncReturnCheckFuncByCODE = ${funcName}(${funcParameters.toString()})\n`
                 + `console.log("---RESULT@@#:")\n`
-                + `console.log(FuncReturnCheckFuncByCODE == ${funcReturn})\n`
+                + `FuncReturnCheckFuncByCODE = FuncReturnCheckFuncByCODE.toString().replace(/ /g,"")\n`
+                + `console.log(FuncReturnCheckFuncByCODE == "${funcReturn})"\n`
                 + `console.log(FuncReturnCheckFuncByCODE)`;
         }
     }

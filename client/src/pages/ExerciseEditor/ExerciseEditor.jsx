@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import DescriprionBlock from "./componenets/descriptionBlock";
 import AutocheckValues from "./componenets/autocheckValues";
 import FileMenu from "./componenets/fileMenu";
@@ -25,6 +25,7 @@ const deafultData = {
 const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
     const { t } = useTranslation();
 
+    const autoCheckValuesRef = useRef(null);
     const [autocheckType, setAutocheckType] = useState(t("output_check_input"))
     const [data, setData] = useState({ ...deafultData })
     const [notifications, setNotifications] = useState([])
@@ -94,7 +95,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
                 if (dataG.inputCount === 0) {
                     dataG.inputCount = 1
                 }
-
+                autoCheckValuesRef.current.clearPaires();
                 setData(dataG)
                 setEditorKey(prev => prev + 1);
             }
@@ -112,7 +113,6 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
             addNotification(`${t("description")} ${t("required")}`, "red")
             return;
         }
-
 
         fetch(`${client_config.SERVER_IP}/api/exercise/update-exercise`, {
             method: "POST",
@@ -225,7 +225,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
                     <div className="exercise_editor_page-form-items_line">
                         <div className="exercise_editor_page-form-item">
                             <div className="exercise_editor_page-form-item-label">{t("complete_percent")}</div>
-                            <input type="number" min="1" max="100" defaultValue="100" className="exercise_editor_page-form-item-counter" value={data.minimalPercent} onChange={(e) => { addData("minimalPercent", e.target.value) }}></input>
+                            <input type="number" min="1" max="100" className="exercise_editor_page-form-item-counter" value={data.minimalPercent} onChange={(e) => { addData("minimalPercent", e.target.value) }}></input>
                         </div>
                         {autocheckType === t("func_check") && (
                             <div className="exercise_editor_page-form-item">
@@ -236,9 +236,16 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
                     {autocheckType === t("output_check") && (
                         <div className="exercise_editor_page-form-item">
                             <div className="exercise_editor_page-form-item-label">{t("Output")}</div>
-                            <textarea className="exercise_editor_page-form-item-textarea" onInput={(e) => addData("withoutInputAnswer", e.target.value)}></textarea>
+                            <textarea className="exercise_editor_page-form-item-textarea" value={data.withoutInputAnswer} onInput={(e) => addData("withoutInputAnswer", e.target.value)}></textarea>
                         </div>)}
-                    {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (<AutocheckValues key={editorKey} inputAmount={data.inputCount} setInputs={(p) => addData("inputAnswers", p)} func={autocheckType === t("func_check")} startInput={data.inputAnswers} />)}
+                    {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (
+                        <AutocheckValues ref={autoCheckValuesRef}
+                            key={editorKey}
+                            inputAmount={data.inputCount}
+                            setInputs={(p) => autocheckType === t("func_check") ? addData("functionReturns", p) : addData("inputAnswers", p)}
+                            func={autocheckType === t("func_check")}
+                            startInput={autocheckType === t("func_check") ? data.functionReturns : data.inputAnswers}
+                        />)}
                 </>
             )}
             <div className="exercise_editor_page-form-select">

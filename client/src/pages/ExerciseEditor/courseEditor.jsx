@@ -20,6 +20,9 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
     const [askWindowQuestion, setAskWindowQuestion] = useState("No question")
     const [askWindowFunc, setAskWindowFunc] = useState(() => { })
 
+    const [editingCourseId, setEditingCourseId] = useState(null)
+    const [editingCourseName, setEditingCourseName] = useState("")
+
     useEffect(() => {
         getCourses()
     }, [])
@@ -246,6 +249,54 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
         }, 4000)
     }
 
+    const handleCourseNameClick = (courseId, currentName) => {
+        setEditingCourseId(courseId)
+        setEditingCourseName(currentName)
+    }
+
+    const handleCourseNameChange = (e) => {
+        setEditingCourseName(e.target.value)
+    }
+
+    const handleCourseNameBlur = (courseId) => {
+        if (editingCourseName.trim() && editingCourseName !== courses[courseId][0]) {
+            updateCourseName(courseId, editingCourseName.trim())
+        }
+        setEditingCourseId(null)
+        setEditingCourseName("")
+    }
+
+    const handleCourseNameKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.target.blur()
+        } else if (e.key === 'Escape') {
+            setEditingCourseId(null)
+            setEditingCourseName("")
+        }
+    }
+
+    const updateCourseName = (courseId, newName) => {
+        setCourses(prevCourses => ({
+            ...prevCourses,
+            [courseId]: [newName, prevCourses[courseId][1]]
+        }))
+
+        fetch(`${client_config.SERVER_IP}/api/exercise/update-course-name`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ courseId: courseId, courseName: newName }),
+        }).then(async res => {
+            if (!res.ok) {
+                setError(res)
+            }
+        })
+
+        getCourses();
+    }
+
     return (
         <div className="exercise_editor-course_menu-wrap">
             <div className="course_menu">
@@ -266,7 +317,24 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
                             return (
                                 <div className="course_menu-course" key={courseId}>
                                     <div className="course_menu-line">
-                                        <div className="course_menu-course-name">{courseName}</div>
+                                        {editingCourseId === courseId ? (
+                                            <input
+                                                type="text"
+                                                className="course_menu-course-name-input"
+                                                value={editingCourseName}
+                                                onChange={handleCourseNameChange}
+                                                onBlur={() => handleCourseNameBlur(courseId)}
+                                                onKeyDown={(e) => handleCourseNameKeyDown(e)}
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <div
+                                                className="course_menu-course-name"
+                                                onClick={() => handleCourseNameClick(courseId, courseName)}
+                                            >
+                                                {courseName}
+                                            </div>
+                                        )}
                                         <div className="course_menu-course-del"><img src={deleteImg} alt="Delete" onClick={() => handleDeletePress("course", courseId, courseName)} /></div>
                                         <button className="course_menu-btn small_btn" onClick={() => handleAddExercise(courseId)}><img src={plus} />{t("add_exercise")}</button>
                                     </div>

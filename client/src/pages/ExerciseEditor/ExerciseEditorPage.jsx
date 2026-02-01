@@ -1,6 +1,6 @@
 import MinimizedHeader from "../../components/other/minimizedHeader"
 import CourseEditor from "./courseEditor"
-import ExerciseEditor from "./ExerciseEditor"
+import ExerciseEditor from "./exerciseEditor"
 
 import "./exerciseEditor.css"
 import "./componenets/components.css"

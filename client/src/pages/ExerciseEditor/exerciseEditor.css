@@ -322,3 +322,26 @@
     margin-top: 5vh;
     margin-left: 2vw;
 }
+
+.course_menu-course-name-input {
+    flex: 1;
+    padding: 1vh 1.5vw;
+    font-size: 1vw;
+    font-weight: 600;
+    border: 0.15vh solid #FFD369;
+    border-radius: 0.3vh;
+    outline: none;
+    background-color: #d8d9db;
+    color: #333;
+    transition: border-color 0.2s ease;
+    font-family: "Electrolize";
+}
+
+.course_menu-course-name-input:focus {
+    box-shadow: 0 0 0 0.3vh rgba(209, 209, 40, 0.1);
+}
+
+.course_menu-course-name-input::placeholder {
+    color: #999;
+    font-weight: 400;
+}

@@ -101,7 +101,7 @@ const FileMenu = ({ addFiles, startFiles }) => {
         <div className="fileMenu">
             <div className="fileMenu-add_btn" onClick={handleNewFile}>{t("add_file")}</div>
             <div className="fileMenu-menu-area">
-                {Object.entries(files).map(([idx, file]) => {
+                {files && Object.entries(files).map(([idx, file]) => {
                     const ext = file.name.split(".").pop().toLowerCase()
                     let icon = null
                     if (ext === "py") {

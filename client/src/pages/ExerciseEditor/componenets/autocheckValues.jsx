@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
 import arrow_r from "../../../pictures/arrow-r.png"
 import deleteImg from "../../../pictures/delete.png";
 import deleteRedImg from "../../../pictures/delete-red.png";
 
-const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) => {
+const AutocheckValues = forwardRef(({ inputAmount, setInputs, func = false, startInput }, ref) => {
     const { t } = useTranslation()
 
     const [paires, setPairs] = useState(() => {
@@ -15,9 +15,13 @@ const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) =
     })
     const [isInitialized, setIsInitialized] = useState(false)
 
-    useEffect(() => {
-        console.log(startInput)
-    }, [startInput])
+    useImperativeHandle(ref, () => ({
+        clearPaires
+    }));
+
+    const clearPaires = () => {
+        setPairs([{ input: Array(inputAmount).fill(""), output: "" }])
+    }
 
     useEffect(() => {
         if (!isInitialized && startInput && startInput.length > 0) {
@@ -87,6 +91,13 @@ const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) =
         setInputs(newPairs);
     };
 
+    const autoResize = (element) => {
+        if (element) {
+            element.style.height = 'auto';
+            element.style.height = element.scrollHeight + 'px';
+        }
+    };
+
     return (
         <div>
             <div className="exercise_editor_page-form-item">
@@ -100,9 +111,14 @@ const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) =
                                         <div key={idx} className="autocheck_values-menu-pair-item-input">
                                             <div className="autocheck_values-menu-pair-label">{func ? t("param") : t("input")} {idx + 1}</div>
                                             <textarea
+                                                ref={autoResize}
                                                 className="autocheck_values-menu-pair-textarea"
-                                                onChange={e => updatePairInput(index, idx, e.target.value)}
+                                                onChange={e => {
+                                                    updatePairInput(index, idx, e.target.value);
+                                                    autoResize(e.target);
+                                                }}
                                                 value={inputOne}
+                                                rows={1}
                                             ></textarea>
                                         </div>
                                     ))}
@@ -111,9 +127,14 @@ const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) =
                                 <div className="autocheck_values-menu-pair-item">
                                     <div className="autocheck_values-menu-pair-label">{t("output")}</div>
                                     <textarea
+                                        ref={autoResize}
                                         className="autocheck_values-menu-pair-textarea"
-                                        onChange={e => updatePairOutput(index, e.target.value)}
+                                        onChange={e => {
+                                            updatePairOutput(index, e.target.value);
+                                            autoResize(e.target);
+                                        }}
                                         value={output}
+                                        rows={1}
                                     ></textarea>
                                 </div>
                                 <div className="autocheck_values-menu-pair-del" onClick={() => deleteItem(index)} style={{ backgroundImage: `url(${deleteImg})` }}
@@ -127,5 +148,5 @@ const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) =
         </div>
     )
 }
-
+)
 export default AutocheckValues;

@@ -261,7 +261,8 @@ router.post("/get-exercise-data", requireAuth, async (req, res) => {
         const user = await MongoGetData.getUserBySession(sessionId)
         const exercise = await MongoGetData.getExercise({ _id: exerciseId })
 
-        if (exercise.creatorId !== user._id) {
+        if (exercise.creatorId !== user._id.toString()) {
+            logger.warn(`${user._id} tryed to get ${exerciseId} data`)
             return res.status(401).json({ error: "You don't have permission for this action" })
         }
 
@@ -289,6 +290,31 @@ router.post("/save-exercise-order", requireAuth, async (req, res) => {
             }
             await MongoUpdateData.update("course", { _id: courseId }, { courseExercises: exercises })
         })
+
+        res.status(200).json({ complete: true })
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.post("/update-course-name", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const { courseId, courseName } = req.body;
+        const user = await MongoGetData.getUserBySession(sessionId)
+        const course = await MongoGetData.getCourse({ _id: courseId })
+
+        if (!course) {
+            return res.status(404).json({ error: "No course found" })
+        }
+
+        if (user.weight != "teacher" || user._id.toString() !== course.creator) {
+            logger.warn(`${user._id} tryed to update ${courseId} course`)
+            return res.status(401).json({ error: "You don't have permission for this action" })
+        }
+
+        await MongoUpdateData.update("course", { _id: courseId }, { name: courseName })
 
         res.status(200).json({ complete: true })
     } catch (err) {
