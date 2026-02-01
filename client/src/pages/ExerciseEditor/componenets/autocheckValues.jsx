@@ -7,7 +7,12 @@ import deleteRedImg from "../../../pictures/delete-red.png";
 const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) => {
     const { t } = useTranslation()
 
-    const [paires, setPairs] = useState(startInput)
+    const [paires, setPairs] = useState(() => {
+        if (Array.isArray(startInput) && startInput.length > 0) {
+            return startInput;
+        }
+        return [{ input: Array(inputAmount).fill(""), output: "" }];
+    })
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
@@ -28,13 +33,15 @@ const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) =
                 input: normalizeInput(pair.input)
             }))
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inputAmount])
 
     useEffect(() => {
-        if (paires.length <= 0) {
+        if (!Array.isArray(paires) || paires.length <= 0) {
             const inputArr = Array(inputAmount).fill("")
             setPairs([{ input: inputArr, output: "" }])
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inputAmount])
 
     const normalizeInput = (arr) => [
@@ -85,7 +92,7 @@ const AutocheckValues = ({ inputAmount, setInputs, func = false, startInput }) =
             <div className="exercise_editor_page-form-item">
                 <button className="autocheck_values-menu-add_btn" onClick={handleAddClick}>{t('add_pair')}</button>
                 <div className="autocheck_values-menu-pairs">
-                    {paires.map(({ input, output }, index) => (
+                    {Array.isArray(paires) && paires.map(({ input, output }, index) => (
                         <div key={index} className="autocheck_values-menu-pair-wrap">
                             <div className="autocheck_values-menu-pair">
                                 <div className="autocheck_values-menu-pair-item">

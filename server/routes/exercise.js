@@ -158,8 +158,12 @@ router.post("/delete-course", requireAuth, async (req, res) => {
             logger.warn(`${user._id} tryed to delete ${course._id}`);
             return res.status(401).json({ error: "You don't have permission for this action" });
         }
-
+        const exercises = course.courseExercises
         await MongoDeleteData.deleteCourse(courseId);
+
+        exercises.forEach(async exerciseId => {
+            await MongoDeleteData.deleteExercise(exerciseId)
+        })
 
         return res.status(200).json({ complete: true });
 
@@ -209,6 +213,7 @@ router.post("/update-exercise", requireAuth, async (req, res) => {
             return res.status(403).json({ error: "You are not allowed to use Exercise editor" })
         }
         if (!isSafeExercise(data)) {
+            logger.warn(`${user._id} tryed to pass this data - ${data}`)
             return res.status(409).json({ error: "Data wasn't correct or includes forbidden keys" })
         }
 
@@ -263,6 +268,29 @@ router.post("/get-exercise-data", requireAuth, async (req, res) => {
         const sExercise = safeExercise(exercise)
         return res.status(200).json({ data: sExercise })
 
+    } catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
+router.post("/save-exercise-order", requireAuth, async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const { order } = req.body;
+
+        const user = await MongoGetData.getUserBySession(sessionId)
+
+        Object.entries(order).map(async ([courseId, exercises]) => {
+            const course = await MongoGetData.getCourse({ _id: courseId })
+            if (user._id !== course.creator) {
+                logger.warn(`${user._id} tryed to change ${course._id} course`)
+                return res.status(401).json({ error: "You don't have permission for this action" })
+            }
+            await MongoUpdateData.update("course", { _id: courseId }, { courseExercises: exercises })
+        })
+
+        res.status(200).json({ complete: true })
     } catch (err) {
         logger.error(err)
         res.status(500).json({ error: "Internal server error" })

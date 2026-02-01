@@ -20,12 +20,9 @@ const FileMenu = ({ addFiles, startFiles }) => {
     const [fileEditorValue, setFileEditorValue] = useState(null)
     const [fileEditorH, setFileEditorH] = useState(7.5)
 
-    // Only update files when startFiles changes (new exercise loaded)
     useEffect(() => {
         setFiles(startFiles)
     }, [startFiles])
-
-    // Remove the problematic useEffect that was calling addFiles(files)
 
     useEffect(() => {
         if (fileEditorValue == null) return
@@ -142,7 +139,7 @@ const FileMenu = ({ addFiles, startFiles }) => {
                     <div className="fileMenu-file_editor-fileName">{openedFile ? openedFile.name : ""}</div>
                     <div className="fileMenu-file_editor-closeIcon"><img src={closeImg} alt="Close" onClick={() => setOpenFile(false)} /></div>
                 </div>
-                <Editor fixedHeight={false} w={80} h={fileEditorH} editorValue={fileEditorValue ? fileEditorValue : ""} getValue={setFileEditorValue} />
+                <Editor fixedHeight={false} w={50} h={fileEditorH} editorValue={fileEditorValue ? fileEditorValue : ""} getValue={setFileEditorValue} />
             </div>)}
         </div>
     )

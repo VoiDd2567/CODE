@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import "./askWindow.css"
 
-const AskWindow = ({ question, func, open, setOpen }) => {
+const AskWindow = ({ question, func, open, setOpen, negFunc = () => { } }) => {
     const { t } = useTranslation();
 
 
@@ -12,7 +12,7 @@ const AskWindow = ({ question, func, open, setOpen }) => {
             <div className="ask_window-question">{question}</div>
             <div className="ask_window-line">
                 <div className="ask_window-option negative" onClick={() => { setOpen(false); func() }}>{t("yes")}</div>
-                <div className="ask_window-option positive" onClick={() => setOpen(false)}>{t("no")}</div>
+                <div className="ask_window-option positive" onClick={() => { setOpen(false); negFunc() }}>{t("no")}</div>
             </div>
         </div>
     </div>)

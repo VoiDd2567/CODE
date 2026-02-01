@@ -95,7 +95,7 @@
   "input_amount": "Sisendite arv",
   "param": "Parameeter",
   "param_amount": "Parameetrite arv",
-  "add_file": "Lisa file",
+  "add_file": "Lisa fail",
   "exercises": "Ülesanded",
   "saved": "Salvestatud",
   "not_saved": "Pole salvestatud",
@@ -109,5 +109,6 @@
   "no": "Ei",
   "no_courses": "Teil pole kursusi",
   "delete_confirm": "Kas soovite kustutada",
-  "exercise_saved": "Ülesanne salvestatud"
+  "exercise_saved": "Ülesanne salvestatud",
+  "not_saved_q": "Eelmine harjutus pole salvestatud, kas soovite jätkata?"
 }

@@ -7,7 +7,7 @@ import plus from "../../pictures/plus.png"
 import openImg from "../../pictures/open-exercise-btn.png"
 import deleteImg from "../../pictures/delete-red.png"
 
-const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
+const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, setIsSaved }) => {
     const { t } = useTranslation();
 
     const errorMsg = useRef(null)
@@ -92,6 +92,7 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
 
     const handleDragEnd = () => {
         setDraggedItem(null);
+        saveExerciseOrder();
     };
 
     const handleAddCourse = () => {
@@ -172,7 +173,6 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
                 setError(res)
             } else {
                 getCourses() // Refresh courses after deleteing
-
             }
         })
     }
@@ -196,13 +196,43 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
         })
     }
 
+    const saveExerciseOrder = () => {
+        let orderN = {}
+
+        Object.entries(order).forEach(([id, items]) => {
+            orderN[id] = items.map(item => exerciseIdxs[item])
+        })
+
+        fetch(`${client_config.SERVER_IP}/api/exercise/save-exercise-order`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ order: orderN })
+        }).then(async res => {
+            if (!res.ok) {
+                setError(res)
+            }
+        })
+    }
+
     const makeAskWindow = (question, func) => {
         setAskWindowQuestion(question);
         setAskWindowFunc(() => func);
         setAskWindowOpen(true);
     }
 
+    const handleOpenExercise = (id) => {
+        if (!isSaved) {
+            makeAskWindow(t("not_saved_q"), () => openExercise(id))
+        } else {
+            openExercise(id)
+        }
+    }
+
     const openExercise = (id) => {
+        setIsSaved(true)
         setOpenExerciseEditor(true)
         setOpenedExerciseId(id)
     }
@@ -251,7 +281,7 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId }) => {
                                             >
                                                 <div className="course_menu-exercise-name">{exercises[exerciseIdxs[idx]]}</div>
                                                 <div className="course_menu-exercise-change">
-                                                    <img src={openImg} alt="Open" onClick={() => openExercise(exerciseIdxs[idx])} />
+                                                    <img src={openImg} alt="Open" onClick={() => handleOpenExercise(exerciseIdxs[idx])} />
                                                     <img src={deleteImg} alt="Delete" onClick={() => handleDeletePress("exercise", exerciseIdxs[idx], exercises[exerciseIdxs[idx]], courseId)} />
                                                 </div>
                                             </div>

@@ -110,5 +110,6 @@
   "no": "No",
   "no_courses": "You have no courses",
   "delete_confirm": "Do you want to delete",
-  "exercise_saved": "Exercise saved"
+  "exercise_saved": "Exercise saved",
+  "not_saved_q": "Previous exercise isn't saved, do you want to continue?"
 }
