@@ -1,35 +1,31 @@
 import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef } from "react";
+
 import DescriprionBlock from "./componenets/descriptionBlock";
-import AutocheckValues from "./componenets/autocheckValues";
 import FileMenu from "./componenets/fileMenu";
+import TestCase from "./componenets/testCase"
+
 import cross from "../../pictures/cross-b.png"
 import client_config from "../../client_config.json"
 
 const deafultData = {
     "name": "",
     "programmingLng": "py",
-    "inputCount": 1,
-    "answerCheckType": "checkCodeOutput",
     "minimalPercent": "100",
-    "type": "code",
     "autoCheck": true,
     "files": { 1: { name: "main.py", value: "#Write your code here\n\n" } },
     "description": { "eng": "", "est": "" },
-    "inputAnswers": [{ input: [""], output: "" }],
-    "withoutInputAnswer": "",
-    "functionName": "",
-    "functionReturns": ""
+    "exerciseType": "outputCheck",
+    "completeSolution": ""
 }
 
 const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
     const { t } = useTranslation();
 
-    const autoCheckValuesRef = useRef(null);
-    const [autocheckType, setAutocheckType] = useState(t("output_check_input"))
     const [data, setData] = useState({ ...deafultData })
+    const [testCases, setTestCases] = useState([])
     const [notifications, setNotifications] = useState([])
-    const [editorKey, setEditorKey] = useState(0);
+    const textareaRef = useRef(null);
 
     useEffect(() => {
         if (exerciseId) {
@@ -40,6 +36,18 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [exerciseId])
 
+    useEffect(() => {
+        adjustTextareaHeight();
+    }, [data.completeSol]);
+
+    const adjustTextareaHeight = () => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+    };
+
     const addNotification = (message, type = "green") => {
         setNotifications(prev => [
             ...prev,
@@ -49,7 +57,6 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
 
     const getExercise = (exerciseId) => {
         setData({ ...deafultData });
-        setAutocheckType(t("output_check_input"))
 
         fetch(`${client_config.SERVER_IP}/api/exercise/get-exercise-data`, {
             method: "POST",
@@ -84,20 +91,9 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
                 });
                 dataG.description = originalDescription;
 
-                if (dataG.answerCheckType === "no-answer-check") {
-                    delete dataG.answerCheckType;
-                } else {
-                    setAutocheckType(autoCheckTypeName(dataG))
-                }
-                if (dataG.functionName === "no-func") {
-                    delete dataG.answerCheckType;
-                }
-                if (dataG.inputCount === 0) {
-                    dataG.inputCount = 1
-                }
-                autoCheckValuesRef.current.clearPaires();
+                parseTestCasesText(dataG.checksFile)
+                console.log(dataG)
                 setData(dataG)
-                setEditorKey(prev => prev + 1);
             }
         }).catch(error => {
             addNotification(error.message, "red")
@@ -114,13 +110,22 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
             return;
         }
 
+        const checksFileText = buildTestCasesText();
+        console.log(checksFileText);
+
+        // Create updated data object with checksFile included
+        const updatedData = {
+            ...data,
+            checksFile: checksFileText
+        };
+
         fetch(`${client_config.SERVER_IP}/api/exercise/update-exercise`, {
             method: "POST",
             credentials: 'include',
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ exerciseId: exerciseId, data: data })
+            body: JSON.stringify({ exerciseId: exerciseId, data: updatedData })
         }).then(async res => {
             if (!res.ok) {
                 const errorData = await res.json();
@@ -147,34 +152,89 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
         setIsSaved(false)
     }
 
-    const handleAutocheckType = (e) => {
-        const v = e.target.value
-        setAutocheckType(v);
-
-        const typeMap = {
-            [t("func_check")]: "checkFuncReturn",
-            [t("output_check")]: "checkCodeOutput",
-            [t("output_check_input")]: "checkCodeOutput"
-        }
-
-        addData("answerCheckType", typeMap[v])
-
-        if (v === t("output_check_input") || v === t("func_check")) {
-            addData("inputCount", 1)
+    const handleAddTestCase = () => {
+        const l = testCases.length
+        let newCase;
+        if (l === 0) {
+            newCase = { id: 0, inputs: [], file: { filename: "a.txt", value: "" }, params: "" }
         } else {
-            addData("inputCount", 0)
+            let inp = testCases[l - 1].inputs ? Array(testCases[l - 1].inputs.length).fill("") : null
+            let f = testCases[l - 1].file ? { filename: testCases[l - 1].file.filename, value: "" } : null
+            newCase = { id: testCases[l - 1].id + 1, inputs: inp, file: f, params: "" }
         }
+        setTestCases(prev => [...prev, newCase]
+        );
     }
 
-    const autoCheckTypeName = (d) => {
-        if (d.answerCheckType === "checkCodeOutput" && d.inputCount > 0) {
-            return t("output_check_input")
+    const updateTestCases = (testCase) => {
+        setTestCases(prev =>
+            prev.map(tc =>
+                tc.id === testCase.id
+                    ? { ...testCase }
+                    : tc
+            )
+        );
+    };
+
+    const delTestCase = (id) => {
+        setTestCases(prev =>
+            prev.filter(tc => tc.id !== id)
+        );
+    };
+
+    const buildTestCasesText = () => {
+        return testCases.map(testCase => {
+            let caseText = '';
+
+            if (testCase.inputs && testCase.inputs.length > 0) {
+                const inputsStr = testCase.inputs.join(';;');
+                caseText += `<-input->${inputsStr}</-input->\n`;
+            }
+
+            if (testCase.params && testCase.params.trim() !== '') {
+                caseText += `<-param->${testCase.params}</-param->\n`;
+            }
+
+            if (testCase.file && testCase.file.filename && testCase.file.value !== undefined) {
+                caseText += `<-file->"${testCase.file.filename}" : "${testCase.file.value}"</-file->\n`;
+            }
+
+            return caseText.trim();
+        }).join('\n --------------- \n');
+    };
+
+    const parseTestCasesText = (text) => {
+        if (!text || text.trim() === '') {
+            return [];
         }
-        if (d.answerCheckType === "checkCodeOutput") {
-            return t("output_check")
-        }
-        return t("func_check")
-    }
+
+        const casesText = text.split(' --------------- ');
+
+        setTestCases(casesText.map((caseText, index) => {
+            const testCase = { id: index, inputs: null, params: "", file: null };
+
+            const inputMatch = caseText.match(/<-input->(.*?)<\/-input->/s);
+            if (inputMatch) {
+                const inputsStr = inputMatch[1];
+                testCase.inputs = inputsStr.split(';;');
+            }
+
+            const paramMatch = caseText.match(/<-param->(.*?)<\/-param->/s);
+            if (paramMatch) {
+                testCase.params = paramMatch[1];
+            }
+
+            const fileMatch = caseText.match(/<-file->\\?"(.*?)\\?" : \\?"(.*?)\\?"<\/-file->/s);
+            if (fileMatch) {
+                testCase.file = {
+                    filename: fileMatch[1],
+                    value: fileMatch[2]
+                };
+            }
+
+            return testCase;
+        }));
+    };
 
     return (<div className="exercise_editor-form-wrap">
         <div className="exercise_editor_page-form">
@@ -182,13 +242,6 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
                 <div className="exercise_editor_page-form-item">
                     <div className="exercise_editor_page-form-item-label">{t("name")}</div>
                     <textarea className="exercise_editor_page-form-item-textarea" value={data.name} onInput={(e) => addData("name", e.target.value)} autoFocus></textarea>
-                </div>
-                <div className="exercise_editor_page-form-item">
-                    <div className="exercise_editor_page-form-item-label">{t("code_lng")}</div>
-                    <select defaultValue={data.programmingLng} className="exercise_editor_page-form-item-select" onChange={(e) => addData("programmingLng", e.target.value)}>
-                        <option value={"py"}>Python</option>
-                        <option value={"js"}>JavaScript</option>
-                    </select>
                 </div>
             </div>
             <DescriprionBlock setDesc={(d) => addData("description", d)} startValue={data.description} />
@@ -198,54 +251,42 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
             </div>
             {data.autoCheck && (
                 <>
-                    <div className="exercise_editor_page-form-items_line">
-                        <div className="exercise_editor_page-form-item">
-                            <div className="exercise_editor_page-form-item-label">{t("autocheck_type")}</div>
-                            <select
-                                className="exercise_editor_page-form-item-select"
-                                value={autocheckType}
-                                onChange={(e) => handleAutocheckType(e)}
-                            >
-                                <option>{t("output_check_input")}</option>
-                                <option>{t("func_check")}</option>
-                                <option>{t("output_check")}</option>
-                            </select>
+                    <div className="exercise_editor_page-completeSol-wrap">
+                        <div className="exercise_editor_page-completeSol">
+                            <div className="exercise_editor_page-completeSol-header">{t("complete_sol")}</div>
+                            <textarea
+                                ref={textareaRef}
+                                className="exercise_editor_page-completeSol-textarea"
+                                value={data.completeSolution || ''}
+                                onInput={(e) => {
+                                    addData("completeSolution", e.target.value);
+                                    adjustTextareaHeight();
+                                }}
+                            />
                         </div>
-                        {autocheckType === t("func_check") && (
-                            <div className="exercise_editor_page-form-item">
-                                <div className="exercise_editor_page-form-item-label">{t("function_name")}</div>
-                                <textarea className="exercise_editor_page-form-item-textarea small-textarea" value={data.functionName} onInput={(e) => addData("functionName", e.target.value)}></textarea>
-                            </div>)}
-                        {autocheckType === t("output_check_input") && (
-                            <div className="exercise_editor_page-form-item">
-                                <div className="exercise_editor_page-form-item-label">{autocheckType === t("func_check") ? t("param_amount") : t("input_amount")}</div>
-                                <input type="number" min="1" className="exercise_editor_page-form-item-counter" value={data.inputCount} onChange={(e) => { addData("inputCount", e.target.value) }}></input>
+                    </div>
+                    <div className="exercise_editor_page-line">
+                        <div className="exercise_editor_page-execise_type">
+                            <div className="exercise_editor_page-execise_type-header">{t("exercise_type")}</div>
+                            <div className="exercise_editor_page-execise_type-choises">
+                                <div onClick={() => addData("exerciseType", "outputCheck")} className={`exercise_editor_page-execise_type-choise ${data.exerciseType == "outputCheck" ? "active" : ""}`}>📤 {t("outputCheck")}</div>
+                                <div onClick={() => addData("exerciseType", "funcCheck")} className={`exercise_editor_page-execise_type-choise ${data.exerciseType == "outputCheck" ? "" : "active"}`}>⚙️ {t("funcCheck")}</div>
+                            </div>
+                        </div>
+                        {data.exerciseType === "funcCheck" &&
+                            (<div className="exercise_editor_page-funcName-wrap">
+                                <div className="exercise_editor_page-funcName">
+                                    <div className="exercise_editor_page-funcName-header">{t("function_name")}</div>
+                                    <input type="text" className="exercise_editor_page-funcName-input" value={data.funcName} onChange={(e) => addData("funcName", e.target.value)} />
+                                </div>
                             </div>)}
                     </div>
-                    <div className="exercise_editor_page-form-items_line">
-                        <div className="exercise_editor_page-form-item">
-                            <div className="exercise_editor_page-form-item-label">{t("complete_percent")}</div>
-                            <input type="number" min="1" max="100" className="exercise_editor_page-form-item-counter" value={data.minimalPercent} onChange={(e) => { addData("minimalPercent", e.target.value) }}></input>
+                    <div className="exercise_editor_page-exercise_cases-wrap">
+                        <button className="exercise_editor_page-add_case_btn" onClick={handleAddTestCase}>{t("add_case")}</button>
+                        <div className="exercise_editor_page-exercise_cases">
+                            {testCases.map(testCase => (<TestCase key={testCase.id} testCase={testCase} addCase={updateTestCases} exType={data.exerciseType} delTestCase={delTestCase} />))}
                         </div>
-                        {autocheckType === t("func_check") && (
-                            <div className="exercise_editor_page-form-item">
-                                <div className="exercise_editor_page-form-item-label">{autocheckType === t("func_check") ? t("param_amount") : t("input_amount")}</div>
-                                <input type="number" min="1" className="exercise_editor_page-form-item-counter" value={data.inputCount} onChange={(e) => { addData("inputCount", e.target.value) }}></input>
-                            </div>)}
                     </div>
-                    {autocheckType === t("output_check") && (
-                        <div className="exercise_editor_page-form-item">
-                            <div className="exercise_editor_page-form-item-label">{t("Output")}</div>
-                            <textarea className="exercise_editor_page-form-item-textarea" value={data.withoutInputAnswer} onInput={(e) => addData("withoutInputAnswer", e.target.value)}></textarea>
-                        </div>)}
-                    {(autocheckType === t("output_check_input") || autocheckType === t("func_check")) && (
-                        <AutocheckValues ref={autoCheckValuesRef}
-                            key={editorKey}
-                            inputAmount={data.inputCount}
-                            setInputs={(p) => autocheckType === t("func_check") ? addData("functionReturns", p) : addData("inputAnswers", p)}
-                            func={autocheckType === t("func_check")}
-                            startInput={autocheckType === t("func_check") ? data.functionReturns : data.inputAnswers}
-                        />)}
                 </>
             )}
             <div className="exercise_editor_page-form-select">

@@ -60,12 +60,10 @@ ${code}
     }
 
     /** Starts container for Python*/
-    /** Starts container for Python*/
     async #ensureContainer() {
         const volumeHostPath = this.tempDir.name;
 
         return new Promise((resolve, reject) => {
-            // Get UID and GID directly from Node.js process (more reliable than shell commands)
             const uid = process.getuid ? process.getuid().toString() : "1000";
             const gid = process.getgid ? process.getgid().toString() : "1000";
 

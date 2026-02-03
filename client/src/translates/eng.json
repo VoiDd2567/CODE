@@ -111,5 +111,16 @@
   "no_courses": "You have no courses",
   "delete_confirm": "Do you want to delete",
   "exercise_saved": "Exercise saved",
-  "not_saved_q": "Previous exercise isn't saved, do you want to continue?"
+  "not_saved_q": "Previous exercise isn't saved, do you want to continue?",
+  "outputCheck": "Porgramm output check",
+  "funcCheck": "Function return check",
+  "add_case": "Add test case",
+  "testcase": "Test Case",
+  "inputs": "Inputs",
+  "file": "File",
+  "add_input": "Add input",
+  "filename": "File name",
+  "file_value": "File value",
+  "func_params": "Function parameters (in one line, separeated by comma)",
+  "complete_sol": "Complete solution"
 }

@@ -48,20 +48,16 @@ function safeCourse(course) {
 function safeExercise(ex) {
     try {
         return {
-            type: ex.type,
             name: ex.name,
             description: ex.description,
             files: ex.files,
-            programmingLng: ex.programmingLng,
+            codeLng: ex.codeLng,
             autoCheck: ex.autoCheck,
-            answerCheckType: ex.answerCheckType,
-            inputAnswers: ex.inputAnswers,
-            inputCount: ex.inputCount,
-            withoutInputAnswer: ex.withoutInputAnswer,
-            functionName: ex.functionName,
-            functionReturns: ex.functionReturns,
-            minimalPercent: ex.minimalPercent,
-            autoCheckType: ex.autoCheckType
+            exerciseType: ex.exerciseType,
+            completeSolution: ex.completeSolution,
+            checksFile: ex.checksFile,
+            funcName: ex.funcName,
+            minimalPercent: ex.minimalPercent
         }
     } catch (err) {
         return "Unvailable to read exercise inforamtion"
@@ -69,12 +65,11 @@ function safeExercise(ex) {
 }
 
 function isSafeExercise(ex) {
-    const allowedKeys = ["type", "name", "description", "files",
-        "programmingLng", "autoCheck", "answerCheckType", "inputAnswers",
-        "inputCount", "withoutInputAnswer", "functionName", "functionReturns",
-        "minimalPercent", "autoCheckType"]
+    const allowedKeys = ["name", "description", "files",
+        "codeLng", "autoCheck", "exerciseType", "completeSolution",
+        "checksFile", "funcName", "minimalPercent"]
 
-    const requiredKeys = ["name", "description", "programmingLng"]
+    const requiredKeys = ["name", "description", "codeLng"]
 
     const hasOnlyAllowedKeys = Object.keys(ex).every(element => allowedKeys.includes(element));
     if (!hasOnlyAllowedKeys) {

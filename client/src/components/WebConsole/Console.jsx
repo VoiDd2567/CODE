@@ -218,9 +218,9 @@ const Console = ({
                     throw new Error(`Error ${res.status}`);
                 } else {
                     const data = await res.json();
-                    textToConsole(data["correct"] >= data["minimal_percent"] ? "SUCCESS\n\n" : "WRONG\n\n", false)
+                    textToConsole(data["success"] ? "SUCCESS\n\n" : "WRONG\n\n", false)
                     textToConsole(data["output"]);
-                    const output = `\n-------------------${data["correct"] >= data["minimal_percent"] ? "Correct" : "Wrong"} solution (${data["correct"]}/100)--------------------`;
+                    const output = `\n-------------------${data["success"] ? "Correct" : "Wrong"} solution (${data["successPercent"]}/100)--------------------`;
                     textToConsole(output)
                     textToConsole("\n\n---------------------Answer check completed-----------------------");
                 }

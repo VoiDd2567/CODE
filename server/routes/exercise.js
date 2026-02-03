@@ -57,11 +57,18 @@ router.post("/check-exercise", requireAuth, async (req, res) => {
         const user = await MongoGetData.getUserBySession(sessionId)
         const exercise = await MongoGetData.getExercise({ _id: exerciseId });
 
-        if (exercise.programmingLng === "py" || exercise.programmingLng === "js") {
-            const check = new ExerciseCheck(exercise._id, user._id);
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+        if (!exercise) {
+            return res.status(404).json({ error: 'Exercise not found' })
+        }
+
+        if (exercise.codeLng === "py" || exercise.codeLng === "js") {
+            const check = new ExerciseCheck(user._id, exerciseId);
             await check.init();
             const check_result = await check.checkSolution();
-            res.status(200).json({ correct: check_result.correct, output: check_result.output, minimal_percent: exercise.minimalPercent })
+            res.status(200).json({ success: check_result.success, output: check_result.output, successPercent: check_result.successPercent })
         } else {
             res.status(400).json({ error: "Unfortunately we still don't have automatic checking for this programming language" })
         }
@@ -77,6 +84,7 @@ router.post("/access-course", requireAuth, async (req, res) => {
         const sessionId = req.cookies.sessionId;
         const { courseId } = req.body;
 
+        const user = await MongoGetData.getUserBySession(sessionId)
         const course = await MongoGetData.getCourse({ courseAccessId: courseId })
         if (!course) {
             return res.status(404).json({ error: "No course found" })

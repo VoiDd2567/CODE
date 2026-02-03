@@ -206,6 +206,119 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
         saveContent();
     };
 
+    const handlePaste = (e) => {
+        e.preventDefault();
+
+        // Get pasted text
+        const text = e.clipboardData.getData('text/plain');
+        if (!text) return;
+
+        const container = descriptionRef.current;
+        if (!container) return;
+
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Delete any selected content first
+        range.deleteContents();
+
+        // Find the paragraph we're in
+        let currentNode = range.startContainer;
+        let currentP = currentNode.nodeType === Node.TEXT_NODE ? currentNode.parentNode : currentNode;
+
+        while (currentP && currentP.tagName !== 'P' && currentP !== container) {
+            currentP = currentP.parentNode;
+        }
+
+        if (!currentP || currentP === container) {
+            // Not in a paragraph, create one
+            currentP = document.createElement('p');
+            currentP.innerHTML = '<br>';
+            container.appendChild(currentP);
+            range.selectNodeContents(currentP);
+            range.collapse(true);
+        }
+
+        // Split pasted text by newlines
+        const lines = text.split('\n');
+
+        if (lines.length === 1) {
+            // Single line - just insert as text
+            const textNode = document.createTextNode(text);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.collapse(true);
+        } else {
+            // Multiple lines - need to split into paragraphs
+
+            // Get text before and after cursor in current paragraph
+            const beforeRange = range.cloneRange();
+            beforeRange.selectNodeContents(currentP);
+            beforeRange.setEnd(range.startContainer, range.startOffset);
+            const textBefore = beforeRange.toString();
+
+            const afterRange = range.cloneRange();
+            afterRange.selectNodeContents(currentP);
+            afterRange.setStart(range.endContainer, range.endOffset);
+            const textAfter = afterRange.toString();
+
+            // Create paragraphs for pasted content
+            const paragraphs = [];
+
+            lines.forEach((line, index) => {
+                const p = document.createElement('p');
+
+                if (index === 0) {
+                    // First line includes text before cursor
+                    p.textContent = textBefore + line;
+                } else if (index === lines.length - 1) {
+                    // Last line includes text after cursor
+                    p.textContent = line + textAfter;
+                } else {
+                    // Middle lines
+                    p.textContent = line;
+                }
+
+                if (!p.textContent.trim()) {
+                    p.innerHTML = '<br>';
+                }
+
+                paragraphs.push(p);
+            });
+
+            // Replace current paragraph with new ones
+            paragraphs.forEach((p, index) => {
+                if (index === 0) {
+                    currentP.parentNode.replaceChild(p, currentP);
+                } else {
+                    paragraphs[0].parentNode.insertBefore(p, paragraphs[index - 1].nextSibling);
+                }
+            });
+
+            // Set cursor at end of last paragraph
+            const lastP = paragraphs[paragraphs.length - 1];
+            const newRange = document.createRange();
+            newRange.selectNodeContents(lastP);
+            newRange.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+        }
+
+        // Save content
+        setTimeout(() => {
+            saveContent();
+        }, 0);
+    };
+
+    const handleCut = () => {
+        // Save content after cut completes
+        setTimeout(() => {
+            saveContent();
+        }, 0);
+    };
+
     const addCodeBlock = () => {
         const container = descriptionRef.current;
         if (!container) return;
@@ -272,8 +385,8 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
                     value={lng}
                     onChange={handleLanguageChange}
                 >
-                    <option value="eng">Eng</option>
                     <option value="est">Est</option>
+                    <option value="eng">Eng</option>
                 </select>
             </div>
             <div
@@ -283,6 +396,8 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
                 suppressContentEditableWarning
                 onInput={handleInput}
                 onKeyUp={handleKeyDown}
+                onPaste={handlePaste}
+                onCut={handleCut}
             />
         </div>
     );

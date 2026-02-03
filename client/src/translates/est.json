@@ -110,5 +110,16 @@
   "no_courses": "Teil pole kursusi",
   "delete_confirm": "Kas soovite kustutada",
   "exercise_saved": "Ülesanne salvestatud",
-  "not_saved_q": "Eelmine harjutus pole salvestatud, kas soovite jätkata?"
+  "not_saved_q": "Eelmine harjutus pole salvestatud, kas soovite jätkata?",
+  "outputCheck": "Programmi väljundi kontroll",
+  "funcCheck": "Funktsiooni tagastuse kontroll",
+  "add_case": "Lisa testjuhtum",
+  "testcase": "Testjuhtum",
+  "inputs": "Sisendid",
+  "file": "Fail",
+  "add_input": "Lisa sisend",
+  "filename": "Faili nimi",
+  "file_value": "Faili sisu",
+  "func_params": "Funktsiooni parameetrid (ühel real, komaga eraldatud)",
+  "complete_sol": "Õige lahendus"
 }

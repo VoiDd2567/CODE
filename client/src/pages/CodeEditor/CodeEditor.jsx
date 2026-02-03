@@ -151,7 +151,7 @@ const CodeEditor = () => {
             <div className="code-editor-page__workspace-wrap">
                 <div className="code-editor-page__left-part">
                     {isExerciseOpen &&
-                        <ExerciseDisplay setEditorH={setEditorH} setExerciseOpen={setExerciseOpen} exerciseText={exerciseText} />
+                        <ExerciseDisplay name={exercise.name} setEditorH={setEditorH} setExerciseOpen={setExerciseOpen} exerciseText={exerciseText} />
                     }
                     <div className="ed-wrap">
                         <Editor w={60} h={editorH} setFileSaved={setFileSaved} saveData={saveData} editorValue={editorValue} setEditorValue={handleEditorValueChange} main={true} />

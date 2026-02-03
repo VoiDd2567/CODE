@@ -104,7 +104,6 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExe
                                 <div className="exercise-selector__course-exercises">
                                     {Object.entries(courseExercises).map(([exerciseId, [exerciseName, completeType]]) => {
                                         const img = completeType === "r" ? incomplete : completeType === "y" ? question : complete;
-                                        console.log(completeType)
                                         return (
                                             <div className="exercise-selector__exercise-wrap">
                                                 <div key={exerciseId} id={exerciseId} onClick={handleExerciseClick} className="exercise-selector__exercise" >

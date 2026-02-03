@@ -3,7 +3,7 @@ import Editor from "../../components/Editor/Editor"
 import cross_icon from "../../pictures/cross-icon.png"
 import "./exerciseDisplay.css";
 
-const ExerciseDisplay = ({ setExerciseOpen, setEditorH, exerciseText }) => {
+const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText }) => {
 
     const exerciseTextDiv = useRef(null)
 
@@ -13,41 +13,87 @@ const ExerciseDisplay = ({ setExerciseOpen, setEditorH, exerciseText }) => {
     }
 
     const renderExerciseText = () => {
-        const parts = [];
-        let lastIndex = 0;
-        const regex = /<<editor>>(.*?)<<\/editor>>/gs;
-        const formattedExerciseText = exerciseText.replace(/\\n/g, "\n")
 
-        for (const match of formattedExerciseText.matchAll(regex)) {
-            const [fullMatch, content] = match;
+        // Replace escaped newlines with actual newlines
+        const normalizedText = exerciseText.replace(/\\n/g, '\n');
+
+        const parts = [];
+
+        // Split by [CODE_BLOCK] tags
+        const codeBlockRegex = /\[CODE_BLOCK\](.*?)\[\/CODE_BLOCK\]/gs;
+        let lastIndex = 0;
+
+        for (const match of normalizedText.matchAll(codeBlockRegex)) {
+            const [fullMatch, codeContent] = match;
             const start = match.index;
 
+            // Add text before code block
             if (start > lastIndex) {
-                parts.push(<span key={`text-${lastIndex}`} style={{ whiteSpace: "pre-line" }}>{formattedExerciseText.slice(lastIndex, start)}</span>);
+                const textContent = normalizedText.slice(lastIndex, start);
+                renderTextContent(textContent, parts, lastIndex);
             }
 
-            const linesCount = content.split("").filter(c => c === "\n").length + 1;
+            // Add code block
+            const linesCount = codeContent.split("\n").length;
             parts.push(
-                <Editor key={`editor-${start}`} w={20} h={linesCount * 2.2 + 2} canBeChanged={false} editorValue={content.trim()} />
+                <div key={`code-${start}`} className="exercise-code-block">
+                    <Editor
+                        w={20}
+                        h={linesCount * 2.2 + 2}
+                        canBeChanged={false}
+                        editorValue={codeContent}
+                    />
+                </div>
             );
 
             lastIndex = start + fullMatch.length;
         }
 
-        if (lastIndex < formattedExerciseText.length) {
-            parts.push(<p key={`text-last`}>{formattedExerciseText.slice(lastIndex)}</p>);
+        // Add remaining text after last code block
+        if (lastIndex < normalizedText.length) {
+            const textContent = normalizedText.slice(lastIndex);
+            renderTextContent(textContent, parts, lastIndex);
         }
-        parts.push(<p><br></br><br></br></p>)
+
+        parts.push(<p key="spacing"><br /><br /></p>);
         return parts;
+    };
+
+    const renderTextContent = (text, parts, keyBase) => {
+        if (!text) return;
+
+        // Split text into lines
+        const lines = text.split('\n');
+
+        lines.forEach((line, index) => {
+            const key = `text-${keyBase}-${index}`;
+            if (line.trim()) {
+                parts.push(
+                    <p key={key} className="exercise-paragraph">
+                        {line}
+                    </p>
+                );
+            } else {
+                parts.push(
+                    <p key={key} className="exercise-paragraph">
+                        <br />
+                    </p>
+                );
+            }
+        });
     };
 
     return (
         <div className="exercise-wrap">
             <div className="exercise-header">
-                <div className="exercise-name">ExampleExercise</div>
-                <div className="exercise-close-btn" onClick={handleCloseClick}><img src={cross_icon} alt="close" /></div>
+                <div className="exercise-name">{name}</div>
+                <div className="exercise-close-btn" onClick={handleCloseClick}>
+                    <img src={cross_icon} alt="close" />
+                </div>
             </div>
-            <div ref={exerciseTextDiv} className="exercise-text">{renderExerciseText()}</div>
+            <div ref={exerciseTextDiv} className="exercise-text">
+                {renderExerciseText()}
+            </div>
         </div>
     );
 };
