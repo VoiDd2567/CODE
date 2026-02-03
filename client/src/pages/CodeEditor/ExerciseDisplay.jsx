@@ -20,7 +20,8 @@ const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText }) =>
         const parts = [];
 
         // Split by [CODE_BLOCK] tags
-        const codeBlockRegex = /\[CODE_BLOCK\](.*?)\[\/CODE_BLOCK\]/gs;
+        const codeBlockRegex = /<<editor>>(.*?)<<\/editor>>/gs;
+
         let lastIndex = 0;
 
         for (const match of normalizedText.matchAll(codeBlockRegex)) {
