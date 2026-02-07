@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
-import MinimizedHeader from "../../components/other/minimizedHeader";
-import Footer from "../../components/Footer/Footer";
+import MinimizedHeader from "../../../components/other/minimizedHeader";
+import Footer from "../../../components/Footer/Footer";
 import "./userCourses.css"
 import js from "../../pictures/js-icon.png"
 import py from "../../pictures/py-icon.png"
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import client_config from "../../client_config.json"
+import client_config from "../../../client_config.json"
 
 const UserCourses = () => {
     const { t } = useTranslation();

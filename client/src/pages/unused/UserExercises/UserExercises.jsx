@@ -1,4 +1,4 @@
-import MinimizedHeader from "../../components/other/minimizedHeader";
+import MinimizedHeader from "../../../components/other/minimizedHeader";
 
 import "./userExercises.css"
 

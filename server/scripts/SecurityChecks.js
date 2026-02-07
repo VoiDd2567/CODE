@@ -83,7 +83,7 @@ async function getUserMadeCourses(userId) { // Returns courses in format courseN
                 exercises[exerciseId] = exercise.name;
             }
 
-            data[courseId] = [course.name, exercises]
+            data[courseId] = [course.name, exercises, course.courseAccessId]
         }
         return data
     } catch (err) {

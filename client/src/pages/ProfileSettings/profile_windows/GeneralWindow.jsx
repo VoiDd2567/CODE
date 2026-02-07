@@ -25,11 +25,6 @@ const GeneralWindow = (user) => {
                 <input type="text" className="profile_page-window-main-input" defaultValue={username} placeholder={t("your_username")} disabled />
                 <label className="profile_page-window-main-label">{t("email")}</label>
                 <input type="text" className="profile_page-window-main-input" defaultValue={email} placeholder={t("your_username")} disabled />
-                <label className="profile_page-window-main-label">{t("language")}</label>
-                <select name="lng" id="" className="profile_page-window-main-select">
-                    <option value="English">English</option>
-                    <option value="Eesti">Eesti</option>
-                </select>
             </form>
         </div>
     </div>)

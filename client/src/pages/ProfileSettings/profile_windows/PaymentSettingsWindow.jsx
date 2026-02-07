@@ -1,6 +1,6 @@
 const PaymentSettingsWindow = () => {
     return (<div className="profile_page-window">
-        No payment
+        No payment (placeholder)
     </div>)
 }
 

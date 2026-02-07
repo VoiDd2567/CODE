@@ -47,6 +47,7 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
             } else {
                 const data = await res.json();
                 setCourses(data.courses)
+                console.log(data.courses)
             }
         })
     }
@@ -312,8 +313,7 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
                             if (!courses[courseId] || !courses[courseId][1]) {
                                 return null;
                             }
-                            const [courseName, exercises] = courses[courseId];
-
+                            const [courseName, exercises, accessId] = courses[courseId];
                             return (
                                 <div className="course_menu-course" key={courseId}>
                                     <div className="course_menu-line">
@@ -337,6 +337,9 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
                                         )}
                                         <div className="course_menu-course-del"><img src={deleteImg} alt="Delete" onClick={() => handleDeletePress("course", courseId, courseName)} /></div>
                                         <button className="course_menu-btn small_btn" onClick={() => handleAddExercise(courseId)}><img src={plus} />{t("add_exercise")}</button>
+                                    </div>
+                                    <div className="id-line">
+                                        ID: {accessId}
                                     </div>
                                     <div className="course_menu-course-exercises">
                                         {data.map((idx) => (

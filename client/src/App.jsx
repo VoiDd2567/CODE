@@ -2,7 +2,6 @@ import { useEffect, useState, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserContext } from "./components/UserContext";
 import { useTranslation } from "react-i18next";
-import MainPage from "./pages/Main/MainPage";
 import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
 import RegistrationCode from "./pages/RegistrationCode/RegistrationCode";
@@ -13,7 +12,8 @@ import LoadingScreen from "./components/Loading/LoadingScreem";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import PasswordResetEmailGet from "./pages/PasswordResetEmailGet/PasswordResetEmailGet";
 import ExerciseEditorPage from "./pages/ExerciseEditor/ExerciseEditorPage";
-import UserExercises from "./pages/UserExercises/UserExercises";
+//import UserExercises from "./pages/UserExercises/UserExercises";
+//import MainPage from "./pages/Main/MainPage";
 //import UserCourses from "./pages/UserCourses/UserCourses";
 //import CoursePage from "./pages/CoursePage/CoursePage";
 //import CourseEditor from "./pages/CourseEditor/CourseEditorPage";
@@ -90,11 +90,11 @@ const App = () => {
                             <ExerciseEditorPage />
                         </PrivateRoute>
                     } />
-                    <Route path="/exercises" element={
+                    {/* <Route path="/exercises" element={
                         <PrivateRoute>
                             <UserExercises />
                         </PrivateRoute>
-                    } />
+                    } /> */}
                     {/* <Route path="/course-editor" element={
                         <PrivateRoute>
                             <CourseEditor />

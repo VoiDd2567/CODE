@@ -3,9 +3,9 @@ import { useRef } from "react"
 import py_file_image from "../../pictures/py-file-icon.png"
 import js_file_image from "../../pictures/js-file-icon.png"
 import txt_file_image from "../../pictures/txt-file-icon.png"
-import new_file_image from "../../pictures/plus.png"
-import rename_file_image from "../../pictures/rename-icon.png"
-import delete_file_image from "../../pictures/delete.png"
+// import new_file_image from "../../pictures/plus.png"
+// import rename_file_image from "../../pictures/rename-icon.png"
+// import delete_file_image from "../../pictures/delete.png"
 
 const FileManager = ({ fileList, setFile, username }) => {
 
@@ -41,11 +41,11 @@ const FileManager = ({ fileList, setFile, username }) => {
                 })}
             </div>
 
-            <div className="file-manager__buttons">
+            {/* <div className="file-manager__buttons">
                 <div className="file-manager__btn new_file-btn" title="Doesn't work"><img src={new_file_image} alt="" /></div>
                 <div className="file-manager__btn rename_file-btn" title="Doesn't work"><img src={rename_file_image} alt="" /></div>
                 <div className="file-manager__btn delete_file-btn" title="Doesn't work"><img src={delete_file_image} alt="" /></div>
-            </div>
+            </div> */}
         </div>
     )
 }

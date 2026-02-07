@@ -13,7 +13,9 @@ const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText }) =>
     }
 
     const renderExerciseText = () => {
-
+        if (!exerciseText || exerciseText.trim() === "") {
+            return "";
+        }
         // Replace escaped newlines with actual newlines
         const normalizedText = exerciseText.replace(/\\n/g, '\n');
 
