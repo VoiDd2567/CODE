@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from 'react-router-dom';
 import client_config from "../../client_config.json"
 
 import AskWindow from "../../components/AskWindow/AskWindow";
@@ -23,9 +24,12 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
     const [editingCourseId, setEditingCourseId] = useState(null)
     const [editingCourseName, setEditingCourseName] = useState("")
 
+
+    const location = useLocation();
+
     useEffect(() => {
         getCourses()
-    }, [])
+    }, [location])
 
     useEffect(() => {
         courseInit()

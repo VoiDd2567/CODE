@@ -96,7 +96,11 @@ const MinimizedHeader = ({ showExercise, showCode, fixed }) => {
                 <div className="m_header-lng_switch">
                     <div className={`lng_switch-txt ${lng === "est" ? "" : "small-lng"}`}>EST</div>
                     <label className="lng_switch-switch">
-                        <input type="checkbox" onClick={changeLng} />
+                        <input
+                            type="checkbox"
+                            checked={lng === "eng"}
+                            onChange={changeLng}
+                        />
                         <span></span>
                     </label>
                     <div className={`lng_switch-txt ${lng === "eng" ? "" : "small-lng"}`}>ENG</div>
