@@ -72,7 +72,7 @@ class MongoGetData {
         taskAccess: [TaskAccess, getCache.getTaskAccess, 43200]
       }[collectionType];
       let cache;
-      if (collectionType != "passwordReset" && collectionType != "exercise") {
+      if (collectionType != "passwordReset" && collectionType != "exercise" && collectionType != "course") {
         cache = await getFn.call(getCache, findBy);
         if (typeof cache === "object") {
           return cache;
