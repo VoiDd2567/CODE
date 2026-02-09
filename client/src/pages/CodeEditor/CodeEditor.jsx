@@ -20,6 +20,7 @@ const CodeEditor = () => {
     const [editorValue, setEditorValue] = useState(files[Object.keys(files)[0]]);
     const [editorH, setEditorH] = useState(85)
     const [isExerciseOpen, setExerciseOpen] = useState(false);
+    const [exerciseTextOpen, setExerciseTextOpen] = useState(false)
     const [exercise, setExercise] = useState({}); //{_id: '', type: '', name: 's', description: {…}, files: {…},…}
     const [exerciseText, setExerciseText] = useState(null);
     const [user, setUser] = useState({});
@@ -107,7 +108,13 @@ const CodeEditor = () => {
                 setExerciseOpen(true);
                 setEditorH(55);
 
-                setExerciseText(data["exercise"].description[lng]);
+                if (!Object.keys(data["exercise"].description).includes("est")) {
+                    data["exercise"].description["est"] = ""
+                } else if (!Object.keys(data["exercise"].description).includes("eng")) {
+                    data["exercise"].description["eng"] = ""
+                }
+
+                setExerciseText(data["exercise"].description);
             }
         }).catch(error => {
             console.error('ERROR with getting data', error);
@@ -151,15 +158,20 @@ const CodeEditor = () => {
             <div className="code-editor-page__workspace-wrap">
                 <div className="code-editor-page__left-part">
                     {isExerciseOpen &&
-                        <ExerciseDisplay name={exercise.name} setEditorH={setEditorH} setExerciseOpen={setExerciseOpen} exerciseText={exerciseText} />
+                        <ExerciseDisplay name={exercise.name} setEditorH={setEditorH} setExerciseOpen={setExerciseOpen} exerciseText={exerciseText[lng]} opened={exerciseTextOpen} setOpened={setExerciseTextOpen} />
                     }
-                    <div className="ed-wrap">
-                        <Editor w={60} h={editorH} setFileSaved={setFileSaved} saveData={saveData} editorValue={editorValue} setEditorValue={handleEditorValueChange} main={true} />
-                    </div>
-                    <div className="code-editor-page__file-saved-label">
-                        {fileSaved ? (<div><img src={complete_image} />{t("saved")}</div>
-                        ) : (<div><img src={cross_image} />{t("not_saved")}</div>)}
-                    </div>
+                    {!exerciseTextOpen && (
+                        <>
+                            <div className="ed-wrap">
+                                <Editor w={60} h={editorH} setFileSaved={setFileSaved} saveData={saveData} editorValue={editorValue} setEditorValue={handleEditorValueChange} main={true} />
+                            </div>
+                            <div className="code-editor-page__file-saved-label">
+                                {fileSaved ? (<div><img src={complete_image} />{t("saved")}</div>
+                                ) : (<div><img src={cross_image} />{t("not_saved")}</div>)}
+                            </div>
+                        </>
+                    )}
+
                 </div>
                 <div className="code-editor-page__right-part">
                     <Console chosenFile={chosenFile} files={files} getExerciseList={getExercises} saveData={saveData} editorValue={editorValue} setExerciseChoose={setExerciseChoose} exerciseOpened={isExerciseOpen} exercise={exercise} />

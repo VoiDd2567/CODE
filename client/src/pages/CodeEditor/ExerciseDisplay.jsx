@@ -1,22 +1,28 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import Editor from "../../components/Editor/Editor"
 import cross_icon from "../../pictures/cross-icon.png"
+import open_icon from "../../pictures/white_exercise_open.png"
+import close_icon from "../../pictures/white_exercise_close.png"
 import "./exerciseDisplay.css";
 
-const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText }) => {
-
+const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText, opened, setOpened }) => {
     const exerciseTextDiv = useRef(null)
+    const exRef = useRef(null)
+
+    useEffect(() => {
+        exRef.current.style.height = opened ? "82vh" : "30vh"
+    }, [opened])
 
     const handleCloseClick = () => {
         setExerciseOpen(false);
         setEditorH(85);
+        setOpened(false)
     }
 
     const renderExerciseText = () => {
         if (!exerciseText || exerciseText.trim() === "") {
             return "";
         }
-        // Replace escaped newlines with actual newlines
         const normalizedText = exerciseText.replace(/\\n/g, '\n');
 
         const parts = [];
@@ -30,13 +36,11 @@ const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText }) =>
             const [fullMatch, codeContent] = match;
             const start = match.index;
 
-            // Add text before code block
             if (start > lastIndex) {
                 const textContent = normalizedText.slice(lastIndex, start);
                 renderTextContent(textContent, parts, lastIndex);
             }
 
-            // Add code block
             const linesCount = codeContent.split("\n").length;
             parts.push(
                 <div key={`code-${start}`} className="exercise-code-block">
@@ -52,7 +56,6 @@ const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText }) =>
             lastIndex = start + fullMatch.length;
         }
 
-        // Add remaining text after last code block
         if (lastIndex < normalizedText.length) {
             const textContent = normalizedText.slice(lastIndex);
             renderTextContent(textContent, parts, lastIndex);
@@ -65,31 +68,45 @@ const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText }) =>
     const renderTextContent = (text, parts, keyBase) => {
         if (!text) return;
 
-        // Split text into lines
-        const lines = text.split('\n');
+        const hasHTML = /<[^>]+>/.test(text);
 
-        lines.forEach((line, index) => {
-            const key = `text-${keyBase}-${index}`;
-            if (line.trim()) {
-                parts.push(
-                    <p key={key} className="exercise-paragraph">
-                        {line}
-                    </p>
-                );
-            } else {
-                parts.push(
-                    <p key={key} className="exercise-paragraph">
-                        <br />
-                    </p>
-                );
-            }
-        });
+        if (hasHTML) {
+            parts.push(
+                <div
+                    key={`html-${keyBase}`}
+                    className="exercise-paragraph"
+                    dangerouslySetInnerHTML={{ __html: text }}
+                />
+            );
+        } else {
+            const lines = text.split('\n');
+
+            lines.forEach((line, index) => {
+                const key = `text-${keyBase}-${index}`;
+                if (line.trim()) {
+                    parts.push(
+                        <p key={key} className="exercise-paragraph">
+                            {line}
+                        </p>
+                    );
+                } else {
+                    parts.push(
+                        <p key={key} className="exercise-paragraph">
+                            <br />
+                        </p>
+                    );
+                }
+            });
+        }
     };
 
     return (
-        <div className="exercise-wrap">
+        <div ref={exRef} className="exercise-wrap">
             <div className="exercise-header">
                 <div className="exercise-name">{name}</div>
+                <div className="exercise-close-btn" onClick={() => setOpened(!opened)}>
+                    {opened ? (<img src={close_icon} />) : (<img src={open_icon} />)}
+                </div>
                 <div className="exercise-close-btn" onClick={handleCloseClick}>
                     <img src={cross_icon} alt="close" />
                 </div>

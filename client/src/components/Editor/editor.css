@@ -89,3 +89,63 @@
     width: 1.3vw;
     margin-right: 1vh;
 }
+
+/* Autocomplete Suggestions Styling */
+.autocomplete-suggestions {
+    position: absolute;
+    background-color: #494a4d;
+    border-radius: 1vh;
+    max-height: 30vh;
+    min-width: 15vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+    box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.3);
+    font-family: "Fira Code", monospace;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar {
+    background-color: transparent;
+    width: 0.5vh;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+.autocomplete-suggestions::-webkit-scrollbar-thumb {
+    background-color: #696a6d;
+    border-radius: 1vw;
+}
+
+.suggestion-item {
+    padding: 0.8vh 1vw;
+    cursor: pointer;
+    color: white;
+    font-size: 1vw;
+    font-family: "Fira Code", monospace;
+    transition: background-color 0.1s ease;
+    line-height: 2.2vh;
+}
+
+.suggestion-item:hover {
+    background-color: #5a5b5e;
+}
+
+.suggestion-item.selected {
+    background-color: #6a6b6e;
+}
+
+.suggestion-item:first-child {
+    border-top-left-radius: 1vh;
+    border-top-right-radius: 1vh;
+}
+
+.suggestion-item:last-child {
+    border-bottom-left-radius: 1vh;
+    border-bottom-right-radius: 1vh;
+}

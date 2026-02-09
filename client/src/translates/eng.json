@@ -122,5 +122,6 @@
   "filename": "File name",
   "file_value": "File value",
   "func_params": "Function parameters (in one line, separeated by comma)",
-  "complete_sol": "Complete solution"
+  "complete_sol": "Complete solution",
+  "description_expl": "In description you can write HTML code or just plain text (or both).<br>You can't use style or script tags.<br>If you want to use style you need to write it inside the tag as a parameter."
 }

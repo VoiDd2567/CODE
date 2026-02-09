@@ -121,5 +121,6 @@
   "filename": "Faili nimi",
   "file_value": "Faili sisu",
   "func_params": "Funktsiooni parameetrid (ühel real, komaga eraldatud)",
-  "complete_sol": "Õige lahendus"
+  "complete_sol": "Õige lahendus",
+  "description_expl": "Kirjelduses saate kirjutada HTML-koodi või lihtsalt tavalist teksti (või mõlemat).<br>Te ei saa kasutada style ega script silte.<br>Kui soovite kasutada stiili, peate selle kirjutama sildi sisse parameetrina."
 }

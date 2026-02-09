@@ -29,7 +29,6 @@ const Editor = ({
     const [previousText, setPreviousText] = useState("");
     const [dicon, setdIcon] = useState(python_icon);
 
-
     useEffect(() => {
         editorWrap.current.style.width = w ? `${w < 10 ? 10 : w}vw` : "auto"
 
@@ -53,6 +52,7 @@ const Editor = ({
             editor.current.style.overflow = "hidden";
             numbersTa.current.style.overflow = "hidden";
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [w, h, main, color, fixedHeight])
 
     useEffect(() => {
@@ -108,20 +108,62 @@ const Editor = ({
         }
     };
 
+
+    const getIndentation = (line) => {
+        const match = line.match(/^(\s*)/);
+        return match ? match[1] : '';
+    };
+
+    const shouldIndent = (line) => {
+        const trimmed = line.trim();
+        if (icon === 'py') {
+            return trimmed.endsWith(':');
+        } else if (icon === 'js') {
+            return trimmed.endsWith('{') || trimmed.endsWith(':');
+        }
+        return false;
+    };
+
     const textareaPress = (e) => {
+        const textarea = e.target;
+
         if (e.key === "Tab") {
             e.preventDefault();
 
-            const textarea = e.target;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
-
             const value = textarea.value;
 
             textarea.value = value.substring(0, start) + "\t" + value.substring(end)
             textarea.selectionStart = textarea.selectionEnd = start + 1;
+            handleChange();
+            return;
         }
-        handleChange();
+
+        if (e.key === "Enter") {
+            e.preventDefault();
+
+            const start = textarea.selectionStart;
+            const value = textarea.value;
+
+            const beforeCursor = value.substring(0, start);
+            const lines = beforeCursor.split('\n');
+            const currentLine = lines[lines.length - 1];
+
+            const currentIndent = getIndentation(currentLine);
+            const needsExtraIndent = shouldIndent(currentLine);
+            const newIndent = needsExtraIndent ? currentIndent + '\t' : currentIndent;
+
+            const afterCursor = value.substring(start);
+            const newValue = beforeCursor + '\n' + newIndent + afterCursor;
+
+            textarea.value = newValue;
+            const newCursorPos = start + 1 + newIndent.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+
+            handleChange();
+            return;
+        }
     }
 
     const setNumbers = () => {
@@ -144,6 +186,7 @@ const Editor = ({
         setTimeout(() => {
             isSyncing.current = false;
         }, 0);
+
     }
 
     const handleChange = () => {
@@ -177,6 +220,7 @@ const Editor = ({
         if (getValue) {
             getValue(editor.current.value)
         }
+
     };
 
     const addDescription = () => {
@@ -185,15 +229,24 @@ const Editor = ({
     }
 
     return (
-        <div>
+        <div style={{ position: 'relative' }}>
             {description && (<div>
                 <div className="editor-description">
-                    <img src={dicon} /><p>{description}</p>
+                    <img src={dicon} alt="icon" /><p>{description}</p>
                 </div>
             </div>)}
             <div ref={editorWrap} className="editor-wrap">
                 <textarea ref={numbersTa} className="editor__string-numbers" defaultValue={numbersTextareaValue}></textarea>
-                <textarea ref={editor} onScroll={handleScroll} onChange={handleChange} onKeyDown={(e) => textareaPress(e)} readOnly={!canBeChanged} type="text" className="editor" defaultValue={editorValue} />
+                <textarea
+                    ref={editor}
+                    onScroll={handleScroll}
+                    onChange={handleChange}
+                    onKeyDown={(e) => textareaPress(e)}
+                    readOnly={!canBeChanged}
+                    type="text"
+                    className="editor"
+                    defaultValue={editorValue}
+                />
             </div>
         </div>
     )
