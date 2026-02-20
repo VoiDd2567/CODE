@@ -27,6 +27,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
     const [notifications, setNotifications] = useState([])
     const textareaRef = useRef(null);
 
+
     useEffect(() => {
         if (exerciseId) {
             getExercise(exerciseId);
@@ -38,7 +39,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
 
     useEffect(() => {
         adjustTextareaHeight();
-    }, [data.completeSol]);
+    }, [data.completeSolution]);
 
     const adjustTextareaHeight = () => {
         const textarea = textareaRef.current;

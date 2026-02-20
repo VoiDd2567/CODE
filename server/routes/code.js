@@ -19,14 +19,19 @@ router.post("/save-code", requireAuth, async (req, res) => {
         const { type, fileName, value, exerciseId } = req.body;
         const user = await MongoGetData.getUserBySession(sessionId)
 
-        if (typeof fileName !== "string" || typeof value !== "string" || !fileName || !value) {
-            return res.status(400).json({ error: "fileName and value must be non-empty strings" });
+        if (typeof fileName !== "string" || !fileName) {
+            return res.status(400).json({ error: "fileName must be non-empty string" });
+        }
+
+        let fValue = value
+        if (typeof fValue !== "string" || !fValue) {
+            fValue = ""
         }
 
         if (type === "user") {
             if (fileName in user.userFiles) {
                 const userFiles = user.userFiles;
-                userFiles[fileName] = value;
+                userFiles[fileName] = fValue;
                 await MongoUpdateData.update("user", { _id: user._id }, { userFiles: userFiles })
                 res.status(200).json({ success: true })
             } else {
@@ -43,13 +48,13 @@ router.post("/save-code", requireAuth, async (req, res) => {
                         let solutionFiles;
                         if (!solution) {
                             solutionFiles = { ...exerciseFiles };
-                            solutionFiles[fileName] = value;
-                            await MongoCreateData.createExerciseSolution(exerciseId, value, user._id, solutionFiles);
+                            solutionFiles[fileName] = fValue;
+                            await MongoCreateData.createExerciseSolution(exerciseId, fValue, user._id, solutionFiles);
                             return res.status(200).json({ success: true });
                         } else {
                             solutionFiles = solution.solutionFiles;
-                            solutionFiles[fileName] = value;
-                            await MongoUpdateData.update("solution", { _id: solution._id }, { solution: value, solutionFiles: solutionFiles })
+                            solutionFiles[fileName] = fValue;
+                            await MongoUpdateData.update("solution", { _id: solution._id }, { solution: fValue, solutionFiles: solutionFiles })
                             return res.status(200).json({ success: true });
                         }
                     } else {

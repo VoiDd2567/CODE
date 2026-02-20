@@ -198,7 +198,6 @@ const Editor = ({
             updateDynamicHeight();
         }
 
-        if (!eValue) return;
         if (previousText) {
             if (eValue.length > previousText.length) {
                 if (eValue.length > 10000) {
