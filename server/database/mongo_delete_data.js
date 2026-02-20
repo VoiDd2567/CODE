@@ -16,7 +16,7 @@ class MongoDeleteData {
         try {
             const user = await User.findOneAndDelete({ _id: userId });
             if (user) {
-                deleteCache().deleteUser(user);
+                deleteCache.deleteUser(user);
             }
         } catch (err) {
             logger.error("Error deleting data : " + err)
@@ -26,7 +26,7 @@ class MongoDeleteData {
         try {
             const schoolClass = await SchoolClass.findOneAndDelete({ _id: schoolClassId });
             if (schoolClass) {
-                deleteCache().deleteSchoolClass(schoolClass);
+                deleteCache.deleteClass(schoolClass._id);
             }
         } catch (err) {
             logger.error("Error deleting data : " + err)

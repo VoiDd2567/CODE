@@ -268,4 +268,49 @@ router.post("/reset-password", RegLimiter, async (req, res) => {
     }
 })
 
+router.post("/delete-account", async (req, res) => {
+    try {
+        const sessionId = req.cookies.sessionId;
+        const { id, userId, email, password, user } = req.body;
+
+        const session = await MongoGetData.getSession({ sessionId: sessionId });
+        if (!session) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const accountId = userId || id || user?._id || user?.id || String(session.userId);
+        const accountEmail = email || user?.email;
+        if (typeof accountId !== "string" || typeof accountEmail !== "string" || typeof password !== "string") {
+            return res.status(400).json({ error: "Wrong data type" });
+        }
+
+        if (!session || String(session.userId) !== String(accountId)) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const existingUser = await MongoGetData.getUser({ _id: accountId });
+        if (!existingUser) {
+            return res.status(401).json({ error: "User not found" });
+        }
+
+        if (String(existingUser.email).toLowerCase() !== String(accountEmail).toLowerCase()) {
+            return res.status(401).json({ error: "Wrong email or password" });
+        }
+
+        const passwordsSame = await Hash.compare(password, existingUser.password);
+        if (!passwordsSame) {
+            return res.status(401).json({ error: "Wrong email or password" });
+        }
+
+        await UserLogout(accountId);
+        await MongoDeleteData.deleteUser(accountId);
+
+        return res.status(200).json({ message: "Account deleted" });
+    }
+    catch (err) {
+        logger.error(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+})
+
 module.exports = router;

@@ -1,14 +1,13 @@
 .ask_window-wrap {
-    position: absolute;
-    top: -9vh;
-    width: 100vw;
-    height: 100vh;
+    position: fixed;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: rgba(0, 0, 0, 0.4);
     z-index: 99999;
     backdrop-filter: blur(1.2vh);
+    font-family: "Electrolize";
 }
 
 .ask_window {

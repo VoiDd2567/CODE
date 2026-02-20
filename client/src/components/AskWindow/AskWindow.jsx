@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
 import "./askWindow.css"
 
 const AskWindow = ({ question, func, open, setOpen, negFunc = () => { } }) => {
@@ -7,7 +8,7 @@ const AskWindow = ({ question, func, open, setOpen, negFunc = () => { } }) => {
 
     if (!open) return null;
 
-    return (<div className="ask_window-wrap">
+    return createPortal(<div className="ask_window-wrap">
         <div className="ask_window">
             <div className="ask_window-question">{question}</div>
             <div className="ask_window-line">
@@ -15,7 +16,7 @@ const AskWindow = ({ question, func, open, setOpen, negFunc = () => { } }) => {
                 <div className="ask_window-option positive" onClick={() => { setOpen(false); negFunc() }}>{t("no")}</div>
             </div>
         </div>
-    </div>)
+    </div>, document.body)
 }
 
 export default AskWindow;

@@ -5,7 +5,7 @@ import CategoryChoose from "./other/CategoryChoose"
 import GeneralWindow from "./profile_windows/GeneralWindow"
 import SecurityWindow from "./profile_windows/SecurityWindow"
 import PaymentSettingsWindow from "./profile_windows/PaymentSettingsWindow"
-import DelAccountWindow from "./profile_windows/DelAccountWindow"
+import DeleteAccountWindow from "./profile_windows/DeleteAccountWindow"
 import { useState, useEffect, useContext } from "react"
 import { UserContext } from "../../components/UserContext"
 
@@ -15,13 +15,12 @@ const ProfileSettings = () => {
     const [openedWindowDiv, setOpenedWindowDiv] = useState(<GeneralWindow />)
     const user = useContext(UserContext).user
 
-
     useEffect(() => {
         const all_windows = {
             "general": <GeneralWindow user={user} />,
             "security": <SecurityWindow />,
             "payment": <PaymentSettingsWindow />,
-            "delAccount": <DelAccountWindow />
+            "delAccount": <DeleteAccountWindow user={user} />
         }
         setOpenedWindowDiv(all_windows[openedWindow])
     }, [openedWindow, user])
