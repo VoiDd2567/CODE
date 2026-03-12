@@ -1,3 +1,12 @@
+ ██████   ██████  ██████  ███████
+██      ██      ██      ██
+██      ██      ██      █████
+██      ██      ██      ██
+██      ██      ██      ██
+ ██████   ██████  ██████  ███████
+
+This is a platform called CODE (very creative, I know).
+
 The project can be found at the URL:
 
         <https://codeest.online/>
@@ -6,8 +15,6 @@ If your browser says that the connection is not secure and doesn't allow you to 
 
     --Press "Advanced"
     --Press "Proceed to codeest.online (unsafe)"
-
-This is a platform called CODE (very creative, I know).
 
 On this platform you have two paths:
 
