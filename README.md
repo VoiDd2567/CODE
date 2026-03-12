@@ -1,4 +1,4 @@
-The project can be found at the URL:
+The project can be found at the URL:\n
         <https://codeest.online/>
 
 If your browser says that the connection is not secure and doesn't allow you to access the webpage, then:
@@ -7,7 +7,7 @@ If your browser says that the connection is not secure and doesn't allow you to 
 
 This is a platform called CODE (very creative, I know).
 
-On this platform you have two paths:
+On this platform you have two paths:\n
     -be a teacher and create exercises
     -be a student and solve exercises or just run your code
 
