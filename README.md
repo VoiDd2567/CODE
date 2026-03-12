@@ -1,4 +1,4 @@
-The project can be found at the URL:\n
+The project can be found at the URL:
 
         <https://codeest.online/>
 
