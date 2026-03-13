@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import "./editor.css"
 import python_icon from "../../pictures/py-icon.png"
 import js_icon from "../../pictures/js-icon.png"
+
 
 const Editor = ({
     w = null,
@@ -21,19 +22,23 @@ const Editor = ({
     lineHeight = 2.5 }) => {
 
     const { t } = useTranslation();
-    const [numbersTextareaValue, setNumbersTextareaValue] = useState("");
+    const [numbersTextareaValue, setNumbersTextareaValue] = useState("1\n");
     const editorWrap = useRef(null);
     const editor = useRef(null);
     const numbersTa = useRef(null);
     const isSyncing = useRef(false);
     const [previousText, setPreviousText] = useState("");
+    const previousTextRef = useRef("");
     const [dicon, setdIcon] = useState(python_icon);
+    const saveTimer = useRef(null);
 
     useEffect(() => {
-        editorWrap.current.style.width = w ? `${w < 10 ? 10 : w}vw` : "auto"
+        if (!editorWrap.current || !editor.current || !numbersTa.current) return;
+
+        editorWrap.current.style.width = w ? `${w < 10 ? 10 : w}vw` : "auto";
 
         if (fixedHeight) {
-            editorWrap.current.style.height = h ? `${h < 3.7 ? 3.7 : h}vh` : "auto"
+            editorWrap.current.style.height = h ? `${h < 3.7 ? 3.7 : h}vh` : "auto";
         } else {
             updateDynamicHeight();
         }
@@ -53,13 +58,13 @@ const Editor = ({
             numbersTa.current.style.overflow = "hidden";
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [w, h, main, color, fixedHeight])
+    }, [w, h, main, color, fixedHeight]);
 
     useEffect(() => {
         if (description) {
             addDescription();
         }
-    }, [description])
+    }, [description]);
 
     useEffect(() => {
         if (icon === "py") {
@@ -67,12 +72,15 @@ const Editor = ({
         } else if (icon === "js") {
             setdIcon(js_icon);
         }
-    }, [icon])
+    }, [icon]);
 
     useEffect(() => {
+        if (!editor.current) return;
+
         editor.current.value = editorValue;
+        previousTextRef.current = editorValue;
         setPreviousText(editorValue);
-        setNumbers();
+        setNumbers(editorValue);
         if (!fixedHeight) {
             updateDynamicHeight();
         }
@@ -80,19 +88,20 @@ const Editor = ({
     }, [editorValue]);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
+        if (saveTimer.current) clearTimeout(saveTimer.current);
+        saveTimer.current = setTimeout(() => {
             if (saveData) {
                 saveData(previousText)
             }
         }, 2000);
 
-        return () => clearTimeout(timeout);
+        return () => clearTimeout(saveTimer.current);
     }, [previousText, saveData]);
 
-    const updateDynamicHeight = () => {
+    const updateDynamicHeight = useCallback(() => {
         if (fixedHeight || !editor.current) return;
 
-        const lineCount = (editor.current.value.match(/\n/g) || []).length + 1;
+        const lineCount = editor.current.value.split("\n").length;
         const calculatedHeight = lineCount * lineHeight;
         const minHeight = 3.7;
         const finalHeight = Math.max(calculatedHeight, minHeight);
@@ -100,7 +109,7 @@ const Editor = ({
         editorWrap.current.style.height = `${finalHeight}vh`;
         editor.current.style.height = "100%";
         numbersTa.current.style.height = "100%";
-    };
+    }, [fixedHeight, lineHeight]);
 
     const syncScroll = (source, target) => {
         if (target.current) {
@@ -164,68 +173,71 @@ const Editor = ({
             handleChange();
             return;
         }
-    }
+    };
 
-    const setNumbers = () => {
-        const stringCount = [...editor.current.value].filter(c => c === "\n").length;
+    const setNumbers = (text) => {
+        if (!numbersTa.current) return;
+        const value = typeof text === "string" ? text : editor.current?.value || "";
+        const stringCount = value.split("\n").length;
         let textareaNewValue = "1\n";
-        for (let i = 1; stringCount + 1 > i; i++) {
+        for (let i = 1; stringCount > i; i++) {
             textareaNewValue += `${i + 1}\n`;
         }
         setNumbersTextareaValue(textareaNewValue);
         if (fixedHeight) {
             syncScroll(editor, numbersTa);
         }
-    }
+    };
 
     const handleScroll = () => {
-        if (isSyncing.current || !fixedHeight) return;
+        if (isSyncing.current || !fixedHeight || !numbersTa.current || !editor.current) return;
 
         isSyncing.current = true;
         numbersTa.current.scrollTop = editor.current.scrollTop;
-        setTimeout(() => {
+        requestAnimationFrame(() => {
             isSyncing.current = false;
-        }, 0);
+        });
 
-    }
+    };
 
     const handleChange = () => {
-        const eValue = editor.current.value
+        if (!editor.current) return;
+        const eValue = editor.current.value;
 
-        setNumbers();
+        setNumbers(eValue);
 
         if (!fixedHeight) {
             updateDynamicHeight();
         }
 
-        if (previousText) {
-            if (eValue.length > previousText.length) {
-                if (eValue.length > 10000) {
-                    editor.current.value = previousText;
-                    alert(t("too_many_characters_editor"))
-                }
+        if (previousTextRef.current && eValue.length > previousTextRef.current.length) {
+            if (eValue.length > 10000) {
+                editor.current.value = previousTextRef.current;
+                alert(t("too_many_characters_editor"));
             }
         }
-        const stringCount = [...eValue].filter(c => c === "\n").length;
+        const stringCount = eValue.split("\n").length - 1;
         if (stringCount > 998) {
-            editor.current.value = previousText;
-            alert(t("too_many_strings_editor"))
+            editor.current.value = previousTextRef.current;
+            alert(t("too_many_strings_editor"));
         }
         if (setFileSaved) {
             setFileSaved(false);
-            setPreviousText(editor.current.value)
-            setEditorValue(editor.current.value)
+            previousTextRef.current = editor.current.value;
+            setPreviousText(editor.current.value);
+            setEditorValue(editor.current.value);
         }
         if (getValue) {
-            getValue(editor.current.value)
+            getValue(editor.current.value);
         }
 
     };
 
     const addDescription = () => {
+        if (!editorWrap.current) return;
         editorWrap.current.style.borderTopRightRadius = "0vh";
-        editorWrap.current.style.borderTopLeftRadius = "0vh"
-    }
+        editorWrap.current.style.borderTopLeftRadius = "0vh";
+    };
 
     return (
         <div style={{ position: 'relative' }}>
@@ -235,7 +247,7 @@ const Editor = ({
                 </div>
             </div>)}
             <div ref={editorWrap} className="editor-wrap">
-                <textarea ref={numbersTa} className="editor__string-numbers" defaultValue={numbersTextareaValue}></textarea>
+                <textarea ref={numbersTa} className="editor__string-numbers" value={numbersTextareaValue} readOnly />
                 <textarea
                     ref={editor}
                     onScroll={handleScroll}

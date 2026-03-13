@@ -293,7 +293,6 @@
     overflow-x: auto;
     white-space: pre;
     min-height: 2.5vh;
-    max-height: 40vh;
 }
 
 .code-block-content::-webkit-scrollbar {

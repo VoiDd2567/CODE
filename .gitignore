@@ -25,6 +25,7 @@ lineCount.py*
 README.txt*
 delDockers.js*
 exampleFile.txt*
+server.js*
 
 node_modules
 dist

@@ -6,7 +6,7 @@ import q_yellow from "../../../pictures/yellow-quest-c.png"
 const DescriptionBlock = ({ setDesc, startValue }) => {
     const { t } = useTranslation();
 
-    const [lng, setLng] = useState("eng");
+    const [lng, setLng] = useState("est");
     const descriptionRef = useRef(null);
     const [descValue, setDescValue] = useState(startValue || { eng: "", est: "" });
 
@@ -101,7 +101,7 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
             lineNumbers.scrollTop = codeContent.scrollTop;
         };
 
-        const handleTab = (e) => {
+        const handleCodeKeyDown = (e) => {
             if (e.key === "Tab") {
                 e.preventDefault();
                 const start = codeContent.selectionStart;
@@ -111,6 +111,13 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
                 codeContent.selectionStart = codeContent.selectionEnd = start + 4;
                 updateLineNumbers();
                 saveContent();
+                return;
+            }
+
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c") {
+                setTimeout(() => {
+                    saveContent();
+                }, 0);
             }
         };
 
@@ -119,7 +126,7 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
             saveContent();
         });
         codeContent.addEventListener("scroll", syncScroll);
-        codeContent.addEventListener("keydown", handleTab);
+        codeContent.addEventListener("keydown", handleCodeKeyDown);
 
         updateLineNumbers();
 
@@ -210,6 +217,13 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
     };
 
     const handlePaste = (e) => {
+        if (e.target.closest(".code-block-wrapper")) {
+            setTimeout(() => {
+                saveContent();
+            }, 0);
+            return;
+        }
+
         e.preventDefault();
 
         const text = e.clipboardData.getData('text/plain');
@@ -362,8 +376,8 @@ const DescriptionBlock = ({ setDesc, startValue }) => {
                     {t("desc_language")}
                 </div>
                 <select className="exercise_editor_page-form-item-select desc-select" value={lng} onChange={handleLanguageChange}  >
-                    <option value="est">Est</option>
                     <option value="eng">Eng</option>
+                    <option value="est">Est</option>
                 </select>
             </div>
             <div

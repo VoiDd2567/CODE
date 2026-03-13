@@ -102,7 +102,10 @@ const CodeEditor = () => {
             } else {
                 const data = await res.json();
                 if (data["userSolution"]) {
-                    data["exercise"].files = data["userSolution"]
+                    data["exercise"].files = {
+                        ...data["exercise"].files,
+                        ...data["userSolution"]
+                    };
                 }
                 setExercise(data["exercise"])
                 setExerciseOpen(true);
@@ -158,7 +161,7 @@ const CodeEditor = () => {
             <div className="code-editor-page__workspace-wrap">
                 <div className="code-editor-page__left-part">
                     {isExerciseOpen &&
-                        <ExerciseDisplay name={exercise.name} setEditorH={setEditorH} setExerciseOpen={setExerciseOpen} exerciseText={exerciseText[lng]} opened={exerciseTextOpen} setOpened={setExerciseTextOpen} />
+                        <ExerciseDisplay name={exercise.name} setEditorH={setEditorH} setExerciseOpen={setExerciseOpen} exerciseText={exerciseText} lng={lng} opened={exerciseTextOpen} setOpened={setExerciseTextOpen} />
                     }
                     {!exerciseTextOpen && (
                         <>

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { useLocation } from 'react-router-dom';
 import client_config from "../../client_config.json"
 
@@ -7,8 +7,7 @@ import AskWindow from "../../components/AskWindow/AskWindow";
 import plus from "../../pictures/plus.png"
 import openImg from "../../pictures/open-exercise-btn.png"
 import deleteImg from "../../pictures/delete-red.png"
-
-const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, setIsSaved }) => {
+const CourseEditor = forwardRef(({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, setIsSaved }, ref) => {
     const { t } = useTranslation();
 
     const errorMsg = useRef(null)
@@ -55,6 +54,10 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
             }
         })
     }
+
+    useImperativeHandle(ref, () => ({
+        getCourses
+    }));
 
     const courseInit = () => {
         if (Object.keys(courses).length <= 0) return;
@@ -255,6 +258,9 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
     }
 
     const handleCourseNameClick = (courseId, currentName) => {
+        if (editingCourseId && editingCourseId !== courseId) {
+            commitCourseName(editingCourseId, editingCourseName)
+        }
         setEditingCourseId(courseId)
         setEditingCourseName(currentName)
     }
@@ -264,9 +270,7 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
     }
 
     const handleCourseNameBlur = (courseId) => {
-        if (editingCourseName.trim() && editingCourseName !== courses[courseId][0]) {
-            updateCourseName(courseId, editingCourseName.trim())
-        }
+        commitCourseName(courseId, editingCourseName)
         setEditingCourseId(null)
         setEditingCourseName("")
     }
@@ -278,6 +282,13 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
             setEditingCourseId(null)
             setEditingCourseName("")
         }
+    }
+
+    const commitCourseName = (courseId, name) => {
+        if (!courseId || !courses[courseId]) return;
+        const trimmed = name.trim();
+        if (!trimmed || trimmed === courses[courseId][0]) return;
+        updateCourseName(courseId, trimmed);
     }
 
     const updateCourseName = (courseId, newName) => {
@@ -301,7 +312,6 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
 
         getCourses();
     }
-
     return (
         <div className="exercise_editor-course_menu-wrap">
             <div className="course_menu">
@@ -373,6 +383,6 @@ const CourseEditor = ({ setOpenExerciseEditor, setOpenedExerciseId, isSaved, set
             <AskWindow open={askWindowOpen} setOpen={setAskWindowOpen} question={askWindowQuestion} func={askWindowFunc} />
         </div>
     )
-}
+})
 
 export default CourseEditor

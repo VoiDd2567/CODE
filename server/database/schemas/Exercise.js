@@ -4,7 +4,7 @@ const exerciseSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: Map, of: String, required: true },
   creatorId: { type: String, default: "no-creator" },
-  files: { type: Object, default: { "text.txt": "#" } },
+  files: { type: Object, default: { "main.py": "#" } },
   codeLng: { type: String, default: "py" },
   autoCheck: { type: Boolean, default: true },
   exerciseType: { type: String, default: "outputCheck" },

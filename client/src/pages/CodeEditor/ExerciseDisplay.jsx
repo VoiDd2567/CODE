@@ -5,7 +5,7 @@ import open_icon from "../../pictures/white_exercise_open.png"
 import close_icon from "../../pictures/white_exercise_close.png"
 import "./exerciseDisplay.css";
 
-const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText, opened, setOpened }) => {
+const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText, opened, setOpened, lng }) => {
     const exerciseTextDiv = useRef(null)
     const exRef = useRef(null)
 
@@ -19,11 +19,34 @@ const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText, open
         setOpened(false)
     }
 
+    const getResolvedExerciseText = () => {
+        if (!exerciseText) return "";
+        if (typeof exerciseText === "string") return exerciseText;
+        if (typeof exerciseText !== "object") return "";
+
+        const currentText = lng && Object.prototype.hasOwnProperty.call(exerciseText, lng)
+            ? exerciseText[lng]
+            : "";
+
+        if (typeof currentText === "string" && currentText.trim()) {
+            return currentText;
+        }
+
+        for (const value of Object.values(exerciseText)) {
+            if (typeof value === "string" && value.trim()) {
+                return value;
+            }
+        }
+
+        return "";
+    };
+
     const renderExerciseText = () => {
-        if (!exerciseText || exerciseText.trim() === "") {
+        const resolvedText = getResolvedExerciseText();
+        if (!resolvedText || resolvedText.trim() === "") {
             return "";
         }
-        const normalizedText = exerciseText.replace(/\\n/g, '\n');
+        const normalizedText = resolvedText.replace(/\\n/g, '\n');
 
         const parts = [];
 

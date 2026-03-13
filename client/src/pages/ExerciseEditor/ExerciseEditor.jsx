@@ -19,7 +19,7 @@ const deafultData = {
     "completeSolution": ""
 }
 
-const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
+const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved, onSaved }) => {
     const { t } = useTranslation();
 
     const [data, setData] = useState({ ...deafultData })
@@ -135,6 +135,9 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved }) => {
             } else {
                 addNotification(t("exercise_saved"), "green")
                 setIsSaved(true)
+                if (onSaved) {
+                    onSaved()
+                }
             }
         }).catch(error => {
             addNotification(error.message, "red")

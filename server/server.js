@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const rateLimit = require("express-rate-limit");
+// const https = require('https');
+// const fs = require('fs');
 const expressSession = require("express-session");
 
 const mongoConnect = require("./database/mongo_connect");
@@ -38,4 +40,12 @@ app.use(limiter);
   app.listen(PORT, '127.0.0.1', () => {
     console.log(`HTTP server listening on 127.0.0.1:${PORT}`);
   });
+  // const options = {
+  //   key: fs.readFileSync('../server.key'),
+  //   cert: fs.readFileSync('../server.cert')
+  // };
+
+  // https.createServer(options, app).listen(PORT, () => {
+  //   console.log(`HTTPS server working on ${PORT}`);
+  // });
 })();
