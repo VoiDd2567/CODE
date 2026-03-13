@@ -1,14 +1,16 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router-dom";
 import PasswordInput from "../../components/PasswordInput/PasswordInput";
 import TeacherStudentChoose from "./TeacherStudentChoose";
 import LoginingPageLogo from "../../components/other/logginingPagesLogo";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 import "./registration.css";
 import client_config from "../../client_config.json"
 
 const Registration = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const { lng, setLng } = useContext(LanguageContext);
 
     const [redirectToLogin, setRedirectToLogin] = useState(false);
     const [redirectBack, setRedirectBack] = useState(false);
@@ -55,6 +57,24 @@ const Registration = () => {
         });
     };
 
+    const changeLng = () => {
+        let newLng = "est"
+        if (lng === newLng) {
+            newLng = "eng"
+        }
+
+        setLng(newLng);
+        i18n.changeLanguage(newLng);
+
+        fetch(`${client_config.SERVER_IP}/api/user/lng`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newLng }),
+        })
+    };
 
     if (redirectToCode) {
         return <Navigate to="/registration-code" replace />;
@@ -68,7 +88,7 @@ const Registration = () => {
         return <Navigate to="/" replace />;
     }
 
-    return (
+    return (<>
         <div className="registration-page">
             <LoginingPageLogo />
             <form className="registration-page__form">
@@ -90,6 +110,19 @@ const Registration = () => {
             </form >
             <div className="registration-page__back-button" onClick={() => setRedirectBack(true)}>{t("back")}</div>
         </div >
+        <div className="log-lng_switch">
+            <div className={`lng_switch-txt`}>EST</div>
+            <label className="lng_switch-switch">
+                <input
+                    type="checkbox"
+                    checked={lng === "eng"}
+                    onChange={changeLng}
+                />
+                <span></span>
+            </label>
+            <div className={`lng_switch-txt`}>ENG</div>
+        </div>
+    </>
     );
 };
 

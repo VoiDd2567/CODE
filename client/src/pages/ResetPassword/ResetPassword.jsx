@@ -1,9 +1,10 @@
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useContext } from "react"
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router-dom";
 import LogginingPageLogo from "../../components/other/logginingPagesLogo";
 import PasswordInput from "../../components/PasswordInput/PasswordInput";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 import "./resetPassword.css"
 import client_config from "../../client_config.json"
 
@@ -13,7 +14,8 @@ const ResetPassword = () => {
     const token = searchParams.get("token");
     const uid = searchParams.get("uid");
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const { lng, setLng } = useContext(LanguageContext);
     const errorMessage = useRef(null);
     const [reseted, setReseted] = useState(false)
     const [rightToken, setRightToken] = useState(false)
@@ -46,6 +48,25 @@ const ResetPassword = () => {
             console.error('ERROR with sending data', error);
         });
     }, [token, uid])
+
+    const changeLng = () => {
+        let newLng = "est"
+        if (lng === newLng) {
+            newLng = "eng"
+        }
+
+        setLng(newLng);
+        i18n.changeLanguage(newLng);
+
+        fetch(`${client_config.SERVER_IP}/api/user/lng`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newLng }),
+        })
+    };
 
     if (redirectBack) {
         return <Navigate to="/" replace />;
@@ -87,26 +108,40 @@ const ResetPassword = () => {
         });
     }
 
-    return (<div className="password_reset_page">
-        <LogginingPageLogo />
-        <div className="password_reset-page__form">
-            <label className="login-page__error" ref={errorMessage} hidden></label>
-            {rightToken ?
-                reseted ? (<div>
-                    <div className="info-label" style={{ "color": "green" }}>{t("password_changed")}</div>
-                </div>) :
-                    (<div className="password_reset-page__form-wrap">
-                        <div className="info-label">{t("enter_new_password")}</div>
-                        <PasswordInput password={password} pholder={t("password")} />
-                        <PasswordInput password={password_repeat} pholder={t("password_repeat")} />
-                        <button className="password_reset-page__form-btn" onClick={handleSend}>{t("send")}</button>
+    return (<>
+        <div className="password_reset_page">
+            <LogginingPageLogo />
+            <div className="password_reset-page__form">
+                <label className="login-page__error" ref={errorMessage} hidden></label>
+                {rightToken ?
+                    reseted ? (<div>
+                        <div className="info-label" style={{ "color": "green" }}>{t("password_changed")}</div>
                     </div>) :
-                (<div>
-                    <div className="info-label">{t("wrong_token")}</div>
-                </div>)}
+                        (<div className="password_reset-page__form-wrap">
+                            <div className="info-label">{t("enter_new_password")}</div>
+                            <PasswordInput password={password} pholder={t("password")} />
+                            <PasswordInput password={password_repeat} pholder={t("password_repeat")} />
+                            <button className="password_reset-page__form-btn" onClick={handleSend}>{t("send")}</button>
+                        </div>) :
+                    (<div>
+                        <div className="info-label">{t("wrong_token")}</div>
+                    </div>)}
+            </div>
+            <div className="registration-page__back-button" onClick={() => setRedirectBack(true)}>{t("back")}</div>
         </div>
-        <div className="registration-page__back-button" onClick={() => setRedirectBack(true)}>{t("back")}</div>
-    </div>)
+        <div className="log-lng_switch">
+            <div className={`lng_switch-txt`}>EST</div>
+            <label className="lng_switch-switch">
+                <input
+                    type="checkbox"
+                    checked={lng === "eng"}
+                    onChange={changeLng}
+                />
+                <span></span>
+            </label>
+            <div className={`lng_switch-txt`}>ENG</div>
+        </div>
+    </>)
 }
 
 export default ResetPassword

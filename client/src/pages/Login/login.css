@@ -108,3 +108,19 @@
     text-align: start;
     margin-left: 3vw;
 }
+
+.log-lng_switch {
+    position: fixed;
+    bottom: 2vh;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
+    color: #FFD369;
+    font-family: "Electrolize";
+    font-weight: bold;
+    font-size: 3vh;
+    left: 0;
+}

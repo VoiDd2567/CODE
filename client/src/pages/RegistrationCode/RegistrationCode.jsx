@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router-dom";
 import CodeInput from "./CodeInput"
@@ -6,11 +6,12 @@ import TimerToCodeEnd from "./TimerToCodeEnd";
 import NewCodeSend from "./NewCodeSend";
 import "./registrationCode.css"
 import logo from "../../pictures/logo.png";
-import { useEffect } from "react";
+import { LanguageContext } from "../../components/LanguageContext/LanguageContext";
 import client_config from "../../client_config.json"
 
 const RegistrationCode = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const { lng, setLng } = useContext(LanguageContext);
     const [redirectBack, setRedirectHome] = useState(false);
     const [redirectToMain, setRedirectToMain] = useState(false);
     const [codeEndTime, setCodeEndTime] = useState(null);
@@ -47,6 +48,25 @@ const RegistrationCode = () => {
     useEffect(() => {
         codeExpireTime();
     }, [])
+
+    const changeLng = () => {
+        let newLng = "est"
+        if (lng === newLng) {
+            newLng = "eng"
+        }
+
+        setLng(newLng);
+        i18n.changeLanguage(newLng);
+
+        fetch(`${client_config.SERVER_IP}/api/user/lng`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newLng }),
+        })
+    };
 
     const checkCode = (event) => {
         event.preventDefault();
@@ -101,7 +121,7 @@ const RegistrationCode = () => {
         sendBtn.current.hidden = true;
     }
 
-    return (
+    return (<>
         <div className="code-page">
             <div className="code-page__logo"><img src={logo} alt="Logo" /></div>
             <form className="code-page__form" onSubmit={checkCode}>
@@ -122,7 +142,19 @@ const RegistrationCode = () => {
             </form>
             <div className="registration-page__back-button" onClick={handleBack}>Back</div>
         </div>
-    )
+        <div className="log-lng_switch">
+            <div className={`lng_switch-txt`}>EST</div>
+            <label className="lng_switch-switch">
+                <input
+                    type="checkbox"
+                    checked={lng === "eng"}
+                    onChange={changeLng}
+                />
+                <span></span>
+            </label>
+            <div className={`lng_switch-txt`}>ENG</div>
+        </div>
+    </>)
 }
 
 
