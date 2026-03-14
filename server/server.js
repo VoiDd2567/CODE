@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const rateLimit = require("express-rate-limit");
-const https = require('https');
-const fs = require('fs');
+// const https = require('https');
+// const fs = require('fs');
 const expressSession = require("express-session");
 
 const mongoConnect = require("./database/mongo_connect");
@@ -18,12 +18,12 @@ const limiter = rateLimit({
 })
 
 const app = express();
-//app.use(cors({ origin: 'https://codeest.online', credentials: true }));
-app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
+app.use(cors({ origin: 'https://codeest.online', credentials: true }));
+//app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(limiter);
-//app.set('trust proxy', true); Set on for cloudflare
+app.set('trust proxy', 1);
 
 (async () => {
   await ensureRedis();
@@ -37,15 +37,15 @@ app.use(limiter);
   app.use("/api/code", require("./routes/code"));
 
   const PORT = 3001;
-  // app.listen(PORT, '127.0.0.1', () => {
-  //   console.log(`HTTP server listening on 127.0.0.1:${PORT}`);
-  // });
-  const options = {
-    key: fs.readFileSync('../server.key'),
-    cert: fs.readFileSync('../server.cert')
-  };
-
-  https.createServer(options, app).listen(PORT, () => {
-    console.log(`HTTPS server working on ${PORT}`);
+  app.listen(PORT, '127.0.0.1', () => {
+    console.log(`HTTP server listening on 127.0.0.1:${PORT}`);
   });
+  // const options = {
+  //   key: fs.readFileSync('../server.key'),
+  //   cert: fs.readFileSync('../server.cert')
+  // };
+
+  // https.createServer(options, app).listen(PORT, () => {
+  //   console.log(`HTTPS server working on ${PORT}`);
+  // });
 })();

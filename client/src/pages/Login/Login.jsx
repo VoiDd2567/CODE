@@ -36,7 +36,6 @@ const Login = () => {
                 const errorData = await res.json();
                 errorMessage.current.textContent = errorData.error || 'Error';
                 errorMessage.current.hidden = false;
-                throw new Error(`Error ${res.status}`);
             } else {
                 const data = await res.json();
                 i18n.changeLanguage(data["user"].defaultLng);

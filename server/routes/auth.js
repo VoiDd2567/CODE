@@ -50,7 +50,7 @@ router.post('/login', async (req, res) => {
 
 router.post("/registration", RegLimiter, async (req, res) => {
     try {
-        const { username, password, password_repeat, email, role, policy } = req.body;
+        const { username, password, password_repeat, email, role, policy, lng } = req.body;
         const sessionId = req.cookies.sessionId;
 
         const policyResult = RegistartionDataChecks.isPolicyAccepted(policy);
@@ -72,9 +72,6 @@ router.post("/registration", RegLimiter, async (req, res) => {
         if (!passwordValidResult.valid) return res.status(403).json({ error: passwordValidResult.message })
 
         const hashedPassword = await Hash.hash(password);
-
-        const session = await MongoGetData.getSession({ sessionId: sessionId });
-        const lng = session.lng;
 
         const checkCode = await MongoGetData.getRegistrationCode({ email: email })
         let codeId;

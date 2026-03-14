@@ -4,20 +4,26 @@ const CodeInput = ({ length = 6, onComplete, codeInput }) => {
     const [values, setValues] = useState(Array(length).fill(""));
     const inputsRef = useRef([]);
 
-    const handleChange = (e, idx) => {
-        const val = e.target.value.replace(/\D/g, "");
-        if (!val) return;
+    const applyDigits = (digits, startIdx) => {
+        if (!digits) return;
         const newValues = [...values];
-        newValues[idx] = val[0];
+        let i = startIdx;
+        for (let d = 0; d < digits.length && i < length; d += 1, i += 1) {
+            newValues[i] = digits[d];
+        }
         setValues(newValues);
 
-        if (idx < length - 1) {
-            inputsRef.current[idx + 1].focus();
-        }
+        const nextIdx = Math.min(startIdx + digits.length, length - 1);
+        inputsRef.current[nextIdx]?.focus();
 
         if (newValues.every(v => v !== "") && onComplete) {
             onComplete(newValues.join(""));
         }
+    };
+
+    const handleChange = (e, idx) => {
+        const val = e.target.value.replace(/\D/g, "");
+        applyDigits(val, idx);
     };
 
     const handleKeyDown = (e, idx) => {
@@ -53,6 +59,11 @@ const CodeInput = ({ length = 6, onComplete, codeInput }) => {
         }
     };
 
+    const handlePaste = (e, idx) => {
+        e.preventDefault();
+        const pasted = e.clipboardData.getData("Text").replace(/\D/g, "");
+        applyDigits(pasted, idx);
+    };
 
     return (
         <div ref={codeInput} className="code-page__input-wrap">
@@ -64,6 +75,7 @@ const CodeInput = ({ length = 6, onComplete, codeInput }) => {
                     maxLength={1}
                     onChange={e => handleChange(e, idx)}
                     onKeyDown={e => handleKeyDown(e, idx)}
+                    onPaste={e => handlePaste(e, idx)}
                     inputMode="numeric"
                     pattern="[0-9]*"
                 />

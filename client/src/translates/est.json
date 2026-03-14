@@ -122,5 +122,9 @@
   "file_value": "Faili sisu",
   "func_params": "Funktsiooni parameetrid (ühel real, komaga eraldatud)",
   "complete_sol": "Õige lahendus",
-  "description_expl": "Kirjelduses saate kirjutada HTML-koodi või lihtsalt tavalist teksti (või mõlemat).<br>Te ei saa kasutada style ega script silte.<br>Kui soovite kasutada stiili, peate selle kirjutama sildi sisse parameetrina."
+  "description_expl": "Kirjelduses saate kirjutada HTML-koodi või lihtsalt tavalist teksti (või mõlemat).<br>Te ei saa kasutada style ega script silte.<br>Kui soovite kasutada stiili, peate selle kirjutama sildi sisse parameetrina.",
+  "del_account": "Kustuta konto",
+  "del_account_q": "Kas oled kindel, et soovid oma konto jäädavalt kustutada?",
+  "enter_password": "Sisesta oma parool",
+  "waiting": "Ootamine..."
 }

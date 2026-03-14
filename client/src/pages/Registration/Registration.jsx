@@ -16,15 +16,16 @@ const Registration = () => {
     const [redirectBack, setRedirectBack] = useState(false);
     const [redirectToCode, setRedirectCode] = useState(false)
     const [role, setRole] = useState("student");
+    const [regText, setRegText] = useState(t("registrate"))
     const username = useRef(null);
     const password = useRef(null);
     const password_repeat = useRef(null);
     const email = useRef(null);
     const policy = useRef(null);
     const errorMessage = useRef(null);
-
     const fetchData = (event) => {
         event.preventDefault();
+        setRegText(t("waiting"));
 
         fetch(`${client_config.SERVER_IP}/api/auth/registration`, {
             method: 'POST',
@@ -38,20 +39,21 @@ const Registration = () => {
                 password_repeat: password_repeat.current.value,
                 email: email.current.value,
                 role,
-                policy: policy.current.checked
+                policy: policy.current.checked,
+                lng: lng
             }),
         }).then(async res => {
             if (!res.ok) {
                 const errorData = await res.json();
                 errorMessage.current.textContent = errorData.error || 'Error';
                 errorMessage.current.hidden = false;
-                throw new Error(`Error ${res.status}`);
             } else {
                 const data = await res.json();
                 if (data.message == "Success") {
                     setRedirectCode(true);
                 }
             }
+            setRegText(t("registrate"))
         }).catch(error => {
             console.error('ERROR with sending data', error);
         });
@@ -102,7 +104,7 @@ const Registration = () => {
                     <label htmlFor="acceptPolicy" className="registration-page__label terms-of-use-ask-label">{t("agreement_question")}<a href="https://docs.google.com/document/d/14fUs8iqHhFe-m_9bdYyN8Vhf-TCETn-tz-whVJkO90w/edit?usp=sharing"> {t("terms_of_use")}</a></label>
                     <input name="acceptPolicy" ref={policy} type="checkbox" className="registration-page__checkbox" required />
                 </div>
-                <button className="registration-page__send-form-btn" onClick={fetchData} >{t("registrate")}</button>
+                <button className="registration-page__send-form-btn" onClick={fetchData} >{regText}</button>
                 <div className="registration-page__registry">
                     <label className="registration-page__label">{t("account_exists_q")}</label>
                     <a className="registration-page__link" onClick={() => setRedirectToLogin(true)}>{t("login")}</a>

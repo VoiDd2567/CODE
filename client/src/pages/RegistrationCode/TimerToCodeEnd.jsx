@@ -24,6 +24,7 @@ const TimerToCodeEnd = ({ endDate, onTimeout }) => {
             }
         }, 1000);
         return () => clearInterval(timerId)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onTimeout])
 
     const formatTime = (num) => (num < 10 ? "0" + num : num);

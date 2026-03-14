@@ -1,8 +1,10 @@
 import { useState } from "react"
 import AskWindow from "../../../components/AskWindow/AskWindow"
 import client_config from "../../../client_config.json"
+import { useTranslation } from "react-i18next"
 
 const DeleteAccountWindow = ({ user }) => {
+    const { t } = useTranslation();
     const [password, setPassword] = useState("")
     const [message, setMessage] = useState("")
     const [messageColor, setMessageColor] = useState("black")
@@ -53,13 +55,13 @@ const DeleteAccountWindow = ({ user }) => {
     return (
         <div className="profile_page-window">
             <div className="profile_page-window-main">
-                <label className="profile_page-window-main-label">Password</label>
+                <label className="profile_page-window-main-label">{t("password")}</label>
                 <input
                     type="password"
                     className="profile_page-window-main-input"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder={t("enter_password")}
                 />
                 <div className="profile_page-window-reset_password">
                     <button
@@ -67,14 +69,14 @@ const DeleteAccountWindow = ({ user }) => {
                         style={{ backgroundColor: "#c03838", color: "white" }}
                         onClick={() => setIsAskOpen(true)}
                     >
-                        Delete account
+                        {t("del_account")}
                     </button>
                     <div className="profile_page-window-reset_password-message" style={{ color: messageColor }}>
                         {message}
                     </div>
                 </div>
                 <AskWindow
-                    question="Are you sure you want to permanently delete your account?"
+                    question={t("del_account_q")}
                     func={handleDelete}
                     open={isAskOpen}
                     setOpen={setIsAskOpen}
