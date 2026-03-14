@@ -13,6 +13,30 @@
     tab-size: 4;
 }
 
+.editor-input-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.editor__leading-dots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-top: 2vh;
+    text-align: left;
+    font-family: "Fira Code", monospace;
+    font-style: normal;
+    font-size: 1vw;
+    line-height: 2.2vh;
+    white-space: pre;
+    color: #6a6b6e;
+    pointer-events: none;
+    overflow: hidden;
+}
+
 .editor__string-numbers {
     width: 10%;
     height: 100%;

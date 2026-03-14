@@ -26,11 +26,33 @@ const Editor = ({
     const editorWrap = useRef(null);
     const editor = useRef(null);
     const numbersTa = useRef(null);
+    const leadingDots = useRef(null);
     const isSyncing = useRef(false);
     const [previousText, setPreviousText] = useState("");
     const previousTextRef = useRef("");
     const [dicon, setdIcon] = useState(python_icon);
     const saveTimer = useRef(null);
+    const [leadingSpaceDots, setLeadingSpaceDots] = useState("");
+    const TAB_SIZE = 4;
+
+    const buildLeadingSpaceDots = (text) => {
+        if (!text) return "";
+        return text.split("\n").map((line) => {
+            if (!line) return "";
+            let out = "";
+            for (let i = 0; i < line.length; i += 1) {
+                const ch = line[i];
+                if (ch === " ") {
+                    out += "·";
+                } else if (ch === "\t") {
+                    out += "·".repeat(TAB_SIZE);
+                } else {
+                    break;
+                }
+            }
+            return out;
+        }).join("\n");
+    };
 
     useEffect(() => {
         if (!editorWrap.current || !editor.current || !numbersTa.current) return;
@@ -52,6 +74,11 @@ const Editor = ({
         editor.current.style.backgroundColor = color;
         numbersTa.current.style.backgroundColor = color;
         editorWrap.current.style.backgroundColor = color;
+        if (leadingDots.current) {
+            leadingDots.current.style.fontSize = editor.current.style.fontSize;
+            leadingDots.current.style.paddingTop = editor.current.style.paddingTop;
+            leadingDots.current.style.lineHeight = editor.current.style.lineHeight;
+        }
 
         if (!fixedHeight) {
             editor.current.style.overflow = "hidden";
@@ -80,6 +107,7 @@ const Editor = ({
         editor.current.value = editorValue;
         previousTextRef.current = editorValue;
         setPreviousText(editorValue);
+        setLeadingSpaceDots(buildLeadingSpaceDots(editorValue));
         setNumbers(editorValue);
         if (!fixedHeight) {
             updateDynamicHeight();
@@ -116,7 +144,6 @@ const Editor = ({
             target.current.scrollTop = source.current.scrollTop;
         }
     };
-
 
     const getIndentation = (line) => {
         const match = line.match(/^(\s*)/);
@@ -187,6 +214,10 @@ const Editor = ({
         if (fixedHeight) {
             syncScroll(editor, numbersTa);
         }
+        if (leadingDots.current && editor.current) {
+            leadingDots.current.scrollTop = editor.current.scrollTop;
+            leadingDots.current.scrollLeft = editor.current.scrollLeft;
+        }
     };
 
     const handleScroll = () => {
@@ -194,6 +225,10 @@ const Editor = ({
 
         isSyncing.current = true;
         numbersTa.current.scrollTop = editor.current.scrollTop;
+        if (leadingDots.current) {
+            leadingDots.current.scrollTop = editor.current.scrollTop;
+            leadingDots.current.scrollLeft = editor.current.scrollLeft;
+        }
         requestAnimationFrame(() => {
             isSyncing.current = false;
         });
@@ -205,6 +240,7 @@ const Editor = ({
         const eValue = editor.current.value;
 
         setNumbers(eValue);
+        setLeadingSpaceDots(buildLeadingSpaceDots(eValue));
 
         if (!fixedHeight) {
             updateDynamicHeight();
@@ -248,16 +284,19 @@ const Editor = ({
             </div>)}
             <div ref={editorWrap} className="editor-wrap">
                 <textarea ref={numbersTa} className="editor__string-numbers" value={numbersTextareaValue} readOnly />
-                <textarea
-                    ref={editor}
-                    onScroll={handleScroll}
-                    onChange={handleChange}
-                    onKeyDown={(e) => textareaPress(e)}
-                    readOnly={!canBeChanged}
-                    type="text"
-                    className="editor"
-                    defaultValue={editorValue}
-                />
+                <div className="editor-input-wrap">
+                    <pre ref={leadingDots} className="editor__leading-dots">{leadingSpaceDots}</pre>
+                    <textarea
+                        ref={editor}
+                        onScroll={handleScroll}
+                        onChange={handleChange}
+                        onKeyDown={(e) => textareaPress(e)}
+                        readOnly={!canBeChanged}
+                        type="text"
+                        className="editor"
+                        defaultValue={editorValue}
+                    />
+                </div>
             </div>
         </div>
     )
