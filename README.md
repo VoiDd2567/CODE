@@ -28,6 +28,7 @@ On this platform you have two paths:
 You can create and solve Python exercises and run Python code. Node.js code can also be written and run, but you can't create exercises for Node.js.
 
 To register, you need an email.
+
 If you want to check exercises, but don't have a course then here is ID of a test course: 54735856
 
 If you have any questions about the project or anything else:
