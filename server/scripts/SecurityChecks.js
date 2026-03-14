@@ -3,42 +3,48 @@ const logger = require("./Logging");
 
 const getUsersAllowedExercises = async (user, byClass = false) => {
     try {
-        const userId = user._id
+        const userId = user._id.toString()
         const courses = await MongoGetData.getAllCourses()
+        const allowedCourses = courses.filter(course => course.accessedUsers.includes(userId))
 
-        const allowedExercises = []
-        const structuredAllowedExercises = {}
+        const allowedExercises = allowedCourses.flatMap(course =>
+            course.courseExercises.map(exerciseId => exerciseId.toString())
+        )
 
-        for (const course of courses) {
-            if (!course.accessedUsers.includes(userId)) continue;
+        if (!byClass) {
+            return allowedExercises;
+        }
 
-            allowedExercises.push(...course.courseExercises)
+        const courseEntries = await Promise.all(
+            allowedCourses.map(async (course) => {
+                const courseId = course._id.toString();
+                const exerciseEntries = await Promise.all(
+                    course.courseExercises.map(async (exerciseId) => {
+                        const exerciseIdStr = exerciseId.toString();
+                        const [exercise, solution] = await Promise.all([
+                            MongoGetData.getExercise({ _id: exerciseIdStr }),
+                            MongoGetData.getExerciseSolution({ userId: userId, exerciseId: exerciseIdStr })
+                        ])
 
-            if (byClass) {
-                const exerciseList = {}
-
-                for (const exerciseId of course.courseExercises) {
-                    const exercise = await MongoGetData.getExercise({ _id: exerciseId.toString() });
-                    const solution = await MongoGetData.getExerciseSolution({ userId: userId, exerciseId: exercise._id })
-
-                    let completeType = "r"
-                    if (solution) {
-                        const intSolPercent = parseInt(solution.answerCorrectPercent)
-                        if (intSolPercent >= parseInt(exercise.minimalPercent)) {
-                            completeType = "g"
-                        } else {
-                            if (intSolPercent > 0) {
+                        let completeType = "r"
+                        if (solution) {
+                            const intSolPercent = parseInt(solution.answerCorrectPercent)
+                            if (intSolPercent >= parseInt(exercise.minimalPercent)) {
+                                completeType = "g"
+                            } else if (intSolPercent > 0) {
                                 completeType = "y"
                             }
                         }
-                    }
-                    exerciseList[exerciseId.toString()] = [exercise.name, completeType];
-                }
-                structuredAllowedExercises[course.name] = exerciseList;
-            }
-        }
 
-        return byClass ? structuredAllowedExercises : allowedExercises;
+                        return [exerciseIdStr, { name: exercise.name, completeType }];
+                    })
+                )
+
+                return [courseId, { name: course.name, exercises: Object.fromEntries(exerciseEntries) }]
+            })
+        )
+
+        return Object.fromEntries(courseEntries);
     } catch (err) {
         logger.error("Problem with getting user courses: " + err)
         throw Error("Problem with getting user courses")

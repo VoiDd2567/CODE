@@ -251,7 +251,13 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved, onSaved
             <DescriprionBlock setDesc={(d) => addData("description", d)} startValue={data.description} />
             <div className="exercise_editor_page-form-select">
                 <div className="exercise_editor_page-form-section_name">{t("autocheck")}</div>
-                <input type="checkbox" className="exercise_editor_page-form-item-checkbox" onChange={() => { addData("autoCheck", !data.autoCheck) }} checked={data.autoCheck} />
+                <input
+                    type="checkbox"
+                    className="exercise_editor_page-form-item-checkbox"
+                    style={{ position: "relative", zIndex: 0 }}
+                    onChange={() => { addData("autoCheck", !data.autoCheck) }}
+                    checked={data.autoCheck}
+                />
             </div>
             {data.autoCheck && (
                 <>

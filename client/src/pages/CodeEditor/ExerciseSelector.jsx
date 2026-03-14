@@ -5,6 +5,7 @@ import complete from "../../pictures/complete-green.png"
 import question from "../../pictures/question.png"
 import incomplete from "../../pictures/incomplete.png"
 import client_config from "../../client_config.json"
+import { useEffect } from "react";
 
 const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExercises }) => {
     const { t } = useTranslation();
@@ -14,8 +15,18 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExe
     const successRef = useRef(null)
     const [selectedExerciseId, setSelectedExerciseId] = useState(null)
     const [expandedCourses, setExpandedCourses] = useState(
-        Object.fromEntries(Object.keys(exercises).map(courseName => [courseName, true]))
+        Object.fromEntries(Object.keys(exercises).map(courseId => [courseId, true]))
     );
+
+    useEffect(() => {
+        setExpandedCourses(prev => {
+            const next = {};
+            for (const courseId of Object.keys(exercises)) {
+                next[courseId] = prev[courseId] ?? true;
+            }
+            return next;
+        });
+    }, [exercises])
 
     const handleBackClick = () => {
         setExerciseChoose(false)
@@ -80,10 +91,10 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExe
         });
     }
 
-    const toggleCourse = (courseName) => {
+    const toggleCourse = (courseId) => {
         setExpandedCourses(prev => ({
             ...prev,
-            [courseName]: !prev[courseName]
+            [courseId]: !prev[courseId]
         }));
     };
 
@@ -92,22 +103,22 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExe
             <div className="exercise-selector">
                 <div className="exercise-selector__choose-label">{t("exercise_choose")}</div>
                 <div ref={exercisesList} className="exercise-selector__exercises-list">
-                    {Object.entries(exercises).map(([courseName, courseExercises]) => (
-                        <div key={courseName} className="exercise-selector__course-section">
-                            <div className="exercise-selector__course-header" onClick={() => toggleCourse(courseName)}>
+                    {Object.entries(exercises).map(([courseId, courseData]) => (
+                        <div key={courseId} className="exercise-selector__course-section">
+                            <div className="exercise-selector__course-header" onClick={() => toggleCourse(courseId)}>
                                 <span className="exercise-selector__course-arrow">
-                                    {expandedCourses[courseName] ? '▼' : '▶'}
+                                    {expandedCourses[courseId] ? '▼' : '▶'}
                                 </span>
-                                {courseName}
+                                {courseData.name}
                             </div>
-                            {expandedCourses[courseName] && (
+                            {expandedCourses[courseId] && (
                                 <div className="exercise-selector__course-exercises">
-                                    {Object.entries(courseExercises).map(([exerciseId, [exerciseName, completeType]]) => {
-                                        const img = completeType === "r" ? incomplete : completeType === "y" ? question : complete;
+                                    {Object.entries(courseData.exercises).map(([exerciseId, exerciseData]) => {
+                                        const img = exerciseData.completeType === "r" ? incomplete : exerciseData.completeType === "y" ? question : complete;
                                         return (
-                                            <div className="exercise-selector__exercise-wrap">
-                                                <div key={exerciseId} id={exerciseId} onClick={handleExerciseClick} className="exercise-selector__exercise" >
-                                                    {exerciseName}
+                                            <div key={`${courseId}-${exerciseId}`} className="exercise-selector__exercise-wrap">
+                                                <div id={exerciseId} onClick={handleExerciseClick} className="exercise-selector__exercise" >
+                                                    {exerciseData.name}
                                                 </div>
                                                 <div id={exerciseId} onClick={handleExerciseClick} className="exercise-selector__exercise-correct-status" >
                                                     <img src={img} alt="" />
@@ -144,3 +155,4 @@ const ExerciseSelector = ({ exercises, setExerciseChoose, getExercise, updateExe
 }
 
 export default ExerciseSelector;
+

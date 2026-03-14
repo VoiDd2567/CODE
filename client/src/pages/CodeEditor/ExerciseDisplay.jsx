@@ -64,11 +64,19 @@ const ExerciseDisplay = ({ name, setExerciseOpen, setEditorH, exerciseText, open
                 renderTextContent(textContent, parts, lastIndex);
             }
 
-            const linesCount = codeContent.split("\n").length;
+            const codeLines = codeContent.split("\n");
+            const linesCount = codeLines.length;
+            let maxLineLength = 0;
+            for (let i = 0; i < codeLines.length; i++) {
+                const lineLength = codeLines[i].length;
+                if (lineLength > maxLineLength) {
+                    maxLineLength = lineLength;
+                }
+            }
             parts.push(
                 <div key={`code-${start}`} className="exercise-code-block">
                     <Editor
-                        w={20}
+                        w={maxLineLength}
                         h={linesCount * 2.2 + 2}
                         canBeChanged={false}
                         editorValue={codeContent}
