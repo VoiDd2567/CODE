@@ -4,7 +4,6 @@ import "./editor.css"
 import python_icon from "../../pictures/py-icon.png"
 import js_icon from "../../pictures/js-icon.png"
 
-
 const Editor = ({
     w = null,
     h = null,
@@ -37,21 +36,42 @@ const Editor = ({
 
     const buildLeadingSpaceDots = (text) => {
         if (!text) return "";
-        return text.split("\n").map((line) => {
-            if (!line) return "";
-            let out = "";
+        const lines = text.split("\n");
+        const outLines = new Array(lines.length);
+
+        for (let li = 0; li < lines.length; li += 1) {
+            const line = lines[li];
+            if (!line) {
+                outLines[li] = "";
+                continue;
+            }
+
+            let columns = 0;
             for (let i = 0; i < line.length; i += 1) {
                 const ch = line[i];
                 if (ch === " ") {
-                    out += "·";
+                    columns += 1;
                 } else if (ch === "\t") {
-                    out += "·".repeat(TAB_SIZE);
+                    const nextTabStop = TAB_SIZE - (columns % TAB_SIZE);
+                    columns += nextTabStop;
                 } else {
                     break;
                 }
             }
-            return out;
-        }).join("\n");
+
+            if (columns === 0) {
+                outLines[li] = "";
+                continue;
+            }
+
+            const guideChars = new Array(columns);
+            for (let col = 0; col < columns; col += 1) {
+                guideChars[col] = col % TAB_SIZE === 0 ? "▏" : " ";
+            }
+            outLines[li] = guideChars.join("");
+        }
+
+        return outLines.join("\n");
     };
 
     useEffect(() => {
