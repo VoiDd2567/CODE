@@ -187,6 +187,27 @@
     min-height: 100vh;
     width: 40vw;
     font-family: "Electrolize";
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.exercise_editor-course_menu-wrap::-webkit-scrollbar {
+    background-color: transparent;
+    width: 1vh;
+}
+
+.exercise_editor-course_menu-wrap::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+}
+
+.exercise_editor-course_menu-wrap::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+.exercise_editor-course_menu-wrap::-webkit-scrollbar-thumb {
+    background-color: #494a4d;
+    border-radius: 1vw;
+    width: 0.5vh;
 }
 
 .course_menu {

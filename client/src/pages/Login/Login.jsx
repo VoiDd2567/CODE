@@ -39,6 +39,7 @@ const Login = () => {
             } else {
                 const data = await res.json();
                 i18n.changeLanguage(data["user"].defaultLng);
+                setLng(data["user"].defaultLng);
                 setRedirectBack(true);
             }
         }).catch(async error => {
@@ -68,7 +69,7 @@ const Login = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ newLng }),
+            body: JSON.stringify({ lng: newLng }),
         })
 
     };

@@ -291,25 +291,24 @@ const CourseEditor = forwardRef(({ setOpenExerciseEditor, setOpenedExerciseId, i
         updateCourseName(courseId, trimmed);
     }
 
-    const updateCourseName = (courseId, newName) => {
+    const updateCourseName = async (courseId, newName) => {
         setCourses(prevCourses => ({
             ...prevCourses,
             [courseId]: [newName, prevCourses[courseId][1]]
         }))
 
-        fetch(`${client_config.SERVER_IP}/api/exercise/update-course-name`, {
+        const res = await fetch(`${client_config.SERVER_IP}/api/exercise/update-course-name`, {
             method: 'POST',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ courseId: courseId, courseName: newName }),
-        }).then(async res => {
-            if (!res.ok) {
-                setError(res)
-            }
         })
-
+        if (!res.ok) {
+            setError(res)
+            return;
+        }
         getCourses();
     }
     return (
@@ -320,7 +319,7 @@ const CourseEditor = forwardRef(({ setOpenExerciseEditor, setOpenedExerciseId, i
                     <div className="course_menu-header">{t("your_courses")}</div>
                     <button className="course_menu-btn" onClick={handleAddCourse}><img src={plus} />{t("add_course")}</button>
                 </div>
-                <div className="course_menu-course_list">
+                <div className="course_menu-course_list" style={{ paddingBottom: "10vh" }}>
 
                     {(Object.keys(courses).length) ? (
                         Object.entries(order).map(([courseId, data]) => {

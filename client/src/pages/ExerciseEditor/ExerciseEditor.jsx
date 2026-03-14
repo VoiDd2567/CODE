@@ -25,6 +25,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved, onSaved
     const [data, setData] = useState({ ...deafultData })
     const [testCases, setTestCases] = useState([])
     const [notifications, setNotifications] = useState([])
+    const notifIdRef = useRef(0);
     const textareaRef = useRef(null);
 
 
@@ -50,10 +51,14 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved, onSaved
     };
 
     const addNotification = (message, type = "green") => {
+        const id = notifIdRef.current++;
         setNotifications(prev => [
             ...prev,
-            { message, type }
-        ])
+            { id, message, type }
+        ]);
+        setTimeout(() => {
+            setNotifications(prev => prev.filter(notif => notif.id !== id));
+        }, 10000);
     }
 
     const getExercise = (exerciseId) => {
@@ -145,7 +150,7 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved, onSaved
     }
 
     const removeNotif = (id) => {
-        setNotifications(prev => prev.filter((_, i) => i !== id))
+        setNotifications(prev => prev.filter(notif => notif.id !== id))
     }
 
     const addData = (key, value) => {
@@ -309,10 +314,10 @@ const ExerciseEditor = ({ exerciseId, setOpenExerciseEditor, setIsSaved, onSaved
             <div className="exercise_editor_page_bottom"></div>
         </div>
         <div className="exercise_editor_page-notifications">
-            {notifications.map((notif, id) => {
-                return (<div key={id} className={`exercise_editor_page-notification notification-${notif.type}`} >
+            {notifications.map((notif) => {
+                return (<div key={notif.id} className={`exercise_editor_page-notification notification-${notif.type}`} >
                     <div className="notification-text">{notif.message}</div>
-                    <div className="notification-delete"><img src={cross} alt="Close" onClick={() => removeNotif(id)} /></div>
+                    <div className="notification-delete"><img src={cross} alt="Close" onClick={() => removeNotif(notif.id)} /></div>
                 </div>)
             })}
         </div>

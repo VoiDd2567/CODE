@@ -74,7 +74,7 @@ const Registration = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ newLng }),
+            body: JSON.stringify({ lng: newLng }),
         })
     };
 
